@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>dot-world - 2Dドット絵ゲーム</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <div id="game-container">
+        <canvas id="game-canvas"></canvas>
+        <div id="ui-overlay">
+            <span id="controls-hint"></span>
+        </div>
+    </div>
+
+    <!-- 1. 基本定数 -->
+    <script src="js/constants.js"></script>
+
+    <!-- 2. データ定義 -->
+    <script src="js/data/magic.js"></script>
+    <script src="js/data/enemies.js"></script>
+    <script src="js/data/items.js"></script>
+
+    <!-- 3. 状態管理 -->
+    <script src="js/state/inventory.js"></script>
+    <script src="js/state/quest.js"></script>
+    <script src="js/state/player.js"></script>
+    <script src="js/state/party.js"></script>
+    <script src="js/state/checkpoint.js"></script>
+
+    <!-- 4. コアシステム -->
+    <script src="js/core/assets.js"></script>
+    <script src="js/core/effects.js"></script>
+
+    <!-- 5. 入力・描画 -->
+    <script src="js/systems/input.js"></script>
+    <script src="js/systems/draw.js"></script>
+    <script src="js/systems/camera.js"></script>
+
+    <!-- 6. UI -->
+    <script src="js/systems/message.js"></script>
+    <script src="js/systems/menu.js"></script>
+    <script src="js/systems/shop.js"></script>
+    <script src="js/systems/gameover.js"></script>
+
+    <!-- 7. マップ -->
+    <script src="js/systems/maps/chests.js"></script>
+    <script src="js/systems/maps/data.js"></script>
+    <script src="js/systems/maps/manager.js"></script>
+
+    <!-- 8. 戦闘 -->
+    <script src="js/systems/battle/actions.js"></script>
+    <script src="js/systems/battle/magic.js"></script>
+    <script src="js/systems/battle/items.js"></script>
+    <script src="js/systems/battle/render.js"></script>
+    <script src="js/systems/battle/core.js"></script>
+
+    <!-- 9. メインゲーム -->
+    <script src="js/main.js"></script>
+</body>
+
+</html>

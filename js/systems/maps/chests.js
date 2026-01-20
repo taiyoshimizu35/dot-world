@@ -1,0 +1,36 @@
+// ===========================================
+// 宝箱
+// ===========================================
+const Chests = {
+    list: [],
+    opened: new Set(),
+
+    init() {
+        this.list = [
+            { id: 'c1', map: 'village', x: 14, y: 12, item: '薬草', count: 2 },
+            { id: 'c2', map: 'village', x: 3, y: 13, item: 'ポーション', count: 1 },
+            { id: 'c3', map: 'house1', x: 7, y: 2, item: '薬草', count: 3 }
+        ];
+    },
+
+    forMap(m) { return this.list.filter(c => c.map === m); },
+    isOpen(id) { return this.opened.has(id); },
+    open(id) { this.opened.add(id); },
+
+    nearby(map, px, py) {
+        const TS = GameConfig.TILE_SIZE;
+        for (const c of this.forMap(map)) {
+            if (Math.abs(px - c.x * TS) < TS * 1.5 && Math.abs(py - c.y * TS) < TS * 1.5) return c;
+        }
+        return null;
+    },
+
+    render(ctx, map) {
+        const TS = GameConfig.TILE_SIZE;
+        for (const c of this.forMap(map)) {
+            const sp = Camera.toScreen(c.x * TS, c.y * TS);
+            const img = AssetLoader.get(this.isOpen(c.id) ? 'chest_open' : 'chest_closed');
+            if (img) ctx.drawImage(img, sp.x, sp.y, TS, TS);
+        }
+    }
+};
