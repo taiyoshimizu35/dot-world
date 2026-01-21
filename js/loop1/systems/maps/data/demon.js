@@ -7,8 +7,13 @@ function initDemonCastleMaps(Maps, T) {
     // 魔王城 - 入口
     const dc1t = createDungeonTiles(20, 18, T);
     // 道を端まで繋げる（y=1からy=16まで）
+    // 道を端まで繋げる（y=1からy=16まで）
     for (let y = 1; y <= 16; y++) dc1t[y][10] = T.PATH;
     for (let x = 4; x <= 16; x++) dc1t[9][x] = T.PATH;
+
+    // 北ボスからのワープ着地点(7, 12)からメイン通路への道
+    dc1t[12][7] = T.PATH; dc1t[12][8] = T.PATH; dc1t[12][9] = T.PATH;
+
     dc1t[17][10] = T.EXIT;
 
     Maps.data.demon_castle = {
