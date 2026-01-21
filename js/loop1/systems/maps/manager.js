@@ -35,8 +35,12 @@ const Maps = {
 
             // 仲間加入NPCのチェック
             if (npc.partyJoin) {
-                // 既に仲間になっている場合はスキップ
-                if (Party.members.find(m => m.id === npc.partyJoin)) continue;
+                const party = WorldState.managers.party;
+                // 仲間システム有効時のみチェック
+                if (party) {
+                    // 既に仲間になっている場合はスキップ
+                    if (party.members.find(m => m.id === npc.partyJoin)) continue;
+                }
                 // ボス撃破条件チェック
                 if (npc.requiresBoss && !QuestFlags.trueBosses[npc.requiresBoss]) continue;
                 return true;
@@ -68,8 +72,11 @@ const Maps = {
 
             // 仲間加入NPCのチェック
             if (npc.partyJoin) {
-                // 既に仲間になっている場合は非表示
-                if (Party.members.find(m => m.id === npc.partyJoin)) return false;
+                const party = WorldState.managers.party;
+                if (party) {
+                    // 既に仲間になっている場合は非表示
+                    if (party.members.find(m => m.id === npc.partyJoin)) return false;
+                }
                 // ボス撃破条件チェック
                 if (npc.requiresBoss && !QuestFlags.trueBosses[npc.requiresBoss]) return false;
             }
@@ -111,7 +118,8 @@ const Maps = {
                 // パーティサイズ条件チェック
                 const m = this.data[w.to];
                 if (m && m.requiresPartySize) {
-                    const partySize = Party.members.length;
+                    const party = WorldState.managers.party;
+                    const partySize = party ? party.members.length : 0;
                     if (partySize < m.requiresPartySize) {
                         Msg.show(`この先に進むには仲間が${m.requiresPartySize}人必要だ。\n現在: ${partySize}人`);
                         return null;

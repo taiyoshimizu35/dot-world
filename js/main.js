@@ -3,8 +3,7 @@
 // ===========================================
 
 // 週切り替えヘルパー関数
-function getBattle() { return WorldState.week === 2 ? Battle2 : Battle; }
-function getPlayer() { return WorldState.week === 2 ? PlayerStats2 : PlayerStats; }
+// WorldState.managersを使用するため削除
 class Game {
     constructor() {
         this.cvs = document.getElementById('game-canvas');
@@ -23,6 +22,10 @@ class Game {
         Input.init();
         Maps.init();
         Chests.init();
+
+        // Ensure managers are initialized (Week 1 default)
+        if (!WorldState.managers.player) WorldState.reset();
+
         const start = Maps.get().start;
         this.player.x = start.x * GameConfig.TILE_SIZE;
         this.player.y = start.y * GameConfig.TILE_SIZE;
@@ -47,9 +50,15 @@ class Game {
         }
         if (currentState === GameState.MENU) { Menu.update(); return; }
         if (currentState === GameState.SHOP) { Shop.update(); return; }
-        if (currentState === GameState.BATTLE) { getBattle().update(); return; }
+        if (currentState === GameState.BATTLE) {
+            const battle = WorldState.managers.battle;
+            if (battle) battle.update();
+            return;
+        }
+        if (currentState === GameState.GAMEOVER) { GameOverMenu.update(); return; }
         if (currentState === GameState.GAMEOVER) { GameOverMenu.update(); return; }
         if (currentState === GameState.ENDING) { if (Input.interact()) location.reload(); return; }
+        if (currentState === GameState.OPENING) { Opening.update(); return; }
 
         if (currentState === GameState.PLAYING) {
             if (Input.justPressed('KeyX') && !Menu.visible) Menu.open();
@@ -124,10 +133,13 @@ class Game {
         else if (m.isSouth && currentTile !== GameConfig.TILE_TYPES.PATH) encounterChance = 0.08;
 
         if (Math.random() < encounterChance) {
-            getBattle().playerRef = { x: this.player.x, y: this.player.y };
-            FX.flashRed(200);
-            Input.lock(500);
-            setTimeout(() => getBattle().start(Maps.current), 500);
+            const battle = WorldState.managers.battle;
+            if (battle) {
+                battle.playerRef = { x: this.player.x, y: this.player.y };
+                FX.flashRed(200);
+                Input.lock(500);
+                setTimeout(() => battle.start(Maps.current), 500);
+            }
         }
     }
 
@@ -171,18 +183,26 @@ class Game {
 
             // 仲間加入NPCの処理
             if (npc.partyJoin) {
-                // 既に仲間になっている場合は何もしない
-                if (Party.members.find(m => m.id === npc.partyJoin)) return;
-                // ボス撃破条件チェック
-                if (npc.requiresBoss && !QuestFlags.trueBosses[npc.requiresBoss]) {
-                    Msg.show('（何かを待っているようだ…）');
-                    return;
-                }
-                // 仲間加入
-                const memberData = PartyMemberData[npc.partyJoin];
-                if (memberData) {
-                    Party.add(npc.partyJoin);
-                    Msg.show(`${memberData.name}が仲間になった！\n「一緒に魔王を倒そう！」`);
+                const party = WorldState.managers.party;
+                // パーティシステムが有効かつ、未加入の場合
+                if (party) {
+                    // 既に仲間になっている場合は何もしない
+                    if (party.members.find(m => m.id === npc.partyJoin)) return;
+
+                    // ボス撃破条件チェック
+                    if (npc.requiresBoss && !QuestFlags.trueBosses[npc.requiresBoss]) {
+                        Msg.show('（何かを待っているようだ…）');
+                        return;
+                    }
+
+                    // 仲間加入 (Party2対応: PartyMemberDataはWeek 1用だが、Week 2ではParty.add内で解決されるべき。
+                    // しかし main.js は汎用。npc.partyJoin は ID ('alex' etc)
+                    if (party.add(npc.partyJoin)) {
+                        // 名前取得のため一時的にデータ参照（簡易対応）
+                        // 本来は party.add の戻り値や party から取得すべき
+                        const name = npc.partyJoin === 'alex' ? 'アレックス' : (npc.partyJoin === 'rose' ? 'ローズ' : 'ミリア');
+                        Msg.show(`${name}が仲間になった！\n「一緒に魔王を倒そう！」`);
+                    }
                 }
                 return;
             }
@@ -247,7 +267,10 @@ class Game {
                 }
                 // 新システム: 魔王
                 else if (npc.demonKing) {
-                    getBattle().startDemonKing(QuestFlags.canFaceTrueDemonKing);
+                    const battle = WorldState.managers.battle;
+                    if (battle && typeof battle.startDemonKing === 'function') {
+                        battle.startDemonKing(QuestFlags.canFaceTrueDemonKing);
+                    }
                 }
                 // 旧システム互換
                 else if (npc.boss) Battle.startBoss();
@@ -262,9 +285,15 @@ class Game {
         const chest = Chests.nearby(Maps.current, tx * TS, ty * TS);
         if (chest && !Chests.isOpen(chest.id)) {
             Chests.open(chest.id);
-            if (chest.item === '薬草') Inv.add('薬草', chest.count);
-            else if (chest.item === 'ポーション') Inv.add('ポーション', chest.count);
-            Msg.show(`${chest.item}を手に入れた！` + (chest.count > 1 ? ` x${chest.count}` : ''));
+            // アイテム追加（Invが存在する場合のみ）
+            const inv = WorldState.managers.inventory;
+            if (inv) {
+                if (chest.item === '薬草') inv.add('薬草', chest.count);
+                else if (chest.item === 'ポーション') inv.add('ポーション', chest.count);
+                Msg.show(`${chest.item}を手に入れた！` + (chest.count > 1 ? ` x${chest.count}` : ''));
+            } else {
+                Msg.show(`${chest.item}を見つけたが、今は持ち運べない。`);
+            }
         }
     }
 
@@ -324,13 +353,19 @@ class Game {
         if (currentState === GameState.DIALOG) Msg.render(this.ctx);
         if (currentState === GameState.MENU) Menu.render(this.ctx);
         if (currentState === GameState.SHOP) Shop.render(this.ctx);
-        if (currentState === GameState.BATTLE) getBattle().render(this.ctx);
+        if (currentState === GameState.BATTLE) {
+            const battle = WorldState.managers.battle;
+            if (battle) battle.render(this.ctx);
+        }
 
         if (currentState === GameState.TITLE) {
             Draw.rect(this.ctx, 0, 0, VW, VH, '#000');
             Draw.text(this.ctx, 'DOT WORLD', 80, 80, '#fff', 20);
             Draw.text(this.ctx, 'Press Enter', 90, 150, '#fff', 10);
-            if (Input.interact()) { currentState = GameState.PLAYING; FX.fadeIn(); }
+            if (Input.interact()) {
+                currentState = GameState.OPENING;
+                Opening.init();
+            }
         }
 
         if (currentState === GameState.GAMEOVER) GameOverMenu.render(this.ctx);
@@ -338,8 +373,14 @@ class Game {
             Draw.rect(this.ctx, 0, 0, VW, VH, 'rgba(255,255,255,0.9)');
             Draw.text(this.ctx, 'THE END', 90, 100, '#000', 20);
         }
+
+        if (currentState === GameState.OPENING) {
+            Opening.render(this.ctx);
+        }
     }
 }
+//    }
+//}
 
 const game = new Game();
 window.game = game;

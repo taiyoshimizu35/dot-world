@@ -20,7 +20,8 @@ function initDemonCastleMaps(Maps, T) {
         w: 20, h: 18, tiles: dc1t, isDungeon: true, encounterRate: 0.12, area: 'demon',
         npcs: [{ id: 'dc_sign', type: 'signpost', x: 10, y: 12, msg: '【魔王城】\nここが最後の戦いの場所…', blocking: true }],
         warps: [
-            { x: 10, y: 17, to: 'north_boss_room', tx: 8, ty: 3 },
+            { x: 10, y: 17, to: 'north_boss_room', tx: 8, ty: 3, week2Only: true },
+            { x: 10, y: 17, to: 'north_snowfield', tx: 7, ty: 2, week1Only: true },
             { x: 10, y: 2, to: 'demon_throne', tx: 8, ty: 11 }
         ],
         start: { x: 10, y: 15 }

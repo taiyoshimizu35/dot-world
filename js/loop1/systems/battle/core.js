@@ -231,6 +231,12 @@ const Battle = {
                 Input.lock(100);
                 // 2週目開始メッセージ
                 Msg.show('……目が覚めた。\n何もかもが…違って見える…\n\n【2週目開始】');
+
+                // [DEBUG] Managers Verification
+                console.log('Week2 Started. Managers:', WorldState.managers);
+                console.log('Player Coords:', window.game.player.x, window.game.player.y);
+                Camera.update(window.game.player.x, window.game.player.y, Maps.get().w, Maps.get().h);
+                console.log('Camera:', Camera.x, Camera.y);
             });
         });
     },

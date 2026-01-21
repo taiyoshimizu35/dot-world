@@ -28,7 +28,8 @@ const GameState = {
     GAMEOVER: 'gameover',
     SHOP: 'shop',
     ENDING: 'ending',
-    CUTSCENE: 'cutscene'  // ステータス吸収イベント用
+    CUTSCENE: 'cutscene',  // ステータス吸収イベント用
+    OPENING: 'opening'     // オープニングムービー
 };
 
 let currentState = GameState.TITLE;

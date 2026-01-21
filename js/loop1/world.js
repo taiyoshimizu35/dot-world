@@ -17,6 +17,14 @@ const WorldState = {
         weapon: false    // 武器の嘘（聖剣→魔剣）
     },
 
+    // マネージャーレジストリ（現在のアクティブなシステム）
+    managers: {
+        player: null,
+        party: null,
+        inventory: null,
+        battle: null
+    },
+
     // ヘルパーメソッド
     isWeek1() {
         return this.week === 1;
@@ -47,6 +55,16 @@ const WorldState = {
         this.truthFlags.command = true;
         this.truthFlags.map = true;
         this.truthFlags.weapon = true;
+
+        // マネージャー切り替え
+        this.managers.player = PlayerStats2;
+        this.managers.party = Party2;
+        this.managers.inventory = null; // 2週目はインベントリなし（または別途実装）
+        this.managers.battle = Battle2;
+
+        // システム初期化
+        if (this.managers.party) this.managers.party.init();
+        if (this.managers.player) this.managers.player.init();
     },
 
     // 初期化（ニューゲーム時）
@@ -61,6 +79,12 @@ const WorldState = {
             map: false,
             weapon: false
         };
+
+        // マネージャー初期化（1週目）
+        this.managers.player = PlayerStats;
+        this.managers.party = null; // 1週目は仲間なし
+        this.managers.inventory = Inv;
+        this.managers.battle = Battle;
     }
 };
 
