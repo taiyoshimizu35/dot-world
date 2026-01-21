@@ -58,6 +58,11 @@ function initMapData(Maps) {
             { id: 'guard', type: 'guard', x: 23, y: 9, msg: null, guard: true, blocking: true },
             { id: 'westGuard', type: 'guard', x: 1, y: 9, msg: null, westGuard: true, blocking: true },
             { id: 'sign1', type: 'signpost', x: 12, y: 7, msg: '【始まりの村】\n東西南北、全ての道はここに通ず', blocking: true },
+            // 魔王城案内人（1週目専用）
+            {
+                id: 'demon_guide', type: 'villager', x: 14, y: 11,
+                msg: null, demonGuide: true, blocking: true, week1Only: true
+            },
             // 2週目専用: アレックス（最初の仲間）
             {
                 id: 'alex_join', type: 'villager', img: 'ally_alex', x: 10, y: 11,
@@ -75,7 +80,9 @@ function initMapData(Maps) {
             { x: 12, y: 0, to: 'north_stage1', tx: 9, ty: 16, week2Only: true },
             { x: 12, y: 0, to: 'north_snowfield', tx: 7, ty: 12, week1Only: true },
             { x: 12, y: 17, to: 'south_stage1', tx: 9, ty: 1, week2Only: true },
-            { x: 12, y: 17, to: 'south_forest', tx: 7, ty: 1, week1Only: true }
+            { x: 12, y: 17, to: 'south_forest', tx: 7, ty: 1, week1Only: true },
+            // 1週目: 全嘘ボス撃破後に魔王城へ（村の中央）
+            { x: 14, y: 12, to: 'demon_castle', tx: 10, ty: 15, week1Only: true, requiresDemonCastle: true }
         ],
         start: { x: 12, y: 11 }
     };

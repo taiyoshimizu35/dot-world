@@ -197,6 +197,20 @@ class Game {
                     const isTrueBoss = npc.trueAreaBoss || false;
                     Battle.startAreaBoss(npc.areaBoss, isTrueBoss);
                 }
+                // 魔王城案内人（1週目）
+                else if (npc.demonGuide) {
+                    if (QuestFlags.allFakeBossesDefeated()) {
+                        Msg.show('「勇者よ！全てのボスを倒したな！\n私の後ろから魔王城へ行ける！」');
+                    } else {
+                        const defeated = [];
+                        const remaining = [];
+                        if (QuestFlags.fakeBosses.east) defeated.push('東'); else remaining.push('東');
+                        if (QuestFlags.fakeBosses.west) defeated.push('西'); else remaining.push('西');
+                        if (QuestFlags.fakeBosses.north) defeated.push('北'); else remaining.push('北');
+                        if (QuestFlags.fakeBosses.south) defeated.push('南'); else remaining.push('南');
+                        Msg.show(`「四方のボスを倒せば魔王城への道が開く。\n残り: ${remaining.join('・')}」`);
+                    }
+                }
                 // 新システム: 魔王
                 else if (npc.demonKing) {
                     Battle.startDemonKing(QuestFlags.canFaceTrueDemonKing);

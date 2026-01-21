@@ -19,47 +19,51 @@
     <!-- 1. 基本定数 -->
     <script src="js/constants.js"></script>
 
-    <!-- 2. データ定義 -->
-    <script src="js/data/magic.js"></script>
-    <script src="js/data/enemies.js"></script>
-    <script src="js/data/items.js"></script>
+    <!-- 2. 共通ユーティリティ -->
+    <script src="js/shared/utils.js"></script>
 
-    <!-- 3. 状態管理 -->
-    <script src="js/state/world.js"></script>
-    <script src="js/state/inventory.js"></script>
-    <script src="js/state/quest.js"></script>
-    <script src="js/state/player.js"></script>
-    <script src="js/state/party.js"></script>
-    <script src="js/state/checkpoint.js"></script>
-
-    <!-- 4. コアシステム -->
+    <!-- 3. コアシステム（周回非依存） -->
     <script src="js/core/assets.js"></script>
     <script src="js/core/effects.js"></script>
+    <script src="js/core/input.js"></script>
+    <script src="js/core/draw.js"></script>
+    <script src="js/core/camera.js"></script>
+    <script src="js/core/message.js"></script>
 
-    <!-- 5. 入力・描画 -->
-    <script src="js/systems/input.js"></script>
-    <script src="js/systems/draw.js"></script>
-    <script src="js/systems/camera.js"></script>
+    <!-- ========================================= -->
+    <!-- 4. 1週目専用（loop1） -->
+    <!-- ========================================= -->
 
-    <!-- 6. UI -->
-    <script src="js/systems/message.js"></script>
-    <script src="js/systems/menu.js"></script>
-    <script src="js/systems/shop.js"></script>
-    <script src="js/systems/gameover.js"></script>
+    <!-- 4.1 データ定義 -->
+    <script src="js/loop1/data/magic.js"></script>
+    <script src="js/loop1/data/enemies.js"></script>
+    <script src="js/loop1/data/items.js"></script>
 
-    <!-- 7. マップ -->
-    <script src="js/systems/maps/chests.js"></script>
-    <script src="js/systems/maps/data.js"></script>
-    <script src="js/systems/maps/manager.js"></script>
+    <!-- 4.2 状態管理 -->
+    <script src="js/loop1/world.js"></script>
+    <script src="js/loop1/inventory.js"></script>
+    <script src="js/loop1/quest.js"></script>
+    <script src="js/loop1/player.js"></script>
+    <script src="js/loop1/checkpoint.js"></script>
 
-    <!-- 8. 戦闘 -->
-    <script src="js/systems/battle/actions.js"></script>
-    <script src="js/systems/battle/magic.js"></script>
-    <script src="js/systems/battle/items.js"></script>
-    <script src="js/systems/battle/render.js"></script>
-    <script src="js/systems/battle/core.js"></script>
+    <!-- 4.3 UI -->
+    <script src="js/loop1/systems/menu.js"></script>
+    <script src="js/loop1/systems/shop.js"></script>
+    <script src="js/loop1/systems/gameover.js"></script>
 
-    <!-- 9. メインゲーム -->
+    <!-- 4.4 マップ -->
+    <script src="js/loop1/systems/maps/chests.js"></script>
+    <script src="js/loop1/systems/maps/data.js"></script>
+    <script src="js/loop1/systems/maps/manager.js"></script>
+
+    <!-- 4.5 戦闘 -->
+    <script src="js/loop1/systems/battle/actions.js"></script>
+    <script src="js/loop1/systems/battle/magic.js"></script>
+    <script src="js/loop1/systems/battle/items.js"></script>
+    <script src="js/loop1/systems/battle/render.js"></script>
+    <script src="js/loop1/systems/battle/core.js"></script>
+
+    <!-- 5. メインゲーム -->
     <script src="js/main.js"></script>
 </body>
 
