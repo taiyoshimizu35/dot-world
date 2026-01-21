@@ -2,8 +2,8 @@
 // 描画ユーティリティ
 // ===========================================
 const Draw = {
-    text(ctx, t, x, y, c = '#fff', s = 12) {
-        ctx.fillStyle = c; ctx.font = `${s}px monospace`; ctx.textBaseline = 'top';
+    text(ctx, t, x, y, c = '#fff', s = 12, align = 'left') {
+        ctx.fillStyle = c; ctx.font = `${s}px monospace`; ctx.textBaseline = 'middle'; ctx.textAlign = align;
         ctx.fillText(t, Math.floor(x), Math.floor(y));
     },
     rect(ctx, x, y, w, h, c) { ctx.fillStyle = c; ctx.fillRect(Math.floor(x), Math.floor(y), Math.floor(w), Math.floor(h)); },

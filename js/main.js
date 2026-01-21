@@ -8,13 +8,43 @@ class Game {
     constructor() {
         this.cvs = document.getElementById('game-canvas');
         this.ctx = this.cvs.getContext('2d');
-        this.cvs.width = GameConfig.VIEWPORT_WIDTH * GameConfig.SCALE;
-        this.cvs.height = GameConfig.VIEWPORT_HEIGHT * GameConfig.SCALE;
-        this.ctx.scale(GameConfig.SCALE, GameConfig.SCALE);
-        this.ctx.imageSmoothingEnabled = false;
+        this.baseWidth = GameConfig.VIEWPORT_WIDTH;
+        this.baseHeight = GameConfig.VIEWPORT_HEIGHT;
+        this.currentScale = GameConfig.SCALE;
+
+        // 初期リサイズ
+        this.resize();
 
         this.player = { x: 0, y: 0, dir: 0, moving: false, anim: 0 };
         this.lastTime = 0;
+    }
+
+    resize() {
+        // 画面サイズから最適なスケールを計算
+        const padding = 60; // 余白
+        const availW = window.innerWidth - padding;
+        const availH = window.innerHeight - padding;
+
+        // アスペクト比を維持しながら最大サイズを計算
+        const scaleX = availW / this.baseWidth;
+        const scaleY = availH / this.baseHeight;
+
+        // 整数倍にスナップ（ドット絵ゲームなので）、最低1
+        let optimalScale = Math.floor(Math.min(scaleX, scaleY));
+        if (optimalScale < 1) optimalScale = 1;
+
+        // スケール更新
+        this.currentScale = optimalScale;
+        GameConfig.SCALE = optimalScale;
+
+        // キャンバスサイズ更新
+        this.cvs.width = this.baseWidth * this.currentScale;
+        this.cvs.height = this.baseHeight * this.currentScale;
+
+        // コンテキスト設定をリセット
+        this.ctx.setTransform(1, 0, 0, 1, 0, 0); // リセット
+        this.ctx.scale(this.currentScale, this.currentScale);
+        this.ctx.imageSmoothingEnabled = false;
     }
 
     async init() {
@@ -30,6 +60,10 @@ class Game {
         this.player.x = start.x * GameConfig.TILE_SIZE;
         this.player.y = start.y * GameConfig.TILE_SIZE;
         this.player.dir = 0;
+
+        // ウィンドウリサイズ時の処理
+        window.addEventListener('resize', () => this.resize());
+
         requestAnimationFrame(t => this.loop(t));
     }
 
@@ -59,6 +93,7 @@ class Game {
         if (currentState === GameState.GAMEOVER) { GameOverMenu.update(); return; }
         if (currentState === GameState.ENDING) { if (Input.interact()) location.reload(); return; }
         if (currentState === GameState.OPENING) { Opening.update(); return; }
+        if (currentState === GameState.LOOP1_ENDING) { Loop1Ending.update(); return; }
 
         if (currentState === GameState.PLAYING) {
             if (Input.justPressed('KeyX') && !Menu.visible) Menu.open();
@@ -376,6 +411,10 @@ class Game {
 
         if (currentState === GameState.OPENING) {
             Opening.render(this.ctx);
+        }
+
+        if (currentState === GameState.LOOP1_ENDING) {
+            Loop1Ending.render(this.ctx);
         }
     }
 }

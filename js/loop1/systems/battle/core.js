@@ -179,15 +179,15 @@ const Battle = {
     },
 
     handleFakeDemonKingEnd() {
-        // WEAPON_DECEPTION: 嘘魔王戦敗北 - ステータス吸収イベント
+        // WEAPON_DECEPTION: 嘘魔王戦敗北 - 1週目エンディングムービー開始
         this.active = false;
         this.isDemonKing = false;
         this.isTrueBoss = false;
         this.currentArea = null;
 
-        // ステータス吸収演出フェーズへ
-        currentState = GameState.CUTSCENE;
-        this.startAbsorptionEvent();
+        // 1週目エンディングムービー開始
+        currentState = GameState.LOOP1_ENDING;
+        Loop1Ending.init();
     },
 
     startAbsorptionEvent() {

@@ -3,10 +3,10 @@
 // ===========================================
 const GameConfig = {
     TILE_SIZE: 16,
-    VIEWPORT_WIDTH: 400,
-    VIEWPORT_HEIGHT: 400,
+    VIEWPORT_WIDTH: 300,
+    VIEWPORT_HEIGHT: 300,
     SCALE: 2,
-    PLAYER_SPEED: 2,
+    PLAYER_SPEED: 1.5,
     ENCOUNTER_RATE: 0.015,
 
     TILE_TYPES: {
@@ -29,7 +29,8 @@ const GameState = {
     SHOP: 'shop',
     ENDING: 'ending',
     CUTSCENE: 'cutscene',  // ステータス吸収イベント用
-    OPENING: 'opening'     // オープニングムービー
+    OPENING: 'opening',    // オープニングムービー
+    LOOP1_ENDING: 'loop1_ending'  // 1週目エンディングムービー
 };
 
 let currentState = GameState.TITLE;
