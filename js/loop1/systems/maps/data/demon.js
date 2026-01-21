@@ -9,23 +9,21 @@ function initDemonCastleMaps(Maps, T) {
     // 道を端まで繋げる（y=1からy=16まで）
     for (let y = 1; y <= 16; y++) dc1t[y][10] = T.PATH;
     for (let x = 4; x <= 16; x++) dc1t[9][x] = T.PATH;
-    for (let x = 7; x <= 13; x++) for (let y = 5; y <= 7; y++) dc1t[y][x] = T.FLOOR;
-    dc1t[16][10] = T.EXIT;
+    dc1t[17][10] = T.EXIT;
 
     Maps.data.demon_castle = {
         w: 20, h: 18, tiles: dc1t, isDungeon: true, encounterRate: 0.12, area: 'demon',
         npcs: [{ id: 'dc_sign', type: 'signpost', x: 10, y: 12, msg: '【魔王城】\nここが最後の戦いの場所…', blocking: true }],
         warps: [
-            { x: 10, y: 16, to: 'north_boss_room', tx: 8, ty: 3 },
-            { x: 10, y: 2, to: 'demon_throne', tx: 7, ty: 12 }
+            { x: 10, y: 17, to: 'north_boss_room', tx: 8, ty: 3 },
+            { x: 10, y: 2, to: 'demon_throne', tx: 8, ty: 11 }
         ],
         start: { x: 10, y: 15 }
     };
 
     // 魔王城 - 玉座の間
     const dc2t = createDungeonTiles(16, 14, T);
-    for (let y = 2; y <= 11; y++) dc2t[y][8] = T.PATH;
-    for (let x = 5; x <= 11; x++) for (let y = 3; y <= 5; y++) dc2t[y][x] = T.FLOOR;
+    for (let y = 1; y <= 11; y++) dc2t[y][8] = T.PATH;
     dc2t[12][8] = T.EXIT;
 
     Maps.data.demon_throne = {

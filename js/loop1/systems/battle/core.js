@@ -217,10 +217,12 @@ const Battle = {
             // 村に戻る
             Maps.current = 'village';
             const start = Maps.get().start;
-            game.player.x = start.x * GameConfig.TILE_SIZE;
-            game.player.y = start.y * GameConfig.TILE_SIZE;
-            game.player.dir = 0;
-            game.player.moving = false;
+            if (window.game) {
+                window.game.player.x = start.x * GameConfig.TILE_SIZE;
+                window.game.player.y = start.y * GameConfig.TILE_SIZE;
+                window.game.player.dir = 0;
+                window.game.player.moving = false;
+            }
 
             // ゲーム状態をリセット
             currentState = GameState.FADE;
