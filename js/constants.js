@@ -3,8 +3,8 @@
 // ===========================================
 const GameConfig = {
     TILE_SIZE: 16,
-    VIEWPORT_WIDTH: 256,
-    VIEWPORT_HEIGHT: 224,
+    VIEWPORT_WIDTH: 400,
+    VIEWPORT_HEIGHT: 400,
     SCALE: 2,
     PLAYER_SPEED: 2,
     ENCOUNTER_RATE: 0.015,

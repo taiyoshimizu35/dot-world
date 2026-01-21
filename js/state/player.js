@@ -1,22 +1,7 @@
 // ===========================================
 // プレイヤーステータス
 // ===========================================
-
-// ゲームループ管理（1週目/2週目）
-const gameLoop = {
-    week: 1,              // 1 or 2
-    absorbedStats: null,  // 吸収されたステータス（2週目魔王強化用）
-    holySwordOwned: false,  // 聖剣所持
-    holySwordStolen: false  // 聖剣が魔剣として奪われた
-};
-
-// 真実フラグ - falseの間、各種偽装が有効
-const truthFlags = {
-    status: false,   // ステータスの嘘（Lv×3下駄）
-    command: false,  // コマンドの嘘（防御=挑発、属性ずらし）
-    map: false,      // マップの嘘（1本道、高経験値）
-    weapon: false    // 武器の嘘（聖剣→魔剣）
-};
+// ※ gameLoop, truthFlagsはworld.jsで定義
 
 const PlayerStats = {
     name: '勇者',
@@ -86,7 +71,18 @@ const PlayerStats = {
         return this.mp >= amount;
     },
 
-    addExp(amount) { this.exp += amount; if (this.exp >= this.nextExp) { this.levelUp(); return true; } return false; },
+    addExp(amount) {
+        // 2週目はレベルアップなし
+        if (gameLoop.week === 2) {
+            this.gold += Math.floor(amount / 10); // 経験値をゴールドに変換
+            return false;
+        }
+        // 1週目は通常のレベルアップ
+        this.exp += amount;
+        if (this.exp >= this.nextExp) { this.levelUp(); return true; }
+        return false;
+    },
+
     addGold(amount) { this.gold += amount; },
     spendGold(amount) { if (this.gold >= amount) { this.gold -= amount; return true; } return false; },
 
@@ -138,16 +134,8 @@ const PlayerStats = {
 
     // 2週目開始時のリセット（ステータス吸収後）
     resetForWeek2() {
-        // 現在のステータスを保存（魔王強化用）
-        gameLoop.absorbedStats = {
-            level: this.level,
-            hp: this.maxHp,
-            mp: this.maxMp,
-            atk: this.atk,
-            def: this.def,
-            matk: this.matk,
-            mdef: this.mdef
-        };
+        // WorldStateに2週目移行を通知（ステータス吸収含む）
+        WorldState.startWeek2(this);
 
         // 初期状態にリセット
         this.level = 1;
@@ -161,14 +149,5 @@ const PlayerStats = {
         this.status = { poisonVal: 0, silence: 0, atkDownVal: 0, defDownVal: 0 };
         this.spells = { fire: false, heal: false, water: false, wind: false };
         this.magicBoost = 1.0;
-
-        // 2週目フラグ
-        gameLoop.week = 2;
-
-        // 真実フラグを全て有効に
-        truthFlags.status = true;
-        truthFlags.command = true;
-        truthFlags.map = true;
-        truthFlags.weapon = true;
     }
 };
