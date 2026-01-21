@@ -1,6 +1,10 @@
 // ===========================================
 // メインゲームクラス
 // ===========================================
+
+// 週切り替えヘルパー関数
+function getBattle() { return WorldState.week === 2 ? Battle2 : Battle; }
+function getPlayer() { return WorldState.week === 2 ? PlayerStats2 : PlayerStats; }
 class Game {
     constructor() {
         this.cvs = document.getElementById('game-canvas');
@@ -43,7 +47,7 @@ class Game {
         }
         if (currentState === GameState.MENU) { Menu.update(); return; }
         if (currentState === GameState.SHOP) { Shop.update(); return; }
-        if (currentState === GameState.BATTLE) { Battle.update(); return; }
+        if (currentState === GameState.BATTLE) { getBattle().update(); return; }
         if (currentState === GameState.GAMEOVER) { GameOverMenu.update(); return; }
         if (currentState === GameState.ENDING) { if (Input.interact()) location.reload(); return; }
 
@@ -120,10 +124,10 @@ class Game {
         else if (m.isSouth && currentTile !== GameConfig.TILE_TYPES.PATH) encounterChance = 0.08;
 
         if (Math.random() < encounterChance) {
-            Battle.playerRef = { x: this.player.x, y: this.player.y };
+            getBattle().playerRef = { x: this.player.x, y: this.player.y };
             FX.flashRed(200);
             Input.lock(500);
-            setTimeout(() => Battle.start(Maps.current), 500);
+            setTimeout(() => getBattle().start(Maps.current), 500);
         }
     }
 
@@ -211,9 +215,39 @@ class Game {
                         Msg.show(`「四方のボスを倒せば魔王城への道が開く。\n残り: ${remaining.join('・')}」`);
                     }
                 }
+                // 2週目専用: クエストNPC
+                else if (npc.questGiver && WorldState.week === 2) {
+                    const quests = QuestSystem2.getAvailableQuests();
+                    let claimable = quests.filter(q => q.progress.isComplete && !q.progress.isClaimed);
+                    if (claimable.length > 0) {
+                        const result = QuestSystem2.claimReward(claimable[0].id);
+                        Msg.show(result.msg);
+                    } else {
+                        const active = quests.filter(q => !q.progress.isClaimed);
+                        if (active.length > 0) {
+                            const q = active[0];
+                            Msg.show(`【${q.name}】\n${q.desc}\n進捗: ${q.progress.current}/${q.required}`);
+                        } else {
+                            Msg.show('「全てのクエストを達成した！\nお疲れ様！」');
+                        }
+                    }
+                }
+                // 2週目専用: 武器店NPC
+                else if (npc.weaponShop && WorldState.week === 2) {
+                    const weapons = WeaponShop.getAvailableWeapons();
+                    const affordable = weapons.filter(w => w.canBuy && (!PlayerStats2.weapon || w.atk > PlayerStats2.weapon.atk));
+                    if (affordable.length > 0) {
+                        const weapon = affordable[0];
+                        const result = WeaponShop.buy(weapon.id);
+                        Msg.show(result.msg);
+                    } else {
+                        const current = PlayerStats2.weapon ? PlayerStats2.weapon.name : '素手';
+                        Msg.show(`「現在の装備: ${current}\nもっとゴールドを貯めてから来い！」`);
+                    }
+                }
                 // 新システム: 魔王
                 else if (npc.demonKing) {
-                    Battle.startDemonKing(QuestFlags.canFaceTrueDemonKing);
+                    getBattle().startDemonKing(QuestFlags.canFaceTrueDemonKing);
                 }
                 // 旧システム互換
                 else if (npc.boss) Battle.startBoss();
@@ -290,7 +324,7 @@ class Game {
         if (currentState === GameState.DIALOG) Msg.render(this.ctx);
         if (currentState === GameState.MENU) Menu.render(this.ctx);
         if (currentState === GameState.SHOP) Shop.render(this.ctx);
-        if (currentState === GameState.BATTLE) Battle.render(this.ctx);
+        if (currentState === GameState.BATTLE) getBattle().render(this.ctx);
 
         if (currentState === GameState.TITLE) {
             Draw.rect(this.ctx, 0, 0, VW, VH, '#000');
@@ -308,4 +342,5 @@ class Game {
 }
 
 const game = new Game();
+window.game = game;
 window.onload = () => game.init();

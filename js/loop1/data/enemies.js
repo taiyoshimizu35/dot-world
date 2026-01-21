@@ -4,7 +4,7 @@
 const EnemyData = {
     // ===== 村エリア =====
     slime: { name: 'グリーンスライム', hp: 12, atk: 4, def: 2, exp: 10, gold: 5, img: 'enemy_slime' },
-    goblin: { name: 'ゴブリン', hp: 18, atk: 6, def: 3, exp: 20, gold: 12, img: 'enemy_goblin' },
+    goblin: { name: 'ゴブリン', hp: 1, atk: 6, def: 3, exp: 10000, gold: 12, img: 'enemy_goblin' },
     bat: { name: 'ダークバット', hp: 10, atk: 5, def: 2, exp: 10, gold: 4, img: 'enemy_bat' },
 
     // ===== 東エリア =====

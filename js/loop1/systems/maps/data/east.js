@@ -1,72 +1,87 @@
-import { S, M, createField, createDungeon } from './helpers.js';
+// ===========================================
+// 東エリアマップデータ
+// ===========================================
 
-export function initEastArea(Maps, T) {
-    // --- 1週目: ボス直行 ---
-    const et1 = createDungeon(T);
-    for (let x = 1; x < S - 1; x++) et1[M][x] = T.PATH;
-    et1[M][1] = T.EXIT;
+// 1週目：ボス直行マップ
+function initEastWeek1(Maps, T) {
+    const { createDungeonTiles } = MapHelper;
+    const dw = 14, dh = 14;
+    const dt = createDungeonTiles(dw, dh, T);
+    for (let x = 1; x <= 12; x++) dt[6][x] = T.PATH;
+    dt[6][1] = T.EXIT;
 
     Maps.data.dungeon = {
-        w: S, h: S, tiles: et1, area: 'east', week1Map: true,
-        npcs: [{ id: 'eastBoss', type: 'enemy_slime', img: 'dragon_map', x: 11, y: M, areaBoss: 'east', blocking: true }],
-        warps: [{ x: 1, y: M, to: 'village', tx: 23, ty: 9 }],
-        start: { x: 2, y: M }
+        w: dw, h: dh, tiles: dt, isDungeon: true, encounterRate: 0.15, area: 'east', week1Map: true,
+        npcs: [{ id: 'eastBoss', type: 'enemy_slime', img: 'dragon_map', x: 10, y: 6, msg: null, areaBoss: 'east', blocking: true }],
+        warps: [{ x: 1, y: 6, to: 'village', tx: 22 , ty: 9 }],
+        start: { x: 2, y: 6 }
     };
+}
 
-    // --- 2週目: ステージ1 (森の入口) ---
-    const e1 = createField(T);
-    for (let x = 1; x < S - 1; x++) e1[M][x] = T.PATH;
-    e1[M][1] = T.EXIT;
+// 2週目：ステージ1-3 + ボス部屋
+function initEastWeek2(Maps, T) {
+    const { createFieldTiles, createDungeonTiles } = MapHelper;
 
+    // ステージ1
+    const e1t = createFieldTiles(20, 16, T);
+    for (let x = 2; x <= 17; x++) e1t[8][x] = T.PATH;
+    for (let y = 4; y <= 8; y++) e1t[y][6] = T.PATH;
+    for (let y = 8; y <= 12; y++) e1t[y][14] = T.PATH;
+    e1t[6][10] = T.ROCK; e1t[7][10] = T.ROCK;
+    e1t[9][10] = T.ROCK; e1t[10][10] = T.ROCK;
+    e1t[8][1] = T.EXIT;
     Maps.data.east_stage1 = {
-        w: S, h: S, tiles: e1, area: 'east', week2Map: true,
-        npcs: [{ id: 'e1_sign', type: 'signpost', x: 4, y: M - 1, msg: '【炎の森 入口】', blocking: true }],
+        w: 20, h: 16, tiles: e1t, encounterRate: 0.10, area: 'east', week2Map: true,
+        npcs: [{ id: 'e1_sign', type: 'signpost', x: 4, y: 8, msg: '【緑深き森】\n東へ進めば先に続く', blocking: true }],
         warps: [
-            { x: 1, y: M, to: 'village', tx: 23, ty: 9 },
-            { x: 13, y: M, to: 'east_stage2', tx: 1, ty: M }
+            { x: 1, y: 8, to: 'village', tx: 23, ty: 9 },
+            { x: 18, y: 8, to: 'east_stage2', tx: 2, ty: 8 }
         ],
-        start: { x: 2, y: M }
+        start: { x: 2, y: 8 }
     };
 
-    // --- 2週目: ステージ2 (迷いの小道) ---
-    const e2 = createField(T);
-    for (let x = 1; x < S - 1; x++) e2[M][x] = T.PATH;
-    for (let y = 3; y < 12; y++) e2[y][M + 3] = T.PATH; // 分岐
-    e2[M][1] = T.EXIT;
-
+    // ステージ2
+    const e2t = createFieldTiles(24, 20, T);
+    for (let x = 2; x <= 6; x++) e2t[8][x] = T.PATH;
+    for (let y = 8; y <= 14; y++) e2t[y][6] = T.PATH;
+    for (let x = 6; x <= 18; x++) e2t[14][x] = T.PATH;
+    for (let y = 8; y <= 14; y++) e2t[y][18] = T.PATH;
+    for (let x = 18; x <= 22; x++) e2t[8][x] = T.PATH;
+    e2t[8][1] = T.EXIT;
     Maps.data.east_stage2 = {
-        w: S, h: S, tiles: e2, area: 'east', week2Map: true,
-        npcs: [{ id: 'e2_sign', type: 'signpost', x: M + 3, y: 12, msg: '迷ったら中心へ戻れ', blocking: true }],
+        w: 24, h: 20, tiles: e2t, encounterRate: 0.12, area: 'east', week2Map: true,
+        npcs: [{ id: 'e2_sign', type: 'signpost', x: 12, y: 14, msg: '迷ったら引き返せ', blocking: true }],
         warps: [
-            { x: 1, y: M, to: 'east_stage1', tx: 12, ty: M },
-            { x: 13, y: M, to: 'east_stage3', tx: 1, ty: M }
+            { x: 1, y: 8, to: 'east_stage1', tx: 17, ty: 8 },
+            { x: 22, y: 8, to: 'east_stage3', tx: 2, ty: 8 }
         ],
-        start: { x: 2, y: M }
+        start: { x: 2, y: 8 }
     };
 
-    // --- 2週目: ステージ3 (竜の道) ---
-    const e3 = createDungeon(T);
-    for (let x = 1; x < S - 1; x++) e3[M][x] = T.PATH;
-    e3[M][1] = T.EXIT;
-
+    // ステージ3
+    const e3t = createDungeonTiles(18, 18, T);
+    for (let x = 2; x <= 15; x++) e3t[9][x] = T.PATH;
+    for (let y = 5; y <= 13; y++) e3t[y][9] = T.PATH;
+    e3t[9][1] = T.EXIT;
     Maps.data.east_stage3 = {
-        w: S, h: S, tiles: e3, area: 'east', week2Map: true,
+        w: 18, h: 18, tiles: e3t, isDungeon: true, encounterRate: 0.14, area: 'east', week2Map: true,
+        npcs: [],
         warps: [
-            { x: 1, y: M, to: 'east_stage2', tx: 12, ty: M },
-            { x: 13, y: M, to: 'east_boss_room', tx: 1, ty: M }
+            { x: 1, y: 9, to: 'east_stage2', tx: 21, ty: 8 },
+            { x: 16, y: 9, to: 'east_boss_room', tx: 2, ty: 7 }
         ],
-        start: { x: 2, y: M }
+        start: { x: 2, y: 9 }
     };
 
-    // --- 2週目: ボス部屋 ---
-    const eb = createDungeon(T);
-    for (let x = 1; x <= 11; x++) eb[M][x] = T.PATH;
-    eb[M][1] = T.EXIT;
-
+    // ボス部屋
+    const ebt = createDungeonTiles(16, 14, T);
+    for (let x = 2; x <= 13; x++) ebt[7][x] = T.PATH;
+    for (let y = 4; y <= 10; y++) ebt[y][8] = T.PATH;
+    ebt[7][1] = T.EXIT;
     Maps.data.east_boss_room = {
-        w: S, h: S, tiles: eb, area: 'east', week2Map: true,
-        npcs: [{ id: 'eastTrueBoss', type: 'enemy_slime', img: 'dragon_map', x: 11, y: M, areaBoss: 'east', trueAreaBoss: true, blocking: true }],
-        warps: [{ x: 1, y: M, to: 'east_stage3', tx: 12, ty: M }],
-        start: { x: 2, y: M }
+        w: 16, h: 14, tiles: ebt, isDungeon: true, encounterRate: 0, area: 'east', week2Map: true,
+        npcs: [{ id: 'eastTrueBoss', type: 'enemy_slime', img: 'dragon_map', x: 12, y: 7, msg: null, areaBoss: 'east', trueAreaBoss: true, blocking: true }],
+        warps: [{ x: 1, y: 7, to: 'east_stage3', tx: 15, ty: 9 }],
+        start: { x: 2, y: 7 }
     };
 }

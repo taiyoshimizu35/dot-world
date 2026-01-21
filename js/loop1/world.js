@@ -65,5 +65,11 @@ const WorldState = {
 };
 
 // 後方互換性のためのエイリアス
+// 後方互換性のためのエイリアス
 const gameLoop = WorldState;
 const truthFlags = WorldState.truthFlags;
+
+// グローバル公開
+window.WorldState = WorldState;
+window.gameLoop = gameLoop;
+window.truthFlags = truthFlags;

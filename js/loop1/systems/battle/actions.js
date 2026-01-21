@@ -1,27 +1,24 @@
-import { world } from '../../state/world.js';
-
 // ===========================================
 // 戦闘アクション
 // ===========================================
 const BattleActions = {
     doPlayerAtk(battle) {
-        // 1周目の魔王戦のみ発生する自傷ギミック
-        // ※battle.enemy.isDemonKing などのフラグがある想定
-        if (world.loopCount === 0 && battle.enemy.id === 'fake_demon_king') {
-            const dmg = Math.max(5, Math.floor(PlayerStats.atk * 0.8)); 
+        // 1週目の魔王戦のみ発生する自傷ギミック
+        if (WorldState.week === 1 && battle.isDemonKing) {
+            const dmg = Math.max(5, Math.floor(PlayerStats.atk * 0.8));
             PlayerStats.hp -= dmg;
-            
+
             FX.shake(500); FX.flashRed(300);
             battle.msg = `今の勇者では魔王にダメージを与えられない！\n${PlayerStats.name}は${dmg}のダメージを受けた！`;
-            
+
             this.checkPlayerDeath(battle);
             return;
         }
 
-        // 通常のダメージ計算（1周目の雑魚戦、中ボス戦、および2周目の全戦闘）
+        // 通常のダメージ計算
         const dmg = Math.max(1, PlayerStats.atk - battle.enemy.def + Math.floor(Math.random() * 4));
         battle.enemyHp -= dmg;
-        
+
         FX.shake(200); FX.flash(100);
         battle.msg = `${battle.enemy.name}に${dmg}ダメージ！`;
         battle.msgTimer = 0;
@@ -36,7 +33,7 @@ const BattleActions = {
         }
     },
 
-    // 敵の攻撃ロジック（嘘を排除した通常版）
+    // 敵の攻撃ロジック
     doEnemyAtk(battle) {
         let dmg = 0;
         let effectMsg = '';
@@ -45,9 +42,9 @@ const BattleActions = {
         if (battle.enemy.name === 'クリスタル・ゴーレム' && PlayerStats.isDefending) {
             dmg = Math.floor(battle.enemy.atk * 1.5);
             effectMsg = `重い一撃が防御を貫く！ `;
-        } 
+        }
         else {
-            // 通常・魔法攻撃の計算
+            // 通常攻撃の計算
             dmg = Math.max(1, battle.enemy.atk - PlayerStats.def + Math.floor(Math.random() * 3));
             if (PlayerStats.isDefending) dmg = Math.floor(dmg * 0.5);
             effectMsg = `${battle.enemy.name}の攻撃！\n`;
@@ -65,18 +62,41 @@ const BattleActions = {
         }
     },
 
+    // 逃走処理
+    doFlee(battle) {
+        if (battle.isBoss) {
+            battle.msg = 'ボス戦からは逃げられない！';
+            battle.msgTimer = 0;
+            battle.waitForInput = true;
+            battle.phase = 'wait_input';
+            battle.nextPhase = 'command';
+            return;
+        }
+
+        if (Math.random() < 0.5) {
+            battle.msg = 'うまく逃げ切れた！';
+            battle.phase = 'end';
+        } else {
+            battle.msg = '逃げられなかった！';
+            battle.phase = 'enemyAttack';
+            battle.enemyAttackCount = 0;
+        }
+        battle.msgTimer = 0;
+        battle.waitForInput = true;
+    },
+
     // 死亡判定と周回遷移の分岐
     checkPlayerDeath(battle) {
         PlayerStats.hp = Math.max(0, PlayerStats.hp);
         battle.msgTimer = 0;
         battle.waitForInput = true;
 
-        if (world.loopCount === 0 && (battle.enemy.id === 'demon_king' || battle.enemy.isDemonKing)) {
-            // 1周目の魔王戦で敗北した場合のみ、2周目への特別な遷移を行う
-            battle.phase = 'transitionToLoop2'; 
+        if (WorldState.week === 1 && battle.isDemonKing) {
+            // 1週目の魔王戦で敗北した場合のみ、2週目への特別な遷移を行う
+            battle.phase = 'fakeDemonKingEvent';
             battle.msg = `${PlayerStats.name}の力は魔王に奪われた...\n聖剣と共に力が吸い込まれていく...`;
         } else {
-            // それ以外の敗北（1周目の道中、2周目の全敗北）はゲームオーバー
+            // それ以外の敗北はゲームオーバー
             battle.phase = 'defeat';
             battle.msg = '力尽きた...';
         }

@@ -219,12 +219,17 @@ const Battle = {
             const start = Maps.get().start;
             game.player.x = start.x * GameConfig.TILE_SIZE;
             game.player.y = start.y * GameConfig.TILE_SIZE;
+            game.player.dir = 0;
+            game.player.moving = false;
 
-            currentState = GameState.PLAYING;
-            FX.fadeIn();
-
-            // 2週目開始メッセージ
-            Msg.show('……目が覚めた。\n何もかもが…違って見える…\n\n【2週目開始】');
+            // ゲーム状態をリセット
+            currentState = GameState.FADE;
+            FX.fadeIn(() => {
+                currentState = GameState.PLAYING;
+                Input.lock(100);
+                // 2週目開始メッセージ
+                Msg.show('……目が覚めた。\n何もかもが…違って見える…\n\n【2週目開始】');
+            });
         });
     },
 

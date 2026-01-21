@@ -1,28 +1,34 @@
-// 共通定数
-export const S = 15;  // マップサイズ (Size)
-export const M = 7;   // 中心座標 (Middle)
+// ===========================================
+// マップヘルパー関数
+// ===========================================
+const MapHelper = {
+    // 標準サイズ
+    S: 15,  // 縦
+    M: 7,   // 中心Y
 
-/**
- * 外枠を岩(ROCK)、中を指定タイルで埋めた15x15のベースを作成
- */
-export function createBaseTiles(T, fillType) {
-    const tiles = [];
-    for (let y = 0; y < S; y++) {
-        const row = [];
-        for (let x = 0; x < S; x++) {
-            row.push(x === 0 || x === S - 1 || y === 0 || y === S - 1 ? T.ROCK : fillType);
+    // ダンジョンタイル生成
+    createDungeonTiles(w, h, T) {
+        const tiles = [];
+        for (let y = 0; y < h; y++) {
+            const row = [];
+            for (let x = 0; x < w; x++) {
+                row.push(y === 0 || y === h - 1 || x === 0 || x === w - 1 ? T.ROCK : T.FLOOR);
+            }
+            tiles.push(row);
         }
-        tiles.push(row);
+        return tiles;
+    },
+
+    // 草原タイル生成
+    createFieldTiles(w, h, T) {
+        const tiles = [];
+        for (let y = 0; y < h; y++) {
+            const row = [];
+            for (let x = 0; x < w; x++) {
+                row.push(x === 0 || x === w - 1 || y === 0 || y === h - 1 ? T.ROCK : T.GRASS);
+            }
+            tiles.push(row);
+        }
+        return tiles;
     }
-    return tiles;
-}
-
-/**
- * ダンジョン用(FLOOR)ベース
- */
-export const createDungeon = (T) => createBaseTiles(T, T.FLOOR);
-
-/**
- * フィールド用(GRASS)ベース
- */
-export const createField = (T) => createBaseTiles(T, T.GRASS);
+};

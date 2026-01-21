@@ -151,3 +151,4 @@ const PlayerStats = {
         this.magicBoost = 1.0;
     }
 };
+window.PlayerStats = PlayerStats;

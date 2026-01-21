@@ -1,14 +1,37 @@
-import { S, M, createDungeon } from './helpers.js';
+// ===========================================
+// 魔王城マップデータ
+// ===========================================
+function initDemonCastleMaps(Maps, T) {
+    const { createDungeonTiles } = MapHelper;
 
-export function initDemonCastle(Maps, T) {
-    const dt = createDungeon(T);
-    for (let y = 1; y < S-1; y++) dt[y][M] = T.PATH;
-    dt[S-1][M] = T.EXIT;
+    // 魔王城 - 入口
+    const dc1t = createDungeonTiles(20, 18, T);
+    // 道を端まで繋げる（y=1からy=16まで）
+    for (let y = 1; y <= 16; y++) dc1t[y][10] = T.PATH;
+    for (let x = 4; x <= 16; x++) dc1t[9][x] = T.PATH;
+    for (let x = 7; x <= 13; x++) for (let y = 5; y <= 7; y++) dc1t[y][x] = T.FLOOR;
+    dc1t[16][10] = T.EXIT;
 
     Maps.data.demon_castle = {
-        w: S, h: S, tiles: dt, area: 'demon',
-        npcs: [{ id: 'demonKing', type: 'enemy_slime', img: 'enemy_demon_king', x: M, y: 4, demonKing: true, blocking: true }],
-        warps: [{ x: M, y: S-1, to: 'north_boss_room', tx: M, ty: 1 }],
-        start: { x: M, y: S-2 }
+        w: 20, h: 18, tiles: dc1t, isDungeon: true, encounterRate: 0.12, area: 'demon',
+        npcs: [{ id: 'dc_sign', type: 'signpost', x: 10, y: 12, msg: '【魔王城】\nここが最後の戦いの場所…', blocking: true }],
+        warps: [
+            { x: 10, y: 16, to: 'north_boss_room', tx: 8, ty: 3 },
+            { x: 10, y: 2, to: 'demon_throne', tx: 7, ty: 12 }
+        ],
+        start: { x: 10, y: 15 }
+    };
+
+    // 魔王城 - 玉座の間
+    const dc2t = createDungeonTiles(16, 14, T);
+    for (let y = 2; y <= 11; y++) dc2t[y][8] = T.PATH;
+    for (let x = 5; x <= 11; x++) for (let y = 3; y <= 5; y++) dc2t[y][x] = T.FLOOR;
+    dc2t[12][8] = T.EXIT;
+
+    Maps.data.demon_throne = {
+        w: 16, h: 14, tiles: dc2t, isDungeon: true, encounterRate: 0, area: 'demon',
+        npcs: [{ id: 'demonKing', type: 'enemy_slime', img: 'enemy_slime', x: 8, y: 4, msg: null, demonKing: true, blocking: true }],
+        warps: [{ x: 8, y: 12, to: 'demon_castle', tx: 10, ty: 3 }],
+        start: { x: 8, y: 11 }
     };
 }

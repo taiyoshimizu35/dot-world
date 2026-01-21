@@ -1,7 +1,11 @@
-import { S, M } from './helpers.js';
+// ===========================================
+// 村マップデータ
+// ===========================================
+function initVillageMap(Maps, T) {
+    const { S, M, createFieldTiles } = MapHelper;
+    const vw = 25, vh = 18;
 
-export function initVillage(Maps, T) {
-    const vw = 25, vh = S; // 25x15
+    // 基本タイル
     const vt = [];
     for (let y = 0; y < vh; y++) {
         const r = [];
@@ -9,37 +13,85 @@ export function initVillage(Maps, T) {
         vt.push(r);
     }
 
-    // 中心線(M=7)に道を引く
-    for (let x = 0; x < vw; x++) vt[M][x] = T.PATH;  // 横道
-    for (let y = 0; y < vh; y++) vt[y][12] = T.PATH; // 縦道
+    // 道（端まで）
+    for (let x = 0; x < vw; x++) vt[9][x] = T.PATH;
+    for (let y = 0; y < vh; y++) vt[y][12] = T.PATH;
 
-    // 外枠と出入口
-    for (let x = 0; x < vw; x++) { vt[0][x] = T.ROCK; vt[vh-1][x] = T.ROCK; }
-    for (let y = 0; y < vh; y++) { vt[y][0] = T.ROCK; vt[vw-1][y] = T.ROCK; }
-    vt[M][0] = T.PATH; vt[M][vw-1] = T.PATH; // 西・東出口
-    vt[0][12] = T.PATH; vt[vh-1][12] = T.PATH; // 北・南出口
+    // 建物
+    for (let y = 2; y <= 5; y++) for (let x = 3; x <= 6; x++) vt[y][x] = T.HOUSE;
+    vt[5][4] = T.DOOR;
+    for (let y = 2; y <= 5; y++) for (let x = 17; x <= 21; x++) vt[y][x] = T.HOUSE;
+    vt[5][19] = T.DOOR;
+
+    // 池
+    for (let y = 12; y <= 15; y++) for (let x = 18; x <= 22; x++) vt[y][x] = T.WATER;
+
+    // 岩
+    [[1, 1], [23, 3], [2, 15], [20, 1], [15, 15]].forEach(([x, y]) => {
+        if (vt[y] && vt[y][x] === T.GRASS) vt[y][x] = T.ROCK;
+    });
 
     Maps.data.village = {
-        w: vw, h: vh, tiles: vt,
+        w: vw, h: vh, tiles: vt, encounterRate: 0.02,
         npcs: [
-            { id: 'sign1', type: 'signpost', x: 12, y: M-2, msg: '【始まりの村】\n中心座標は7なり', blocking: true },
-            { id: 'npc1', type: 'villager', x: 8, y: M, msg: 'ようこそ！', blocking: true },
-            { id: 'alex_join', type: 'villager', img: 'ally_alex', x: 10, y: M+2, partyJoin: 'alex', week2Only: true, blocking: true }
+            { id: 'npc1', type: 'villager', x: 8, y: 9, msg: 'ようこそ！\n草原を歩くとモンスターに会うよ。', blocking: true },
+            { id: 'shop', type: 'villager', x: 19, y: 4, msg: null, shop: true, blocking: true },
+            { id: 'guard', type: 'guard', x: 23, y: 9, msg: null, guard: true, blocking: true },
+            { id: 'westGuard', type: 'guard', x: 1, y: 9, msg: null, westGuard: true, blocking: true },
+            { id: 'sign1', type: 'signpost', x: 12, y: 7, msg: '【始まりの村】\n東西南北、全ての道はここに通ず', blocking: true },
+            { id: 'demon_guide', type: 'villager', x: 14, y: 11, msg: null, demonGuide: true, blocking: true, week1Only: true },
+            { id: 'alex_join', type: 'villager', img: 'ally_alex', x: 10, y: 11, msg: null, partyJoin: 'alex', week2Only: true, blocking: true },
+            { id: 'quest_npc', type: 'villager', x: 6, y: 11, msg: null, questGiver: true, week2Only: true, blocking: true },
+            { id: 'weapon_shop', type: 'villager', x: 16, y: 11, msg: null, weaponShop: true, week2Only: true, blocking: true }
         ],
         warps: [
-            // 東 (tx:1, ty:7)
-            { x: 24, y: M, to: 'east_stage1', tx: 1, ty: M, week2Only: true },
-            { x: 24, y: M, to: 'dungeon', tx: 1, ty: M, week1Only: true },
-            // 西 (tx:13, ty:7)
-            { x: 0, y: M, to: 'west_stage1', tx: 13, ty: M, week2Only: true },
-            { x: 0, y: M, to: 'dungeon_west', tx: 13, ty: M, week1Only: true },
-            // 北 (tx:7, ty:13)
-            { x: 12, y: 0, to: 'north_stage1', tx: M, ty: 13, week2Only: true },
-            { x: 12, y: 0, to: 'north_snowfield', tx: M, ty: 13, week1Only: true },
-            // 南 (tx:7, ty:1)
-            { x: 12, y: vh-1, to: 'south_stage1', tx: M, ty: 1, week2Only: true },
-            { x: 12, y: vh-1, to: 'south_forest', tx: M, ty: 1, week1Only: true }
+            { x: 4, y: 5, to: 'magic_shop', tx: 4, ty: 6 },
+            { x: 19, y: 5, to: 'shop_interior', tx: 4, ty: 6 },
+            { x: 24, y: 9, to: 'east_stage1', tx: 3, ty: 6, week2Only: true },
+            { x: 24, y: 9, to: 'dungeon', tx: 3, ty: 6, week1Only: true },
+            { x: 0, y: 9, to: 'west_stage1', tx: 16, ty: 9, week2Only: true },
+            { x: 0, y: 9, to: 'dungeon_west', tx: 12, ty: 6, week1Only: true },
+            { x: 12, y: 0, to: 'north_stage1', tx: 9, ty: 16, week2Only: true },
+            { x: 12, y: 0, to: 'north_snowfield', tx: 7, ty: 12, week1Only: true },
+            { x: 12, y: 17, to: 'south_stage1', tx: 9, ty: 1, week2Only: true },
+            { x: 12, y: 17, to: 'south_forest', tx: 7, ty: 1, week1Only: true },
+            { x: 14, y: 12, to: 'demon_castle', tx: 10, ty: 15, week1Only: true, requiresDemonCastle: true }
         ],
-        start: { x: 12, y: M + 2 }
+        start: { x: 12, y: 11 }
+    };
+}
+
+// ショップマップ
+function initShopMaps(Maps, T) {
+    // 魔法ショップ
+    const hw = 9, hh = 8, ht = [];
+    for (let y = 0; y < hh; y++) {
+        const r = [];
+        for (let x = 0; x < hw; x++) r.push(y === 0 || y === hh - 1 || x === 0 || x === hw - 1 ? T.HOUSE : T.FLOOR);
+        ht.push(r);
+    }
+    ht[2][3] = T.COUNTER; ht[2][4] = T.COUNTER; ht[2][5] = T.COUNTER;
+    ht[hh - 1][4] = T.EXIT;
+    Maps.data.magic_shop = {
+        w: hw, h: hh, tiles: ht,
+        npcs: [{ id: 'mage_shopkeeper', type: 'villager', x: 4, y: 1, msg: null, magicShop: true, blocking: true }],
+        warps: [{ x: 4, y: 7, to: 'village', tx: 4, ty: 6 }],
+        start: { x: 4, y: 5 }
+    };
+
+    // 通常ショップ
+    const sw = 9, sh = 8, st = [];
+    for (let y = 0; y < sh; y++) {
+        const r = [];
+        for (let x = 0; x < sw; x++) r.push(y === 0 || y === sh - 1 || x === 0 || x === sw - 1 ? T.HOUSE : T.FLOOR);
+        st.push(r);
+    }
+    st[2][3] = T.COUNTER; st[2][4] = T.COUNTER; st[2][5] = T.COUNTER;
+    st[sh - 1][4] = T.EXIT;
+    Maps.data.shop_interior = {
+        w: sw, h: sh, tiles: st,
+        npcs: [{ id: 'shopkeeper', type: 'villager', x: 4, y: 1, msg: null, shop: true, blocking: true }],
+        warps: [{ x: 4, y: 7, to: 'village', tx: 19, ty: 6 }],
+        start: { x: 4, y: 5 }
     };
 }
