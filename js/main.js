@@ -191,6 +191,15 @@ class Game {
                 }
             }
 
+            // Consumption Check
+            if (warp.consumeKey) {
+                const inv = WorldState.managers.inventory;
+                if (inv) {
+                    inv.remove(warp.requiresKey);
+                    Msg.show(`${warp.requiresKey}を使った。`);
+                }
+            }
+
             FX.fadeOut(() => {
                 Maps.current = warp.to;
                 this.player.x = warp.tx * TS;
@@ -395,7 +404,9 @@ class Game {
             if (inv) {
                 if (chest.item === '薬草') inv.add('薬草', chest.count);
                 else if (chest.item === 'ポーション') inv.add('ポーション', chest.count);
-                Msg.show(`${chest.item}を手に入れた！` + (chest.count > 1 ? ` x${chest.count}` : ''));
+                else if (chest.item === '魔法の聖水') inv.add('魔法の聖水', chest.count);
+                else if (chest.item === '銀の鍵') inv.add('銀の鍵', chest.count);
+                Msg.show(`${chest.item}を手に入れた!` + (chest.count > 1 ? ` x${chest.count}` : ''));
             } else {
                 Msg.show(`${chest.item}を見つけたが、今は持ち運べない。`);
             }
@@ -435,6 +446,8 @@ class Game {
                     else if (t === 13) imgName = 'stone_switch';
                     else if (t === 14) imgName = 'stone';
                     else if (t === 15) imgName = 'statue';
+                    else if (t === 16) imgName = 'gray_grass';
+                    else if (t === 17) imgName = 'gray_door';
 
                     const sp = Camera.toScreen(x * TS, y * TS);
                     const img = AssetLoader.get(imgName);
@@ -443,11 +456,23 @@ class Game {
             }
         }
 
-        Chests.render(this.ctx, Maps.current);
+        // プレイヤーのタイル座標を計算
+        const playerTx = Math.floor((this.player.x + TS / 2) / TS);
+        const playerTy = Math.floor((this.player.y + TS / 2) / TS);
 
-        // NPCs（条件フィルタリング済み）
+        // 宝箱描画（視界制限適用）
+        Chests.render(this.ctx, Maps.current, playerTx, playerTy, Maps.get().area);
+
+        // NPCs（条件フィルタリング済み、視界制限適用）
         const visibleNpcs = Maps.getVisibleNpcs();
+        const currentArea = Maps.get().area;
         for (const npc of visibleNpcs) {
+            // 南エリアでは視界内のNPCのみ表示
+            if (currentArea === 'south') {
+                const dist = Math.hypot(npc.x - playerTx, npc.y - playerTy);
+                if (dist > 3.5) continue; // 視界外のNPCはスキップ
+            }
+
             const sp = Camera.toScreen(npc.x * TS, npc.y * TS);
             const img = AssetLoader.get(npc.img || (npc.type === 'villager' ? 'villager' : (npc.type === 'guard' ? 'guard' : (npc.type === 'signpost' ? 'signpost' : 'enemy_slime'))));
             if (img) this.ctx.drawImage(img, sp.x, sp.y, TS, TS);
@@ -457,6 +482,32 @@ class Game {
         const pSp = Camera.toScreen(this.player.x, this.player.y);
         const pImg = AssetLoader.get('player');
         if (pImg) this.ctx.drawImage(pImg, pSp.x, pSp.y, TS, TS);
+
+        // South Area Darkness Effect（UI描画の直前、プレイヤー描画の後に配置）
+        if (Maps.get().area === 'south') {
+            const cx = pSp.x + TS / 2; // プレイヤーの中心X
+            const cy = pSp.y + TS / 2; // プレイヤーの中心Y
+            const radius = TS * 3;     // くり抜く半径（ここでは3タイル分）
+        
+            this.ctx.save();
+
+            // 1. 暗闇の色を設定
+            this.ctx.fillStyle = 'rgba(0, 0, 0, 1.0)'; // ほぼ真っ暗
+
+            // 2. 「外枠」と「内側の穴」を同時に描画するパスを作成
+            this.ctx.beginPath();
+            // 画面全体の四角形（時計回り）
+            this.ctx.rect(0, 0, VW, VH);
+            // プレイヤー周りの円形（反時計回り true）
+            // これにより「evenodd」ルールで中がくり抜かれます
+            this.ctx.arc(cx, cy, radius, 0, Math.PI * 2, true);
+
+            // 3. 塗りつぶし
+            this.ctx.fill();
+
+            this.ctx.restore();
+        }
+        
 
         // UI
         FX.render(this.ctx);

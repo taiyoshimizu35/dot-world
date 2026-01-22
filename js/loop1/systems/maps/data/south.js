@@ -2,57 +2,122 @@
 // 南エリアマップデータ
 // ===========================================
 
-// 1週目：ボス直行マップ
-// 1週目：探索エリア2層 + ボス部屋
+// 1週目：視界制限・鍵探しダンジョン
 function initSouthWeek1(Maps, T) {
-    const { createFieldTiles, createDungeonTiles } = MapHelper;
+    const { createDungeonTiles } = MapHelper;
 
+    const fillSouthMaze = (tiles, w, h) => {
+        // 全体をSTONE(床)で埋める
+        for (let y = 1; y < h - 1; y++) {
+            for (let x = 1; x < w - 1; x++) {
+                tiles[y][x] = T.GRAY_GRASS;
+            }
+        }
+        // ランダム障害物(TREE)
+        for (let y = 1; y < h - 1; y++) {
+            for (let x = 1; x < w - 1; x++) {
+                if (Math.random() < 0.25) tiles[y][x] = T.TREE; // Dense forest
+                else if (Math.random() < 0.05) tiles[y][x] = T.ROCK;
+            }
+        }
+    };
+
+    const carvePath = (tiles, points) => {
+        let cx = points[0][0];
+        let cy = points[0][1];
+        for (let i = 1; i < points.length; i++) {
+            const tx = points[i][0];
+            const ty = points[i][1];
+            while (cx !== tx || cy !== ty) {
+                tiles[cy][cx] = T.PATH; // 明示的に道として設定
+                if (cx < tx) cx++; else if (cx > tx) cx--;
+                else if (cy < ty) cy++; else if (cy > ty) cy--;
+            }
+        }
+        tiles[cy][cx] = T.PATH;
+    };
+
+    // ----------------------------------------------------------------
     // ステージ1 (41x41)
-    const s1t = createFieldTiles(41, 41, T);
-    // 北(20,2)から南(20,38)へ
-    for (let y = 2; y <= 38; y++) s1t[y][20] = T.PATH;
-    // 分岐
-    for (let x = 10; x <= 30; x++) s1t[10][x] = T.PATH;
-    for (let x = 10; x <= 30; x++) s1t[20][x] = T.PATH;
+    // ----------------------------------------------------------------
+    const s1t = createDungeonTiles(41, 41, T);
+    fillSouthMaze(s1t, 41, 41);
+
+    // Path
+    // Start(20, 2) -> End(20, 39)
+    const path1 = [[20, 2], [5, 10], [35, 20], [20, 39]]; // Zigzag
+    carvePath(s1t, path1);
+
+    // Chest Path (Silver Key)
+    // Branch from [35, 20] -> [35, 35]
+    //carvePath(s1t, [[35, 20], [35, 35]]);
+
     s1t[1][20] = T.EXIT;
+    s1t[39][20] = T.GRAY_DOOR; // Locked Door (通常のドア)
 
     Maps.data.south_stage1 = {
         w: 41, h: 41, tiles: s1t, encounterRate: 0.02, area: 'south', week1Map: true,
-        npcs: [{ id: 's1_sign', type: 'signpost', x: 23, y: 5, msg: '【忘却の墓地】\n南へ進むほど闇は深くなる', blocking: true }],
+        bgm: 'dungeon',
+        npcs: [
+            { id: 's1_sign', type: 'signpost', x: 23, y: 5, msg: '【忘却の墓地】\n闇に潜む鍵を探せ', blocking: true }
+        ],
         warps: [
             { x: 20, y: 1, to: 'village', tx: 12, ty: 16 },
-            { x: 20, y: 39, to: 'south_stage2', tx: 20, ty: 2 }
+            { x: 20, y: 39, to: 'south_stage2', tx: 20, ty: 2, requiresKey: '銀の鍵', consumeKey: true }
         ],
         start: { x: 20, y: 2 }
     };
 
+    // Chest Definition (Needs to be added to Chests.list via some init mechanism or hardcoded in Chests.js? 
+    // Existing Chests.js has hardcoded list. I need to update Chests.js OR allow Maps to define chests.
+    // Looking at Chests.js, it uses hardcoded list. I MUST update Chests.js.
+    // For now, I define the map structure. I will add chests in Chests.js in next step.)
+
+    // ----------------------------------------------------------------
     // ステージ2 (41x41)
-    const s2t = createFieldTiles(41, 41, T);
-    // 複雑な森
-    for (let y = 2; y <= 38; y++) s2t[y][20] = T.PATH;
-    for (let x = 5; x <= 35; x++) s2t[20][x] = T.PATH;
-    for (let y = 2; y <= 38; y++) s2t[y][10] = T.PATH;
-    for (let y = 2; y <= 38; y++) s2t[y][30] = T.PATH;
-    s2t[1][20] = T.EXIT;
+    // ----------------------------------------------------------------
+    const s2t = createDungeonTiles(41, 41, T);
+    fillSouthMaze(s2t, 41, 41);
+
+    // Path
+    // Start(20, 2) -> End(20, 39)
+    const path2 = [[20, 2], [35, 10], [5, 25], [20, 39]];
+    carvePath(s2t, path2);
+
+    // Chest Path (Silver Key)
+    // Branch from [5, 25] -> [5, 35]
+    //carvePath(s2t, [[5, 25], [5, 35]]);
+
+    s2t[1][20] = T.STAIRS; // 戻り階段
+    s2t[39][20] = T.GRAY_DOOR; // To Boss (Locked)
 
     Maps.data.south_stage2 = {
         w: 41, h: 41, tiles: s2t, encounterRate: 0.02, area: 'south', week1Map: true,
-        npcs: [{ id: 's2_sign', type: 'signpost', x: 23, y: 5, msg: '墓標が道を示す…', blocking: true }],
+        bgm: 'dungeon',
+        npcs: [],
         warps: [
             { x: 20, y: 1, to: 'south_stage1', tx: 20, ty: 38 },
-            { x: 20, y: 39, to: 'south_boss_room', tx: 7, ty: 2 }
+            { x: 20, y: 39, to: 'south_boss_room', tx: 7, ty: 2, requiresKey: '銀の鍵', consumeKey: true }
         ],
         start: { x: 20, y: 2 }
     };
 
+    // ----------------------------------------------------------------
     // ボス部屋 (15x15)
-    const sbt = createFieldTiles(15, 15, T);
+    // ----------------------------------------------------------------
+    const sbt = createDungeonTiles(15, 15, T);
+    for (let y = 1; y < 14; y++) for (let x = 1; x < 14; x++) sbt[y][x] = T.GRAY_GRASS;
+
+    // Path
     for (let y = 2; y <= 12; y++) sbt[y][7] = T.PATH;
-    sbt[1][7] = T.EXIT;
+    sbt[1][7] = T.STAIRS;
 
     Maps.data.south_boss_room = {
         w: 15, h: 15, tiles: sbt, encounterRate: 0, area: 'south', week1Map: true,
-        npcs: [{ id: 'southBoss', type: 'enemy_skeleton', img: 'phantom_knight_map', x: 7, y: 10, msg: null, areaBoss: 'south', blocking: true }],
+        bgm: 'boss',
+        npcs: [
+            { id: 'southBoss', type: 'enemy_skeleton', img: 'phantom_knight_map', x: 7, y: 10, msg: null, areaBoss: 'south', blocking: true, name: '幻影の騎士', atk: 22, def: 8, hp: 100, exp: 60 }
+        ],
         warps: [{ x: 7, y: 1, to: 'south_stage2', tx: 20, ty: 38 }],
         start: { x: 7, y: 2 }
     };

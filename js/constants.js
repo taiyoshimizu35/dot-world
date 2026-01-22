@@ -7,13 +7,14 @@ const GameConfig = {
     VIEWPORT_HEIGHT: 300,
     SCALE: 2,
     PLAYER_SPEED: 1.5,
-    ENCOUNTER_RATE: 0.015,
+    ENCOUNTER_RATE: 0.008,
 
     TILE_TYPES: {
         GRASS: 0, ROCK: 1, PATH: 2, WATER: 3, HOUSE: 4,
         DOOR: 5, FLOOR: 6, DESK: 7, BED: 8, EXIT: 9, COUNTER: 10,
         TREE: 11, STAIRS: 12, SWITCH: 13,
-        STONE: 14, STATUE: 15
+        STONE: 14, STATUE: 15,
+        GRAY_GRASS: 16, GRAY_DOOR: 17
     }
 };
 

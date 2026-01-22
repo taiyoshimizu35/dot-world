@@ -109,6 +109,15 @@ const Maps = {
                 if (w.week1Only && gameLoop.week !== 1) continue;
                 if (w.week2Only && gameLoop.week !== 2) continue;
 
+                // Key Requirement Check
+                if (w.requiresKey) {
+                    const inv = WorldState.managers.inventory;
+                    if (!inv || !inv.has(w.requiresKey)) {
+                        Msg.show(`${w.requiresKey}が必要だ。`);
+                        return null;
+                    }
+                }
+
                 // ボス撃破条件チェック
                 if (w.requiresBoss && !QuestFlags.trueBosses[w.requiresBoss]) {
                     Msg.show(`この先に進むには${w.requiresBoss}エリアのボスを\n倒す必要がある。`);

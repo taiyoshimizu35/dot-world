@@ -32,3 +32,4 @@ const MapHelper = {
         return tiles;
     }
 };
+window.MapHelper = MapHelper;
