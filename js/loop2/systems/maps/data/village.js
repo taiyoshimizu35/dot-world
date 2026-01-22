@@ -1,7 +1,7 @@
 // ===========================================
-// 村マップデータ
+// 村マップデータ（Loop 2）
 // ===========================================
-function initVillageMap(Maps, T) {
+function initVillageWeek2(Maps, T) {
     const { S, M, createFieldTiles } = MapHelper;
     const vw = 25, vh = 18;
 
@@ -39,52 +39,20 @@ function initVillageMap(Maps, T) {
             { id: 'guard', type: 'guard', x: 23, y: 9, msg: null, guard: true, blocking: true },
             { id: 'westGuard', type: 'guard', x: 1, y: 9, msg: null, westGuard: true, blocking: true },
             { id: 'sign1', type: 'signpost', x: 12, y: 7, msg: '【始まりの村】\n東西南北、全ての道はここに通ず', blocking: true },
-            { id: 'demon_guide', type: 'villager', x: 14, y: 11, msg: null, demonGuide: true, blocking: true }
+            // Week 2 Specific NPCs
+            { id: 'alex_join', type: 'villager', img: 'ally_alex', x: 10, y: 11, msg: null, partyJoin: 'alex', blocking: true },
+            { id: 'quest_npc', type: 'villager', x: 6, y: 11, msg: null, questGiver: true, blocking: true },
+            { id: 'weapon_shop', type: 'villager', x: 16, y: 11, msg: null, weaponShop: true, blocking: true }
         ],
         warps: [
             { x: 4, y: 5, to: 'magic_shop', tx: 4, ty: 6 },
             { x: 19, y: 5, to: 'shop_interior', tx: 4, ty: 6 },
-            { x: 24, y: 9, to: 'east_stage1', tx: 2, ty: 20 },
-            { x: 0, y: 9, to: 'west_stage1', tx: 38, ty: 20 },
-            { x: 12, y: 0, to: 'north_stage1', tx: 20, ty: 38 },
-            { x: 12, y: 17, to: 'south_stage1', tx: 20, ty: 2 },
-            { x: 14, y: 12, to: 'demon_castle', tx: 10, ty: 15, requiresDemonCastle: true }
+            // Week 2 Specific Warps (Direct to Stage 1)
+            { x: 24, y: 9, to: 'east_stage1', tx: 3, ty: 6 },
+            { x: 0, y: 9, to: 'west_stage1', tx: 16, ty: 9 },
+            { x: 12, y: 0, to: 'north_stage1', tx: 9, ty: 16 },
+            { x: 12, y: 17, to: 'south_stage1', tx: 9, ty: 1 }
         ],
         start: { x: 12, y: 11 }
-    };
-}
-
-// ショップマップ
-function initShopMaps(Maps, T) {
-    // 魔法ショップ
-    const hw = 9, hh = 8, ht = [];
-    for (let y = 0; y < hh; y++) {
-        const r = [];
-        for (let x = 0; x < hw; x++) r.push(y === 0 || y === hh - 1 || x === 0 || x === hw - 1 ? T.HOUSE : T.FLOOR);
-        ht.push(r);
-    }
-    ht[2][3] = T.COUNTER; ht[2][4] = T.COUNTER; ht[2][5] = T.COUNTER;
-    ht[hh - 1][4] = T.EXIT;
-    Maps.data.magic_shop = {
-        w: hw, h: hh, tiles: ht,
-        npcs: [{ id: 'mage_shopkeeper', type: 'villager', x: 4, y: 1, msg: null, magicShop: true, blocking: true }],
-        warps: [{ x: 4, y: 7, to: 'village', tx: 4, ty: 6 }],
-        start: { x: 4, y: 5 }
-    };
-
-    // 通常ショップ
-    const sw = 9, sh = 8, st = [];
-    for (let y = 0; y < sh; y++) {
-        const r = [];
-        for (let x = 0; x < sw; x++) r.push(y === 0 || y === sh - 1 || x === 0 || x === sw - 1 ? T.HOUSE : T.FLOOR);
-        st.push(r);
-    }
-    st[2][3] = T.COUNTER; st[2][4] = T.COUNTER; st[2][5] = T.COUNTER;
-    st[sh - 1][4] = T.EXIT;
-    Maps.data.shop_interior = {
-        w: sw, h: sh, tiles: st,
-        npcs: [{ id: 'shopkeeper', type: 'villager', x: 4, y: 1, msg: null, shop: true, blocking: true }],
-        warps: [{ x: 4, y: 7, to: 'village', tx: 19, ty: 6 }],
-        start: { x: 4, y: 5 }
     };
 }

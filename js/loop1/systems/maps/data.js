@@ -15,10 +15,7 @@ function initMapData(Maps) {
     initSouthWeek1(Maps, T);
 
     // 2週目マップ
-    initEastWeek2(Maps, T);
-    initWestWeek2(Maps, T);
-    initNorthWeek2(Maps, T);
-    initSouthWeek2(Maps, T);
+    // 2週目は loop2/systems/maps/loader.js で読み込む
 
     // 魔王城
     initDemonCastleMaps(Maps, T);

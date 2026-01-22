@@ -65,6 +65,7 @@ const WorldState = {
         // システム初期化
         if (this.managers.party) this.managers.party.init();
         if (this.managers.player) this.managers.player.init();
+        if (window.Maps && window.Maps.initWeek2) window.Maps.initWeek2();
     },
 
     // 初期化（ニューゲーム時）
