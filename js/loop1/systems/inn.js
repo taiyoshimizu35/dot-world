@@ -1,9 +1,12 @@
 // ===========================================
-// 宿屋システム
+// 教会システム (旧宿屋)
 // ===========================================
 const Inn = {
     visible: false,
     cost: 0,
+
+    // Config: Church Mode
+    // Instant heal, no black screen.
 
     open(cost) {
         this.visible = true;
@@ -22,7 +25,17 @@ const Inn = {
     update() {
         if (!this.visible) return;
 
-        // Yes/No Selection for "Rest?"
+        // If message is showing (result message), handle it
+        if (Msg.visible) {
+            Msg.update();
+            if (Input.interact()) {
+                if (Msg.done()) Msg.hide();
+                else Msg.skip();
+            }
+            return;
+        }
+
+        // Yes/No Selection for "Heal?"
         if (this.step === 0) {
             if (Input.interact()) {
                 this.rest();
@@ -30,29 +43,30 @@ const Inn = {
                 this.close();
             }
         } else if (this.step === 1) {
-            // Result check
-            if (Input.interact()) {
-                this.close();
-            }
+            // After message closes (handled above logic mainly, but safety)
+            this.close();
         }
     },
 
     rest() {
         if (PlayerStats.gold < this.cost) {
-            Msg.show('「金が足りないみたいだね。」');
-            this.close();
+            Msg.show('「寄付金が足りないようですな。」', () => {
+                this.close();
+            }, 'overlay');
             return;
         }
 
         PlayerStats.spendGold(this.cost);
 
-        // Fade out/in sequence
-        FX.fadeOut(() => {
-            PlayerStats.healFull();
-            FX.fadeIn();
-            Msg.show('「おはよう！\n  体力はバッチリだね！」');
+        // Instant Heal - No Fades
+        PlayerStats.healFull();
+
+        // Show Success Message
+        this.step = 1; // Move to result step
+
+        Msg.show('「神の御加護があらんことを…」\n(体力と魔力が全回復した！)', () => {
             this.close();
-        });
+        }, 'overlay');
     },
 
     render(ctx) {
@@ -63,9 +77,9 @@ const Inn = {
         Draw.rect(ctx, 40, VH - 100, VW - 80, 80, 'rgba(0,0,40,0.95)');
         Draw.stroke(ctx, 40, VH - 100, VW - 80, 80, '#fff', 2);
 
-        Draw.text(ctx, '【宿屋】', 50, VH - 80, '#fc0', 14);
-        Draw.text(ctx, `一泊 ${this.cost}G です。`, 50, VH - 50, '#fff', 12);
-        Draw.text(ctx, `宿泊しますか？ (Z: はい / X: いいえ)`, 50, VH - 30, '#aaa', 10);
+        Draw.text(ctx, '【教会】', 50, VH - 80, '#fc0', 14);
+        Draw.text(ctx, `寄付金 ${this.cost}G`, 50, VH - 50, '#fff', 12);
+        Draw.text(ctx, `祈りを捧げますか？ (Z: はい / X: いいえ)`, 50, VH - 30, '#aaa', 10);
         Draw.text(ctx, `所持金: ${PlayerStats.gold}G`, VW - 140, VH - 80, '#ff0', 12);
     }
 };

@@ -56,7 +56,7 @@ function initNorthWeek1(Maps, T) {
     n3t[39][20] = T.EXIT;
 
     Maps.data.north_stage3 = {
-        w: 41, h: 41, tiles: n3t, encounterRate: 0.02, area: 'north', week1Map: true,
+        w: 41, h: 41, tiles: n3t, encounterRate: 0.008, area: 'north', week1Map: true,
         npcs: [{ id: 'n3_sign', type: 'signpost', x: 23, y: 35, msg: '吹雪が視界を遮る…', blocking: true }],
         warps: [
             { x: 20, y: 39, to: 'north_stage2', tx: 20, ty: 2 },

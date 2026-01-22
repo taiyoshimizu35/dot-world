@@ -40,8 +40,10 @@ const FX = {
                 this.fadeActive = false;
                 if (this.fadeCb) this.fadeCb();
                 if (this.fadeDir < 0) {
-                    currentState = GameState.PLAYING;
-                    Input.lock(100);
+                    if (currentState === GameState.FADE) {
+                        currentState = GameState.PLAYING;
+                        Input.lock(100);
+                    }
                 }
             }
         }

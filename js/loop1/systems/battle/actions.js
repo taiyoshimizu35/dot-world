@@ -16,7 +16,14 @@ const BattleActions = {
         }
 
         // 通常のダメージ計算
-        const dmg = Math.max(1, PlayerStats.atk - battle.enemy.def + Math.floor(Math.random() * 4));
+        let baseDmg = PlayerStats.atk - battle.enemy.def + Math.floor(Math.random() * 4);
+
+        // Dragon Slayer Effect: 1.2x damage in East area
+        if (PlayerStats.equipment.weapon === 'ドラゴンスレイヤー' && Maps.get().area === 'east') {
+            baseDmg = Math.floor(baseDmg * 1.2);
+        }
+
+        const dmg = Math.max(1, baseDmg);
         battle.enemyHp -= dmg;
 
         FX.shake(200); FX.flash(100);
@@ -47,6 +54,12 @@ const BattleActions = {
         else if (battle.enemy.useBreath && Math.random() < 0.3) {
             dmg = 30; // 固定ダメージ
             effectMsg = `${battle.enemy.name}は激しい炎を吐いた！\n`;
+
+            // Flame Shield Effect: Halve Breath damage
+            if (PlayerStats.equipment.armor === '炎の盾') {
+                dmg = Math.floor(dmg * 0.5);
+                effectMsg += '(炎の盾がダメージを軽減した！)';
+            }
         }
         else {
             // 通常攻撃の計算

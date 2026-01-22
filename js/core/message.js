@@ -4,24 +4,27 @@
 const Msg = {
     visible: false, text: '', disp: '', idx: 0, lt: 0, callback: null,
 
-    show(t, cb = null) {
+    show(t, cb = null, mode = 'normal') {
         this.visible = true;
         this.text = t;
         this.disp = '';
         this.idx = 0;
         this.lt = Date.now();
         this.callback = cb;
-        currentState = GameState.DIALOG;
+        if (mode !== 'overlay') {
+            currentState = GameState.DIALOG;
+        }
     },
 
     hide() {
         this.visible = false;
-        currentState = GameState.PLAYING;
         Input.lock(150);
         if (this.callback) {
             const cb = this.callback;
             this.callback = null;
             cb();
+        } else {
+            currentState = GameState.PLAYING;
         }
     },
 

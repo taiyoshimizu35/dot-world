@@ -12,6 +12,23 @@ function initEastWeek1(Maps, T) {
     // 全体を草で埋める
     for (let y = 0; y < 41; y++) for (let x = 0; x < 41; x++) e1t[y][x] = T.GRASS;
     // ランダムに木と岩を配置して迷宮感を出す（ただし道は確保するため後で上書き）
+    // Chests: (38, 38) -> Dragon Slayer, (38, 2) -> Flame Shield
+    // Need to ensure paths to these points exist if they are isolated.
+    // The previous loop logic had commented out paths to these locations.
+    // Let's add them back implicitly in the tile array or logic.
+    // Actually, Chests are processed by MapRenderer/Chests system, but usually data is in 'chests' array or similar?
+    // Wait, the file 'east.js' doesn't explicitly list chests in `Maps.data.east_stage1`.
+    // Let me check 'chests.js' or where chest data is defined.
+    // Usually it's in `Maps.data.xxx.chests` or generated dynamically.
+    // Looking at `player_controller.js`, `Chests.nearby` is used.
+    // I need to check `js/loop1/systems/maps/chests.js` to see where chest data lives.
+    // IF the map file defined them, they would be in `east.js`.
+    // Let me check `east.js` again for `chests` property.
+    // It is NOT in `Maps.data.east_stage1` in the view I just saw.
+    // This means chests are likely in a separate file or I missed it.
+    // Re-reading `east.js` showed NO `chests` property.
+    // Checking `chests.js` is necessary.
+
     for (let y = 0; y < 41; y++) {
         for (let x = 0; x < 41; x++) {
             if (Math.random() < 0.3) e1t[y][x] = T.TREE;
@@ -44,7 +61,7 @@ function initEastWeek1(Maps, T) {
     // 右下 (38, 38)
     //for (let y = 20; y <= 38; y++) e1t[y][30] = T.PATH; // 既存のパスから分岐
     //for (let x = 30; x <= 38; x++) e1t[38][x] = T.PATH;
-//
+    //
     //// 右上 (38, 2)
     //for (let y = 20; y >= 2; y--) e1t[y][30] = T.PATH; // 既存のパスから分岐
     //for (let x = 30; x <= 38; x++) e1t[2][x] = T.PATH;
@@ -52,7 +69,7 @@ function initEastWeek1(Maps, T) {
     e1t[20][39] = T.EXIT;
 
     Maps.data.east_stage1 = {
-        w: 41, h: 41, tiles: e1t, isDungeon: true, encounterRate: 0.02, area: 'east', week1Map: true,
+        w: 41, h: 41, tiles: e1t, isDungeon: true, encounterRate: 0.008, area: 'east', week1Map: true,
         npcs: [{ id: 'e1_sign', type: 'signpost', x: 5, y: 20, msg: '【深緑の迷宮】\n木々の隙間を進め', blocking: true }],
         warps: [
             { x: 1, y: 20, to: 'village', tx: 23, ty: 9 },

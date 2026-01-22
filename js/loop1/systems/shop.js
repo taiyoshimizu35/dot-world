@@ -70,30 +70,30 @@ const Shop = {
         item.sold = true;
 
         if (item.type === 'item') {
-            Msg.show(`${item.name}を購入した！`);
+            Msg.show(`${item.name}を購入した！`, () => { Input.lock(100); }, 'overlay');
         } else if (item.type === 'weapon') {
             if (item.name === '鋼の剣') QuestFlags.hasSword = true;
             QuestFlags.check();
-            Msg.show(`${item.name}を購入した！\nメニューから装備しよう。`);
+            Msg.show(`${item.name}を購入した！\nメニューから装備しよう。`, () => { Input.lock(100); }, 'overlay');
         } else if (item.type === 'holySword') {
             // WEAPON_DECEPTION: 聖剣購入
             gameLoop.holySwordOwned = true;
-            Msg.show(`${item.name}を購入した！\n「これで魔王を倒せる…！」`);
+            Msg.show(`${item.name}を購入した！\n「これで魔王を倒せる…！」`, () => { Input.lock(100); }, 'overlay');
         } else if (item.type === 'armor') {
-            Msg.show(`${item.name}を購入した！\nメニューから装備しよう。`);
+            Msg.show(`${item.name}を購入した！\nメニューから装備しよう。`, () => { Input.lock(100); }, 'overlay');
         } else if (item.type === 'spell') {
-            PlayerStats.spells[item.spell] = true; // Spells are still learned immediately (intrinsic)
-            Msg.show(`${item.name}を読んだ！\n習得した！`);
+            PlayerStats.spells[item.spell] = true;
+            Msg.show(`${item.name}を読んだ！\n習得した！`, () => { Input.lock(100); }, 'overlay');
         } else if (item.type === 'staff') {
-            Msg.show(`${item.name}を購入した！\nメニューから装備しよう。`);
+            Msg.show(`${item.name}を購入した！\nメニューから装備しよう。`, () => { Input.lock(100); }, 'overlay');
         } else if (item.type === 'robe') {
-            Msg.show(`${item.name}を購入した！\nメニューから装備しよう。`);
+            Msg.show(`${item.name}を購入した！\nメニューから装備しよう。`, () => { Input.lock(100); }, 'overlay');
         } else if (item.type === 'amulet') {
-            QuestFlags.hasAmulet = true; // Flag for story
+            QuestFlags.hasAmulet = true;
             QuestFlags.check();
-            Msg.show(`${item.name}を入手した！\nメニューから装備しよう。`);
+            Msg.show(`${item.name}を入手した！\nメニューから装備しよう。`, () => { Input.lock(100); }, 'overlay');
         }
-        this.close();
+        // this.close(); // Removed to keep shop open
     },
 
     render(ctx) {

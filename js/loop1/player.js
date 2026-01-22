@@ -88,7 +88,8 @@ const PlayerStats = {
         const allItems = [
             ...ShopData.items,
             ...MagicShopData.items,
-            ...AdvancedShopData.items
+            ...AdvancedShopData.items,
+            ...MapItems.items
         ];
         return allItems.find(i => i.name === name);
     },
@@ -144,6 +145,22 @@ const PlayerStats = {
 
     heal(amount) {
         this.hp = Math.min(this.maxHp, this.hp + amount);
+    },
+    healFull() {
+        this.hp = this.maxHp;
+        this.mp = this.maxMp;
+        this.displayMpOffset = 0;
+        // Reset status ailments
+        this.status.poisonVal = 0;
+        this.status.silence = 0;
+        this.status.atkDownVal = 0;
+        this.status.defDownVal = 0;
+        // Reset base stats if needed (atk/def might be lowered by debuffs)
+        // Since debuffs modify current stats, we should probably reset/recalc?
+        // Current implementation seems to modify `this.atk` directly in `applyAtkDebuff`.
+        // So we need to ensure stats are restored.
+        // For now, simpler reset:
+        this.recalcStats();
     },
     healMp(amount) {
         this.mp = Math.min(this.maxMp, this.mp + amount);

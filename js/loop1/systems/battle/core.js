@@ -111,9 +111,33 @@ const Battle = {
                 if (this.isDemonKing && !this.isTrueBoss) {
                     this.handleFakeDemonKingEnd();
                 } else {
+                    // 通常の敗北処理（宿屋で復活）
                     this.active = false;
-                    currentState = GameState.GAMEOVER;
-                    Input.lock(200);
+
+                    // ゴールド半減
+                    const lostGold = Math.floor(PlayerStats.gold / 2);
+                    PlayerStats.gold -= lostGold;
+
+                    // 全回復
+                    PlayerStats.fullRestore();
+
+                    FX.fadeOut(() => {
+                        // 宿屋へ移動 (Village Inn: Map 'village', coords x:4, y:5 from 'village.js')
+                        Maps.current = 'village';
+                        if (window.game) {
+                            const TS = GameConfig.TILE_SIZE;
+                            window.game.player.x = 4 * TS;
+                            window.game.player.y = 5 * TS;
+                            window.game.player.dir = 0;
+                            // Reset encounter rate
+                            WorldState.resetEncounterSteps(Maps.get().encounterRate);
+                        }
+
+                        currentState = GameState.PLAYING;
+                        FX.fadeIn(() => {
+                            Msg.show(`所持金が半分になった (${lostGold}G 失った)`);
+                        });
+                    });
                 }
             }
         } else if (this.phase === 'deceptiveDeath') {

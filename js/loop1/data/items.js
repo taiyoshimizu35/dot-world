@@ -9,7 +9,7 @@ const ShopData = {
         { name: '上薬草', price: 50, type: 'item', desc: 'HP+60回復', sold: false },
         { name: 'エリクサー', price: 100, type: 'item', desc: 'HP+100回復', sold: false },
         { name: '天使のはね', price: 500, type: 'item', desc: '村へ帰還', sold: false },
-        { name: '魔除け薬', price: 200, type: 'item', desc: '300歩の間魔除け', sold: false },
+        { name: '魔除け薬', price: 200, type: 'item', desc: '600歩の間魔除け', sold: false },
         { name: '木の棒', price: 20, type: 'weapon', atk: 2, desc: '攻撃力+2', sold: false },
         { name: '銅の剣', price: 60, type: 'weapon', atk: 5, desc: '攻撃力+5', sold: false },
         { name: '鉄の剣', price: 100, type: 'weapon', atk: 8, desc: '攻撃力+8', sold: false },
@@ -23,6 +23,17 @@ const ShopData = {
         { name: '鉄の鎧', price: 120, type: 'armor', def: 6, desc: '防御力+6', sold: false },
         { name: '鋼の鎧', price: 200, type: 'armor', def: 10, desc: '防御力+10', sold: false },
         { name: '勇者の鎧', price: 500, type: 'armor', def: 18, desc: '防御力+18', sold: false }
+    ],
+    reset() { this.items.forEach(item => item.sold = false); }
+};
+
+// ===========================================
+// マップアイテムデータ（非売品）
+// ===========================================
+const MapItems = {
+    items: [
+        { name: 'ドラゴンスレイヤー', price: 0, type: 'weapon', atk: 20, desc: '東の敵に特効', sold: false },
+        { name: '炎の盾', price: 0, type: 'armor', def: 8, desc: '炎ダメージ半減', sold: false }
     ],
     reset() { this.items.forEach(item => item.sold = false); }
 };

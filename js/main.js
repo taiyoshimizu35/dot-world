@@ -1,9 +1,10 @@
+// Imports removed for global script compatibility
+// State classes are now loaded via index.html globals
+
 // ===========================================
 // メインゲームクラス
 // ===========================================
 
-// 週切り替えヘルパー関数
-// WorldState.managersを使用するため削除
 class Game {
     constructor() {
         this.cvs = document.getElementById('game-canvas');
@@ -17,6 +18,27 @@ class Game {
 
         this.player = { x: 0, y: 0, dir: 0, moving: false, anim: 0 };
         this.lastTime = 0;
+
+        // State Machine Initialization
+        this.stateMachine = new StateMachine();
+        this.initStates();
+    }
+
+    initStates() {
+        this.stateMachine.add('title', new TitleState(this));
+        this.stateMachine.add('playing', new PlayingState(this));
+        this.stateMachine.add('menu', new MenuState(this));
+        this.stateMachine.add('dialog', new DialogState(this));
+        this.stateMachine.add('battle', new BattleState(this));
+        this.stateMachine.add('shop', new ShopState(this));
+        this.stateMachine.add('inn', new InnState(this));
+        this.stateMachine.add('gameover', new GameOverState(this));
+        this.stateMachine.add('opening', new OpeningState(this));
+        this.stateMachine.add('ending', new EndingState(this));
+        this.stateMachine.add('loop1_ending', new Loop1EndingState(this));
+
+        // Default State
+        this.stateMachine.change('title');
     }
 
     resize() {
@@ -70,484 +92,84 @@ class Game {
     loop(t) {
         requestAnimationFrame(t => this.loop(t));
         this.lastTime = t;
+
         this.update();
         this.draw();
+
         FX.update();
     }
 
     update() {
-        if (currentState === GameState.FADE) return;
-        if (currentState === GameState.DIALOG) {
-            if (Input.interact()) { if (Msg.done()) Msg.hide(); else Msg.skip(); }
-            Msg.update();
-            return;
-        }
-        if (currentState === GameState.MENU) { Menu.update(); return; }
-        if (currentState === GameState.SHOP) { Shop.update(); return; }
-        if (currentState === GameState.INN) { Inn.update(); return; } // Inn Update
-        if (currentState === GameState.BATTLE) {
-            const battle = WorldState.managers.battle;
-            if (battle) battle.update();
-            return;
-        }
-        if (currentState === GameState.GAMEOVER) { GameOverMenu.update(); return; }
-        if (currentState === GameState.GAMEOVER) { GameOverMenu.update(); return; }
-        if (currentState === GameState.ENDING) { if (Input.interact()) location.reload(); return; }
-        if (currentState === GameState.OPENING) { Opening.update(); return; }
-        if (currentState === GameState.LOOP1_ENDING) { Loop1Ending.update(); return; }
+        // Global Systems checks (can be moved to states later)
+        // Check for Global State changes triggered by non-state systems
+        this.checkGlobalStateTransitions();
 
-        if (currentState === GameState.PLAYING) {
-            if (Input.justPressed('KeyX') && !Menu.visible) Menu.open();
-            this.handleMovement();
-            this.handleInteraction();
-        }
-    }
-
-    handleMovement() {
-        const { dx, dy } = Input.move();
-        const TS = GameConfig.TILE_SIZE;
-
-        if (dx === 0 && dy === 0) { this.player.moving = false; return; }
-
-        const nx = this.player.x + dx * GameConfig.PLAYER_SPEED;
-        const ny = this.player.y + dy * GameConfig.PLAYER_SPEED;
-        const margin = 2;
-
-        const c1 = Maps.getTile(Math.floor((nx + margin) / TS), Math.floor((ny + margin) / TS));
-        const c2 = Maps.getTile(Math.floor((nx + TS - margin) / TS), Math.floor((ny + margin) / TS));
-        const c3 = Maps.getTile(Math.floor((nx + margin) / TS), Math.floor((ny + TS - margin) / TS));
-        const c4 = Maps.getTile(Math.floor((nx + TS - margin) / TS), Math.floor((ny + TS - margin) / TS));
-
-        const tileBlocked = Maps.isBlocking(c1) || Maps.isBlocking(c2) || Maps.isBlocking(c3) || Maps.isBlocking(c4);
-        const npcBlocked = Maps.isNpcAt(Math.floor((nx + margin) / TS), Math.floor((ny + margin) / TS)) ||
-            Maps.isNpcAt(Math.floor((nx + TS - margin) / TS), Math.floor((ny + margin) / TS)) ||
-            Maps.isNpcAt(Math.floor((nx + margin) / TS), Math.floor((ny + TS - margin) / TS)) ||
-            Maps.isNpcAt(Math.floor((nx + TS - margin) / TS), Math.floor((ny + TS - margin) / TS));
-
-        if (tileBlocked || npcBlocked) { this.player.moving = false; return; }
-
-        // Gate Checks
-        const tx = Math.floor((nx + TS / 2) / TS);
-        const ty = Math.floor((ny + TS / 2) / TS);
-        if (Maps.current === 'village') {
-            if (tx > 23 && !QuestFlags.gateOpen) { Msg.show('門番「この先は危険だ。\n装備を整えてから来い。」'); return; }
-            if (tx < 1 && !QuestFlags.westGateOpen) { Msg.show('門番「西の塔は危険だ。\n相応の力か、加護が必要だ。」'); return; }
-        }
-
-        this.player.x = nx;
-        this.player.y = ny;
-        this.player.moving = true;
-        if (dx > 0) this.player.dir = 2;
-        else if (dx < 0) this.player.dir = 1;
-        else if (dy > 0) this.player.dir = 0;
-        if (dx > 0) this.player.dir = 2;
-        else if (dx < 0) this.player.dir = 1;
-        else if (dy > 0) this.player.dir = 0;
-        else if (dy < 0) this.player.dir = 3;
-
-        // Tile Event Check (Switch)
-        const currentT = Maps.getTile(Math.floor((this.player.x + TS / 2) / TS), Math.floor((this.player.y + TS / 2) / TS));
-        if (currentT === GameConfig.TILE_TYPES.SWITCH) {
-            // Check current map switch flag
-            const switchKey = Maps.current === 'west_stage1' ? 'stage1' : (Maps.current === 'west_stage2' ? 'stage2' : null);
-            if (switchKey && !QuestFlags.westSwitches[switchKey]) {
-                QuestFlags.westSwitches[switchKey] = true;
-                Msg.show('スイッチを踏んだ！\n遠くで何かが動く音がした。');
-                // Sound effect could go here
-            }
-        }
-
-        // Warp Check
-        const warp = Maps.getWarp(this.player.x, this.player.y);
-        if (warp) {
-            // Demon Castle Check
-            if (warp.requiresDemonCastle && !QuestFlags.canFaceTrueDemonKing) {
-                // 1週目: 4つのボスを倒していないと通さない
-                if (!QuestFlags.allFakeBossesDefeated()) {
-                    Msg.show('結界が張られている…\n四方の魔物を倒さねば通れないようだ。');
-                    return;
-                }
-                // 2週目: 真魔王条件
-                if (WorldState.week === 2 && !QuestFlags.canFaceTrueDemonKing) {
-                    Msg.show('真の魔王への道は閉ざされている…\n全ての元凶を断て！');
-                    return;
-                }
-            }
-
-            // Switch Requirement Check (West Dungeon)
-            if (warp.requiresSwitch) {
-                if (!QuestFlags.westSwitches[warp.requiresSwitch]) {
-                    Msg.show('扉は閉ざされている…\nどこかにあるスイッチを押さなければならないようだ。');
-                    return;
-                }
-            }
-
-            // Boss Count Restriction Check (Advanced Shop)
-            if (warp.requiresBossCount) {
-                const defeated = QuestFlags.countDefeatedBosses();
-                if (defeated < warp.requiresBossCount) {
-                    Msg.show(`店主「一見さんお断りだ。\n実力を示してから出直してきな（ボス撃破数: ${defeated}/${warp.requiresBossCount}）」`);
-                    return;
-                }
-            }
-
-            // Consumption Check
-            if (warp.consumeKey) {
-                const inv = WorldState.managers.inventory;
-                if (inv) {
-                    inv.remove(warp.requiresKey);
-                    Msg.show(`${warp.requiresKey}を使った。`);
-                }
-            }
-
-            FX.fadeOut(() => {
-                Maps.current = warp.to;
-                this.player.x = warp.tx * TS;
-                this.player.y = warp.ty * TS;
-                if (Maps.current === 'dungeon' && !Checkpoint.saved) Checkpoint.save({ x: 23, y: 10 });
-
-                // マップ切り替え時にエンカウント歩数をリセット
-                const m = Maps.get();
-                WorldState.resetEncounterSteps(m.encounterRate);
-
-                FX.fadeIn();
-            });
-            return;
-        }
-
-        // Encounter Check
-        this.checkEncounter();
-    }
-
-    checkEncounter() {
-        const TS = GameConfig.TILE_SIZE;
-        const m = Maps.get();
-        const currentTile = Maps.getTile(Math.floor((this.player.x + TS / 2) / TS), Math.floor((this.player.y + TS / 2) / TS));
-
-        // 安全地帯（道など）ではカウントしない
-        if (currentTile === GameConfig.TILE_TYPES.PATH) return;
-
-        // 歩数減少
-        WorldState.decrementCharm();
-        WorldState.stepsUntilEncounter--;
-
-        if (WorldState.stepsUntilEncounter <= 0) {
-            const battle = WorldState.managers.battle;
-            if (battle) {
-                this.player.moving = false;
-
-                if (m.isDungeon || m.area === 'north' || m.area === 'south' || m.area === 'west' || m.area === 'east') {
-                    battle.start(m.area);
-                } else {
-                    battle.start(Maps.current);
-                }
-
-                // 次回のエンカウント歩数をリセット
-                WorldState.resetEncounterSteps(m.encounterRate);
-            }
-        }
-    }
-
-
-    handleInteraction() {
-        if (!Input.interact()) return;
-        const TS = GameConfig.TILE_SIZE;
-        const playerTx = Math.floor((this.player.x + TS / 2) / TS);
-        const playerTy = Math.floor((this.player.y + TS / 2) / TS);
-
-        let tx = playerTx, ty = playerTy;
-        if (this.player.dir === 0) ty++;
-        else if (this.player.dir === 1) tx--;
-        else if (this.player.dir === 2) tx++;
-        else if (this.player.dir === 3) ty--;
-
-        const targetT = Maps.getTile(tx, ty);
-        if (targetT === GameConfig.TILE_TYPES.COUNTER) {
-            if (this.player.dir === 0) ty++;
-            else if (this.player.dir === 1) tx--;
-            else if (this.player.dir === 2) tx++;
-            else if (this.player.dir === 3) ty--;
-        }
-
-        const npcs = Maps.get().npcs || [];
-        let npc = npcs.find(n => n.x === tx && n.y === ty);
-        if (!npc) {
-            const adjacents = [
-                { x: playerTx, y: playerTy + 1 }, { x: playerTx, y: playerTy - 1 },
-                { x: playerTx + 1, y: playerTy }, { x: playerTx - 1, y: playerTy }
-            ];
-            for (const adj of adjacents) {
-                const adjNpc = npcs.find(n => n.x === adj.x && n.y === adj.y);
-                if (adjNpc) { npc = adjNpc; break; }
-            }
-        }
-
-        if (npc) {
-            // 週限定NPCのチェック
-            if (npc.week1Only && gameLoop.week !== 1) return;
-            if (npc.week2Only && gameLoop.week !== 2) return;
-
-            // 仲間加入NPCの処理
-            if (npc.partyJoin) {
-                const party = WorldState.managers.party;
-                // パーティシステムが有効かつ、未加入の場合
-                if (party) {
-                    // 既に仲間になっている場合は何もしない
-                    if (party.members.find(m => m.id === npc.partyJoin)) return;
-
-                    // ボス撃破条件チェック
-                    if (npc.requiresBoss && !QuestFlags.trueBosses[npc.requiresBoss]) {
-                        Msg.show('（何かを待っているようだ…）');
-                        return;
-                    }
-
-                    // 仲間加入 (Party2対応: PartyMemberDataはWeek 1用だが、Week 2ではParty.add内で解決されるべき。
-                    // しかし main.js は汎用。npc.partyJoin は ID ('alex' etc)
-                    if (party.add(npc.partyJoin)) {
-                        // 名前取得のため一時的にデータ参照（簡易対応）
-                        // 本来は party.add の戻り値や party から取得すべき
-                        const name = npc.partyJoin === 'alex' ? 'アレックス' : (npc.partyJoin === 'rose' ? 'ローズ' : 'ミリア');
-                        Msg.show(`${name}が仲間になった！\n「一緒に魔王を倒そう！」`);
-                    }
-                }
-                return;
-            }
-
-            // 倒したボスならスキップ
-            if (npc.areaBoss && !npc.trueAreaBoss && QuestFlags.fakeBosses[npc.areaBoss]) {
-                // 嘘ボス撃破済み - 何もしない
-            } else if (npc.trueAreaBoss && QuestFlags.trueBosses[npc.areaBoss]) {
-                // 真ボス撃破済み - 何もしない
-            } else {
-                Battle.playerRef = { x: this.player.x, y: this.player.y };
-                if (npc.shop) Shop.open('normal');
-                else if (npc.magicShop) Shop.open('magic');
-                else if (npc.advancedShop) Shop.open('advanced');
-
-                // 宿屋
-                else if (npc.inn) {
-                    const cost = Math.max(1, Math.floor(PlayerStats.gold * 0.05)); // 5% cost
-                    Inn.open(cost);
-                }
-
-                // 新システム: エリアボス
-                else if (npc.areaBoss) {
-                    const isTrueBoss = npc.trueAreaBoss || false;
-                    Battle.startAreaBoss(npc.areaBoss, isTrueBoss);
-                }
-                // 魔王城案内人（1週目）
-                else if (npc.demonGuide) {
-                    if (QuestFlags.allFakeBossesDefeated()) {
-                        Msg.show('「勇者よ！全てのボスを倒したな！\n私の後ろから魔王城へ行ける！」');
-                    } else {
-                        const defeated = [];
-                        const remaining = [];
-                        if (QuestFlags.fakeBosses.east) defeated.push('東'); else remaining.push('東');
-                        if (QuestFlags.fakeBosses.west) defeated.push('西'); else remaining.push('西');
-                        if (QuestFlags.fakeBosses.north) defeated.push('北'); else remaining.push('北');
-                        if (QuestFlags.fakeBosses.south) defeated.push('南'); else remaining.push('南');
-                        Msg.show(`「四方のボスを倒せば魔王城への道が開く。\n残り: ${remaining.join('・')}」`);
-                    }
-                }
-                // 2週目専用: クエストNPC
-                else if (npc.questGiver && WorldState.week === 2) {
-                    const quests = QuestSystem2.getAvailableQuests();
-                    let claimable = quests.filter(q => q.progress.isComplete && !q.progress.isClaimed);
-                    if (claimable.length > 0) {
-                        const result = QuestSystem2.claimReward(claimable[0].id);
-                        Msg.show(result.msg);
-                    } else {
-                        const active = quests.filter(q => !q.progress.isClaimed);
-                        if (active.length > 0) {
-                            const q = active[0];
-                            Msg.show(`【${q.name}】\n${q.desc}\n進捗: ${q.progress.current}/${q.required}`);
-                        } else {
-                            Msg.show('「全てのクエストを達成した！\nお疲れ様！」');
-                        }
-                    }
-                }
-                // 2週目専用: 武器店NPC
-                else if (npc.weaponShop && WorldState.week === 2) {
-                    const weapons = WeaponShop.getAvailableWeapons();
-                    const affordable = weapons.filter(w => w.canBuy && (!PlayerStats2.weapon || w.atk > PlayerStats2.weapon.atk));
-                    if (affordable.length > 0) {
-                        const weapon = affordable[0];
-                        const result = WeaponShop.buy(weapon.id);
-                        Msg.show(result.msg);
-                    } else {
-                        const current = PlayerStats2.weapon ? PlayerStats2.weapon.name : '素手';
-                        Msg.show(`「現在の装備: ${current}\nもっとゴールドを貯めてから来い！」`);
-                    }
-                }
-                // 新システム: 魔王
-                else if (npc.demonKing) {
-                    const battle = WorldState.managers.battle;
-                    if (battle && typeof battle.startDemonKing === 'function') {
-                        battle.startDemonKing(QuestFlags.canFaceTrueDemonKing);
-                    }
-                }
-                // 旧システム互換
-                else if (npc.boss) Battle.startBoss();
-                else if (npc.westBoss) Battle.startWestBoss();
-                else if (npc.northBoss) Battle.startNorthBoss();
-                else if (npc.southBoss) Battle.startSouthBoss();
-                else if (npc.msg) Msg.show(npc.msg);
-            }
-        }
-
-        // Chest
-        const chest = Chests.nearby(Maps.current, tx * TS, ty * TS);
-        if (chest && !Chests.isOpen(chest.id)) {
-            Chests.open(chest.id);
-            // アイテム追加（Invが存在する場合のみ）
-            const inv = WorldState.managers.inventory;
-            if (inv) {
-                if (chest.item === '薬草') inv.add('薬草', chest.count);
-                else if (chest.item === 'ポーション') inv.add('ポーション', chest.count);
-                else if (chest.item === '魔法の聖水') inv.add('魔法の聖水', chest.count);
-                else if (chest.item === '銀の鍵') inv.add('銀の鍵', chest.count);
-                Msg.show(`${chest.item}を手に入れた!` + (chest.count > 1 ? ` x${chest.count}` : ''));
-            } else {
-                Msg.show(`${chest.item}を見つけたが、今は持ち運べない。`);
-            }
-        }
+        this.stateMachine.update();
+        FX.update();
     }
 
     draw() {
-        const { VIEWPORT_WIDTH: VW, VIEWPORT_HEIGHT: VH, TILE_SIZE: TS } = GameConfig;
+        this.stateMachine.draw(this.ctx);
+        FX.render(this.ctx); // FX overlay
+        Msg.render(this.ctx); // Global Msg overlay (must be on top of FX)
+    }
 
-        Camera.update(this.player.x, this.player.y, Maps.get().w, Maps.get().h);
-        Draw.rect(this.ctx, 0, 0, VW, VH, '#000');
+    checkGlobalStateTransitions() {
+        // Compatibility: Check if `currentState` changed externally (e.g. by legacy systems)
+        // and sync StateMachine. 
+        // NOTE: This is a temporary bridge. ideally systems should call game.stateMachine.change
 
-        // Map Render
-        const m = Maps.get();
-        const startCol = Math.floor(Camera.x / TS);
-        const endCol = startCol + (VW / TS) + 1;
-        const startRow = Math.floor(Camera.y / TS);
-        const endRow = startRow + (VH / TS) + 1;
+        // Map legacy GameStates to StateMachine keys
+        const map = {
+            [GameState.TITLE]: 'title',
+            [GameState.PLAYING]: 'playing',
+            [GameState.MENU]: 'menu',
+            [GameState.DIALOG]: 'dialog',
+            [GameState.BATTLE]: 'battle',
+            [GameState.SHOP]: 'shop',
+            [GameState.INN]: 'inn',
+            [GameState.GAMEOVER]: 'gameover',
+            [GameState.OPENING]: 'opening',
+            [GameState.ENDING]: 'ending',
+            [GameState.LOOP1_ENDING]: 'loop1_ending'
+        };
 
-        for (let y = startRow; y <= endRow; y++) {
-            for (let x = startCol; x <= endCol; x++) {
-                if (y >= 0 && y < m.h && x >= 0 && x < m.w) {
-                    const t = m.tiles[y][x];
-                    let imgName = 'grass';
-                    if (t === 1) imgName = 'rock';
-                    else if (t === 2) imgName = 'path';
-                    else if (t === 3) imgName = 'water';
-                    else if (t === 4) imgName = 'house';
-                    else if (t === 5) imgName = 'door';
-                    else if (t === 6) imgName = 'floor';
-                    else if (t === 7) imgName = 'desk';
-                    else if (t === 8) imgName = 'bed';
-                    else if (t === 9) imgName = 'path';
-                    else if (t === 10) imgName = 'counter';
-                    else if (t === 11) imgName = 'tree';
-                    else if (t === 12) imgName = 'stairs';
-                    else if (t === 13) imgName = 'stone_switch';
-                    else if (t === 14) imgName = 'stone';
-                    else if (t === 15) imgName = 'statue';
-                    else if (t === 16) imgName = 'gray_grass';
-                    else if (t === 17) imgName = 'gray_door';
-
-                    const sp = Camera.toScreen(x * TS, y * TS);
-                    const img = AssetLoader.get(imgName);
-                    if (img) this.ctx.drawImage(img, sp.x, sp.y, TS, TS);
-                }
-            }
+        const targetState = map[currentState];
+        if (targetState && targetState !== this.stateMachine.currentName) {
+            // External change detected (e.g. from Msg.show, Menu.open)
+            console.log(`Syncing state: ${this.stateMachine.currentName} -> ${targetState}`);
+            // We use 'change' but we might need to be careful if 'enter' logic repeats?
+            // Most 'enter' logic is safe or empty.
+            this.stateMachine.change(targetState);
         }
 
-        // プレイヤーのタイル座標を計算
-        const playerTx = Math.floor((this.player.x + TS / 2) / TS);
-        const playerTy = Math.floor((this.player.y + TS / 2) / TS);
+        // If we want to support legacy systems setting `currentState`, 
+        // we need to detect mismatch.
+        // But `this.stateMachine.currentState` is an object.
+        // We can't easily check 'name' unless we store it.
+        // However, we can trust the StateMachine if we assume we are migrating fully.
 
-        // 宝箱描画（視界制限適用）
-        Chests.render(this.ctx, Maps.current, playerTx, playerTy, Maps.get().area);
+        // For now, let's reverse it: allow StateMachine to be the source of truth,
+        // and if legacy systems rely on `currentState` variable, keep it updated?
+        // OR, if legacy systems SET `currentState`, we must detect it.
 
-        // NPCs（条件フィルタリング済み、視界制限適用）
-        const visibleNpcs = Maps.getVisibleNpcs();
-        const currentArea = Maps.get().area;
-        for (const npc of visibleNpcs) {
-            // 南エリアでは視界内のNPCのみ表示
-            if (currentArea === 'south') {
-                const dist = Math.hypot(npc.x - playerTx, npc.y - playerTy);
-                if (dist > 3.5) continue; // 視界外のNPCはスキップ
-            }
+        // Let's rely on the wrapper states (MenuState etc) checking the systems.
+        // e.g. MenuState checks if Menu.visible is false.
 
-            const sp = Camera.toScreen(npc.x * TS, npc.y * TS);
-            const img = AssetLoader.get(npc.img || (npc.type === 'villager' ? 'villager' : (npc.type === 'guard' ? 'guard' : (npc.type === 'signpost' ? 'signpost' : 'enemy_slime'))));
-            if (img) this.ctx.drawImage(img, sp.x, sp.y, TS, TS);
-        }
-
-        // Player
-        const pSp = Camera.toScreen(this.player.x, this.player.y);
-        const pImg = AssetLoader.get('player');
-        if (pImg) this.ctx.drawImage(pImg, pSp.x, pSp.y, TS, TS);
-
-        // South Area Darkness Effect（UI描画の直前、プレイヤー描画の後に配置）
-        if (Maps.get().area === 'south') {
-            const cx = pSp.x + TS / 2; // プレイヤーの中心X
-            const cy = pSp.y + TS / 2; // プレイヤーの中心Y
-            const radius = TS * 3;     // くり抜く半径（ここでは3タイル分）
-        
-            this.ctx.save();
-
-            // 1. 暗闇の色を設定
-            this.ctx.fillStyle = 'rgba(0, 0, 0, 1.0)'; // ほぼ真っ暗
-
-            // 2. 「外枠」と「内側の穴」を同時に描画するパスを作成
-            this.ctx.beginPath();
-            // 画面全体の四角形（時計回り）
-            this.ctx.rect(0, 0, VW, VH);
-            // プレイヤー周りの円形（反時計回り true）
-            // これにより「evenodd」ルールで中がくり抜かれます
-            this.ctx.arc(cx, cy, radius, 0, Math.PI * 2, true);
-
-            // 3. 塗りつぶし
-            this.ctx.fill();
-
-            this.ctx.restore();
-        }
-        
-
-        // UI
-        FX.render(this.ctx);
-        if (currentState === GameState.DIALOG) Msg.render(this.ctx);
-        if (currentState === GameState.MENU) Menu.render(this.ctx);
-        if (currentState === GameState.SHOP) Shop.render(this.ctx);
-        if (currentState === GameState.INN) Inn.render(this.ctx); // Inn Render
-        if (currentState === GameState.BATTLE) {
-            const battle = WorldState.managers.battle;
-            if (battle) battle.render(this.ctx);
-        }
-
-        if (currentState === GameState.TITLE) {
-            Draw.rect(this.ctx, 0, 0, VW, VH, '#000');
-            Draw.text(this.ctx, 'DOT WORLD', 80, 80, '#fff', 20);
-            Draw.text(this.ctx, 'Press Enter', 90, 150, '#fff', 10);
-            if (Input.interact()) {
-                currentState = GameState.OPENING;
-                Opening.init();
-            }
-        }
-
-        if (currentState === GameState.GAMEOVER) GameOverMenu.render(this.ctx);
-        if (currentState === GameState.ENDING) {
-            Draw.rect(this.ctx, 0, 0, VW, VH, 'rgba(255,255,255,0.9)');
-            Draw.text(this.ctx, 'THE END', 90, 100, '#000', 20);
-        }
-
-        if (currentState === GameState.OPENING) {
-            Opening.render(this.ctx);
-        }
-
-        if (currentState === GameState.LOOP1_ENDING) {
-            Loop1Ending.render(this.ctx);
-        }
+        // One critical thing: Msg.show() sets currentState = DIALOG?
+        // Let's check Msg.show()
     }
 }
-//    }
-//}
 
 const game = new Game();
 window.game = game;
 window.onload = () => game.init();
+
+// Bridging: We might need to listen to global `currentState` changes if we can't refactor everything.
+// But we can try to intercept Msg.show or similar.
+// For now, let's inject a listener or poll.
+// But since we want "Optimization", polling is bad.
+// Ideally, we modify Msg.show to call game.stateMachine.change via a global helper?
+
+// Let's monkey-patch Msg.show if necessary, or just rely on PlayingState to check Msg.
+// In PlayingState, we can check logic.

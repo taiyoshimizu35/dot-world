@@ -30,7 +30,7 @@ const WorldState = {
     stepsUntilEncounter: 0, // 次のエンカウントまでの歩数
 
     useCharm() {
-        this.charmSteps = 300;
+        this.charmSteps = 600;
         Msg.show('魔除け薬を使った！\nしばらくの間、敵が出にくくなる。');
     },
     decrementCharm() {

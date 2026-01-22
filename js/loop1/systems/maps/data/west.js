@@ -113,7 +113,7 @@ function initWestWeek1(Maps, T) {
     w2t[20][40] = T.STAIRS; // Back to Stage 1
 
     Maps.data.west_stage2 = {
-        w: 41, h: 41, tiles: w2t, isDungeon: true, encounterRate: 0.05, area: 'west', week1Map: true,
+        w: 41, h: 41, tiles: w2t, isDungeon: true, encounterRate: 0.008, area: 'west', week1Map: true,
         bgm: 'dungeon',
         npcs: [],
         warps: [

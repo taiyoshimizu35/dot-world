@@ -9,8 +9,8 @@ const Chests = {
         this.list = [
             { id: 'c1', map: 'village', x: 14, y: 12, item: '薬草', count: 2 },
             { id: 'c3', map: 'house1', x: 7, y: 2, item: '薬草', count: 3 },
-            { id: 'ec1', map: 'east_stage1', x: 38, y: 38, item: 'ポーション', count: 2 },
-            { id: 'ec2', map: 'east_stage1', x: 38, y: 2, item: '魔法の聖水', count: 1 },
+            { id: 'ec1', map: 'east_stage1', x: 38, y: 38, item: 'ドラゴンスレイヤー', count: 1 },
+            { id: 'ec2', map: 'east_stage1', x: 38, y: 2, item: '炎の盾', count: 1 },
             { id: 'sc1', map: 'south_stage1', x: 35, y: 35, item: '銀の鍵', count: 1 },
             { id: 'sc2', map: 'south_stage2', x: 5, y: 35, item: '銀の鍵', count: 1 }
         ];
