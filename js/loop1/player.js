@@ -6,11 +6,14 @@
 const PlayerStats = {
     name: '勇者',
     level: 1,
-    hp: 30, maxHp: 30,
-    mp: 10, maxMp: 10,
-    atk: 8, def: 4,
-    matk: 6, mdef: 3,
-    baseDef: 4,
+    // Base stats (without equipment)
+    baseMaxHp: 30, maxHp: 30, hp: 30,
+    baseMaxMp: 10, maxMp: 10, mp: 10,
+    baseAtk: 8, atk: 8,
+    baseDef: 4, def: 4,
+    baseMatk: 6, matk: 6,
+    baseMdef: 3, mdef: 3,
+
     exp: 0, nextExp: 50,
     gold: 50,
     spells: { fire: false, heal: false, water: false, wind: false },
@@ -19,24 +22,116 @@ const PlayerStats = {
     isDefending: false,
     displayMpOffset: 0,
 
-    // DECEPTION_LOGIC: 表示用ステータス取得 - 1週目はLv×3の下駄
-    getDisplayStats() {
-        // ステータスの嘘: Lv×3の下駄
-        const boost = truthFlags.status ? 0 : (this.level * 3);
+    // Equipment Slots
+    equipment: {
+        weapon: null,
+        armor: null,
+        accessory: null
+    },
 
-        const displayHp = this.hp <= 0 ? 0 : this.hp + boost;
-        const rawDisplayMp = this.mp + boost - this.displayMpOffset;
-        const displayMp = Math.max(0, rawDisplayMp);
+    init() {
+        this.recalcStats();
+    },
+
+    // Recalculate stats based on level and equipment
+    recalcStats() {
+        // 1. Reset to base stats ( Level growth could be added here if we kept it, but "Level * 3" is removed)
+        // For now, let's assume base stats grow with level ONLY via levelUp() modifying base values.
+        // User said: "Remove level * 3 status plus"
+
+        // Reset current max to base (which includes level growth)
+        this.maxHp = this.baseMaxHp;
+        this.maxMp = this.baseMaxMp;
+        this.atk = this.baseAtk;
+        this.def = this.baseDef;
+        this.matk = this.baseMatk;
+        this.mdef = this.baseMdef;
+        this.magicBoost = 1.0;
+
+        // 2. Add Equipment Bonuses
+        // Weapon
+        if (this.equipment.weapon) {
+            const w = this.findItemData(this.equipment.weapon);
+            if (w) {
+                if (w.atk) this.atk += w.atk;
+                if (w.def) this.def += w.def; // Some weapons might give def?
+                if (w.magicBoost) this.magicBoost = Math.max(this.magicBoost, w.magicBoost);
+            }
+        }
+        // Armor
+        if (this.equipment.armor) {
+            const a = this.findItemData(this.equipment.armor);
+            if (a) {
+                if (a.def) this.def += a.def;
+                if (a.maxMp) this.maxMp += a.maxMp;
+                // If maxMp changed, current MP should ideally stay valid, but maybe not fill up?
+                // Let's cap current MP to new maxMp later.
+            }
+        }
+        // Accessory
+        if (this.equipment.accessory) {
+            const acc = this.findItemData(this.equipment.accessory);
+            if (acc) {
+                // Add accessory effects if any
+            }
+        }
+
+        // Cap HP/MP to new max
+        this.hp = Math.min(this.hp, this.maxHp);
+        this.mp = Math.min(this.mp, this.maxMp);
+    },
+
+    // Helper to find item data (needs refernce to ShopData/Items)
+    findItemData(name) {
+        // Combine all shop lists or use a dedicated item DB. 
+        // For now, scan the known lists.
+        const allItems = [
+            ...ShopData.items,
+            ...MagicShopData.items,
+            ...AdvancedShopData.items
+        ];
+        return allItems.find(i => i.name === name);
+    },
+
+    // Equip item
+    equip(name) {
+        const item = this.findItemData(name);
+        if (!item) return false;
+
+        if (item.type === 'weapon' || item.type === 'holySword' || item.type === 'staff') {
+            this.equipment.weapon = name;
+        } else if (item.type === 'armor' || item.type === 'robe') {
+            this.equipment.armor = name;
+        } else if (item.type === 'amulet') {
+            this.equipment.accessory = name;
+        } else {
+            return false;
+        }
+        this.recalcStats();
+        return true;
+    },
+
+    unequip(slot) {
+        if (this.equipment[slot]) {
+            this.equipment[slot] = null;
+            this.recalcStats();
+        }
+    },
+
+    // DECEPTION_LOGIC: 表示用ステータス取得 - 1週目はLv×3の下駄 -> 廃止
+    getDisplayStats() {
+        // ステータスの嘘: 廃止 (truthFlags check removed or always true essentially)
+        // User requested: "Remove level * 3 status, remove waste internal number system, make it normal RPG"
 
         return {
-            hp: displayHp,
-            maxHp: this.maxHp + boost,
-            mp: displayMp,
-            maxMp: this.maxMp + boost,
-            atk: this.atk + boost,
-            def: this.def + boost,
-            matk: this.matk + boost,
-            mdef: this.mdef + boost,
+            hp: this.hp,
+            maxHp: this.maxHp,
+            mp: this.mp,
+            maxMp: this.maxMp,
+            atk: this.atk,
+            def: this.def,
+            matk: this.matk,
+            mdef: this.mdef,
             level: this.level,
             exp: this.exp,
             nextExp: this.nextExp,
@@ -74,7 +169,7 @@ const PlayerStats = {
     addExp(amount) {
         // 2週目はレベルアップなし
         if (gameLoop.week === 2) {
-            this.gold += Math.floor(amount / 10); // 経験値をゴールドに変換
+            this.gold += Math.floor(amount / 10);
             return false;
         }
         // 1週目は通常のレベルアップ
@@ -111,12 +206,22 @@ const PlayerStats = {
 
     levelUp() {
         this.level++;
-        this.maxHp += 5; this.hp = this.maxHp;
-        this.maxMp += 2; this.mp = this.maxMp;
-        this.displayMpOffset = 0;
-        this.atk += 2; this.def += 1; this.baseDef = this.def;
-        this.matk += 2; this.mdef += 1;
-        this.exp = 0; this.nextExp = Math.floor(this.nextExp * 1.5);
+        // Base stats growth
+        this.baseMaxHp += 5;
+        this.baseMaxMp += 2;
+        this.baseAtk += 2;
+        this.baseDef += 1;
+        this.baseMatk += 2;
+        this.baseMdef += 1;
+
+        // Full heal on level up
+        this.hp = this.baseMaxHp; // Will be capped in recalc if needed, but safe here
+        this.mp = this.baseMaxMp;
+
+        this.exp = 0;
+        this.nextExp = Math.floor(this.nextExp * 1.5);
+
+        this.recalcStats(); // Update totals
         QuestFlags.check();
     },
 
@@ -132,17 +237,20 @@ const PlayerStats = {
         this.magicBoost = 1.0;
     },
 
-    // 2週目開始時のリセット（ステータス吸収後）
+    // 2週目開始時のリセット
     resetForWeek2() {
-        // WorldStateに2週目移行を通知（ステータス吸収含む）
         WorldState.startWeek2(this);
 
-        // 初期状態にリセット
         this.level = 1;
-        this.hp = 30; this.maxHp = 30;
-        this.mp = 10; this.maxMp = 10;
-        this.atk = 8; this.def = 4; this.baseDef = 4;
-        this.matk = 6; this.mdef = 3;
+        this.baseMaxHp = 30; this.maxHp = 30; this.hp = 30;
+        this.baseMaxMp = 10; this.maxMp = 10; this.mp = 10;
+        this.baseAtk = 8; this.atk = 8;
+        this.baseDef = 4; this.def = 4;
+        this.baseMatk = 6; this.matk = 6;
+        this.baseMdef = 3; this.mdef = 3;
+
+        this.equipment = { weapon: null, armor: null, accessory: null };
+
         this.exp = 0; this.nextExp = 50;
         this.gold = 50;
         this.displayMpOffset = 0;

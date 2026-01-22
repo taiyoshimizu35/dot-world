@@ -53,51 +53,45 @@ const Shop = {
     buy() {
         const item = this.getItems()[this.cur];
         const uniqueTypes = ['weapon', 'armor', 'spell', 'staff', 'robe', 'amulet', 'holySword'];
+        // Check if already owned (in inventory) for unique items
+        // Note: 'sold' flag in item data is one way, but inventory check is safer if we want to support multiple save slots or re-init.
+        // For now, relying on 'sold' flag as per existing logic, but maybe we should check Inv.has(item.name)?
+        // The existing code uses item.sold which is reset on init.
         if (item.sold && uniqueTypes.includes(item.type)) { this.warning = 'SOLD OUT!'; return; }
+
         if (PlayerStats.gold < item.price) { this.warning = 'ゴールドが足りない！'; return; }
         PlayerStats.spendGold(item.price);
 
-        if (item.type === 'item') {
+        // Create inventory list for types that should be added
+        // Spells are learned immediately, so don't add to inventory
+        if (item.type !== 'spell') {
             Inv.add(item.name);
+        }
+        item.sold = true;
+
+        if (item.type === 'item') {
             Msg.show(`${item.name}を購入した！`);
         } else if (item.type === 'weapon') {
-            PlayerStats.atk += item.atk;
-            item.sold = true;
             if (item.name === '鋼の剣') QuestFlags.hasSword = true;
             QuestFlags.check();
-            Msg.show(`${item.name}を装備した！\n攻撃力+${item.atk}！`);
+            Msg.show(`${item.name}を購入した！\nメニューから装備しよう。`);
         } else if (item.type === 'holySword') {
-            // WEAPON_DECEPTION: 聖剣購入処理
-            PlayerStats.atk += item.atk;
+            // WEAPON_DECEPTION: 聖剣購入
             gameLoop.holySwordOwned = true;
-            item.sold = true;
-            Msg.show(`${item.name}を装備した！\n攻撃力+${item.atk}！\n「これで魔王を倒せる…！」`);
+            Msg.show(`${item.name}を購入した！\n「これで魔王を倒せる…！」`);
         } else if (item.type === 'armor') {
-            PlayerStats.def += item.def;
-            PlayerStats.baseDef = PlayerStats.def;
-            item.sold = true;
-            Msg.show(`${item.name}を装備した！\n防御力+${item.def}！`);
+            Msg.show(`${item.name}を購入した！\nメニューから装備しよう。`);
         } else if (item.type === 'spell') {
-            PlayerStats.spells[item.spell] = true;
-            item.sold = true;
+            PlayerStats.spells[item.spell] = true; // Spells are still learned immediately (intrinsic)
             Msg.show(`${item.name}を読んだ！\n習得した！`);
         } else if (item.type === 'staff') {
-            PlayerStats.atk += item.atk;
-            PlayerStats.magicBoost = item.magicBoost;
-            item.sold = true;
-            Msg.show(`${item.name}を装備した！`);
+            Msg.show(`${item.name}を購入した！\nメニューから装備しよう。`);
         } else if (item.type === 'robe') {
-            PlayerStats.def += item.def;
-            PlayerStats.baseDef = PlayerStats.def;
-            PlayerStats.maxMp += item.maxMp;
-            PlayerStats.mp += item.maxMp;
-            item.sold = true;
-            Msg.show(`${item.name}を装備した！`);
+            Msg.show(`${item.name}を購入した！\nメニューから装備しよう。`);
         } else if (item.type === 'amulet') {
-            QuestFlags.hasAmulet = true;
+            QuestFlags.hasAmulet = true; // Flag for story
             QuestFlags.check();
-            item.sold = true;
-            Msg.show(`${item.name}を入手した！`);
+            Msg.show(`${item.name}を入手した！\nメニューから装備しよう。`);
         }
         this.close();
     },

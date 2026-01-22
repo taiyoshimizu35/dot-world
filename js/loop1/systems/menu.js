@@ -2,7 +2,10 @@
 // メニュー
 // ===========================================
 const Menu = {
-    visible: false, cur: 0, sub: null, itemCur: 0, message: null,
+    visible: false, cur: 0, sub: null, itemCur: 0,
+    categoryCur: 0,
+    categories: ['道具', '武器', '防具', '装飾品'],
+    message: null,
     opts: ['アイテム', 'ステータス', '閉じる'],
 
     open() {
@@ -10,6 +13,7 @@ const Menu = {
         this.cur = 0;
         this.sub = null;
         this.itemCur = 0;
+        this.categoryCur = 0;
         this.message = null;
         currentState = GameState.MENU;
         Input.lock(200);
@@ -26,42 +30,159 @@ const Menu = {
     update() {
         if (!this.visible) return;
 
-        // メッセージ表示中
+        // Message Mode
         if (this.message) {
             if (Input.interact() || Input.cancel()) this.message = null;
             return;
         }
 
-        // サブメニュー操作
-        if (this.sub === 'items') {
-            const items = Inv.list();
-            if (items.length === 0) {
-                if (Input.cancel()) { this.sub = null; Input.lock(150); }
-                return;
-            }
-            if (Input.justPressed('ArrowUp')) this.itemCur = (this.itemCur - 1 + items.length) % items.length;
-            if (Input.justPressed('ArrowDown')) this.itemCur = (this.itemCur + 1) % items.length;
-            if (Input.interact()) this.useItem(items[this.itemCur][0]);
-            if (Input.cancel()) { this.sub = null; Input.lock(150); }
-            return;
-        }
+        // Submenu: Status
         if (this.sub === 'status') {
             if (Input.cancel()) { this.sub = null; Input.lock(150); }
             return;
         }
 
-        // メインメニュー
+        // Submenu: Item Categories
+        if (this.sub === 'categories') {
+            if (Input.justPressed('ArrowUp')) this.categoryCur = (this.categoryCur - 1 + this.categories.length) % this.categories.length;
+            if (Input.justPressed('ArrowDown')) this.categoryCur = (this.categoryCur + 1) % this.categories.length;
+            if (Input.interact()) {
+                this.sub = 'items';
+                this.itemCur = 0;
+            }
+            if (Input.cancel()) { this.sub = null; Input.lock(150); }
+            return;
+        }
+
+        // Submenu: Item List
+        if (this.sub === 'items') {
+            const items = this.getFilteredItems();
+            if (items.length === 0) {
+                if (Input.cancel()) { this.sub = 'categories'; Input.lock(150); }
+                return;
+            }
+            if (Input.justPressed('ArrowUp')) this.itemCur = (this.itemCur - 1 + items.length) % items.length;
+            if (Input.justPressed('ArrowDown')) this.itemCur = (this.itemCur + 1) % items.length;
+
+            if (Input.interact()) {
+                const item = items[this.itemCur];
+                this.handleItemAction(item);
+            }
+
+            if (Input.cancel()) { this.sub = 'categories'; Input.lock(150); }
+            return;
+        }
+
+        // Main Menu
         if (Input.justPressed('ArrowUp')) this.cur = (this.cur - 1 + 3) % 3;
         if (Input.justPressed('ArrowDown')) this.cur = (this.cur + 1) % 3;
         if (Input.interact()) {
-            if (this.cur === 0) { this.sub = 'items'; this.itemCur = 0; }
+            if (this.cur === 0) { this.sub = 'categories'; this.categoryCur = 0; }
             else if (this.cur === 1) this.sub = 'status';
             else this.close();
         }
         if (Input.cancel()) this.close();
     },
 
+    getFilteredItems() {
+        const cat = this.categories[this.categoryCur];
+        const all = Inv.list().map(([n, c]) => ({ name: n, count: c, data: PlayerStats.findItemData(n) }));
+
+        let typeFilter = [];
+        if (cat === '道具') typeFilter = ['item'];
+        else if (cat === '武器') typeFilter = ['weapon', 'holySword', 'staff'];
+        else if (cat === '防具') typeFilter = ['armor', 'robe'];
+        else if (cat === '装飾品') typeFilter = ['amulet'];
+
+        // Include equipped items? "Inv.list()" checks inventory.
+        // Assuming equipped items are REMOVED from inventory or KEPT?
+        // Standard RPG: Equipped item is distinct.
+        // CURRENT SYSTEM: inv.add just increments counter.
+        // If I equip, do I remove from inventory?
+        // If I buy 1 Sword, Equip it -> Inv count 0?
+        // If count 0, Inv.list won't return it.
+        // So I need to ALSO list equipped items if they match category.
+
+        let list = all.filter(i => i.data && typeFilter.includes(i.data.type));
+
+        // Add equipped items if they match filter and aren't in inventory (or simplify display)
+        // Let's create a display list.
+        // If something is equipped, it might not be in Inv (count 0), so we must check PlayerStats.equipment.
+
+        const eq = PlayerStats.equipment;
+        const slots = [];
+        if (cat === '武器' && eq.weapon) slots.push(eq.weapon);
+        if (cat === '防具' && eq.armor) slots.push(eq.armor);
+        if (cat === '装飾品' && eq.accessory) slots.push(eq.accessory);
+
+        // Add equipped items to list if not present (or mark them)
+        slots.forEach(name => {
+            const existing = list.find(i => i.name === name);
+            if (existing) {
+                existing.equipped = true;
+            } else {
+                const data = PlayerStats.findItemData(name);
+                if (data) list.unshift({ name: name, count: 0, data: data, equipped: true });
+            }
+        });
+
+        return list;
+    },
+
+    handleItemAction(item) {
+        if (item.equipped) {
+            // Unequip or do nothing? User said "着脱".
+            // If equipped, unequip.
+            PlayerStats.equip(item.name); // Re-equipping same item? Usually no-op or unequip.
+            // Let's implement unequip check.
+            let slot = null;
+            if (['weapon', 'holySword', 'staff'].includes(item.data.type)) slot = 'weapon';
+            else if (['armor', 'robe'].includes(item.data.type)) slot = 'armor';
+            else if (item.data.type === 'amulet') slot = 'accessory';
+
+            if (slot && PlayerStats.equipment[slot] === item.name) {
+                // Already equipped -> Unequip
+                PlayerStats.unequip(slot);
+                // Return to inventory implicitly (since we check Inv.list + equipped)
+                // We need to ensure Inv has it back if we count it.
+                // Wait, if Inv system counts ownership independently of equip state?
+                // If I have 1 Sword, Equip it. Is it 1 in Inv?
+                // Usually yes. "Inv" = "Possession". "Equipped" = "Active".
+                // If so, my getFilteredItems logic is: Inv.list() shows all.
+                // Then I just mark 'equipped'.
+
+                // Let's assume Inv.add keeps it in inventory.
+                // BUT, if I "sell" it, I need to check if equipped.
+                // For now, let's assume Inv count includes equipped.
+
+                // If so:
+                // Equipping doesn't change Inv count.
+                // It just sets PlayerStats.equipment.
+
+                // However, logic above: `existing.equipped = true`.
+                // So if I click equipped item -> Unequip.
+                this.message = `${item.name}を外しました。`;
+                return;
+            }
+        }
+
+        // Equip / Use
+        if (this.categories[this.categoryCur] === '道具') {
+            this.useItem(item.name);
+        } else {
+            // Equip
+            if (PlayerStats.equip(item.name)) {
+                this.message = `${item.name}を装備しました！`;
+            } else {
+                this.message = '装備できません。';
+            }
+        }
+    },
+
     useItem(itemName) {
+        // ... (Existing useItem logic, but simplified/adapted)
+        // Need to copy existing logic but refactor slightly if needed.
+        // pasting previous logic...
         if (itemName === '薬草') {
             PlayerStats.heal(15); Inv.remove('薬草'); this.message = 'HPが15回復した！';
         } else if (itemName === 'ポーション') {
@@ -103,32 +224,42 @@ const Menu = {
                     const TS = GameConfig.TILE_SIZE;
                     window.game.player.x = 12 * TS;
                     window.game.player.y = 11 * TS;
-                    // Reset encounter steps
                     WorldState.resetEncounterSteps(Maps.get().encounterRate);
                 }
                 FX.fadeIn();
                 this.close();
             });
-            // Return early to prevent message overlay issue or item list update issue while fading
             return;
         } else {
             this.message = 'このアイテムは使えない！';
         }
-        const items = Inv.list();
-        if (this.itemCur >= items.length) this.itemCur = Math.max(0, items.length - 1);
     },
 
     render(ctx) {
         if (!this.visible) return;
-        Draw.rect(ctx, 160, 16, 88, 80, 'rgba(0,0,40,0.95)');
-        Draw.stroke(ctx, 160, 16, 88, 80, '#fff', 2);
-        for (let i = 0; i < this.opts.length; i++) {
-            const y = 26 + i * 22;
-            if (i === this.cur && !this.sub) Draw.text(ctx, '▶', 168, y, '#fc0', 12);
-            Draw.text(ctx, this.opts[i], 184, y, '#fff', 12);
+
+        // Submenu: Categories
+        if (this.sub === 'categories') {
+            this.renderCategories(ctx);
         }
-        if (this.sub === 'items') this.renderItems(ctx);
-        else if (this.sub === 'status') this.renderStatus(ctx);
+        // Submenu: Items
+        else if (this.sub === 'items') {
+            this.renderItems(ctx);
+        }
+        // Submenu: Status
+        else if (this.sub === 'status') {
+            this.renderStatus(ctx);
+        }
+        // Main Menu
+        else {
+            Draw.rect(ctx, 160, 16, 88, 80, 'rgba(0,0,40,0.95)');
+            Draw.stroke(ctx, 160, 16, 88, 80, '#fff', 2);
+            for (let i = 0; i < this.opts.length; i++) {
+                const y = 26 + i * 22;
+                if (i === this.cur) Draw.text(ctx, '▶', 168, y, '#fc0', 12);
+                Draw.text(ctx, this.opts[i], 184, y, '#fff', 12);
+            }
+        }
 
         if (this.message) {
             const { VIEWPORT_WIDTH: VW, VIEWPORT_HEIGHT: VH } = GameConfig;
@@ -138,30 +269,57 @@ const Menu = {
         }
     },
 
+    renderCategories(ctx) {
+        Draw.rect(ctx, 100, 16, 120, 120, 'rgba(0,0,40,0.95)');
+        Draw.stroke(ctx, 100, 16, 120, 120, '#fff', 2);
+        Draw.text(ctx, '【分類】', 110, 30, '#fc0', 12);
+
+        for (let i = 0; i < this.categories.length; i++) {
+            const y = 50 + i * 20;
+            if (i === this.categoryCur) Draw.text(ctx, '▶', 110, y, '#fc0', 12);
+            Draw.text(ctx, this.categories[i], 126, y, '#fff', 12);
+        }
+    },
+
     renderItems(ctx) {
-        const items = Inv.list();
-        const boxHeight = Math.max(100, 50 + items.length * 20);
-        Draw.rect(ctx, 16, 16, 140, boxHeight, 'rgba(0,0,40,0.95)');
-        Draw.stroke(ctx, 16, 16, 140, boxHeight, '#fff', 2);
-        Draw.text(ctx, '【持ち物】Zで使用 X/Escで戻る', 24, 24, '#fc0', 10);
+        const items = this.getFilteredItems();
+        const boxHeight = Math.max(120, 50 + items.length * 20);
+        Draw.rect(ctx, 16, 16, 200, boxHeight, 'rgba(0,0,40,0.95)');
+        Draw.stroke(ctx, 16, 16, 200, boxHeight, '#fff', 2);
+
+        const cat = this.categories[this.categoryCur];
+        Draw.text(ctx, `【${cat}】Z:決定 X:戻る`, 24, 24, '#fc0', 10);
+
         if (items.length === 0) {
             Draw.text(ctx, '何も持っていない', 24, 48, '#888', 12);
         } else {
             let y = 44;
             for (let i = 0; i < items.length; i++) {
-                const [n, c] = items[i];
+                const item = items[i];
                 if (i === this.itemCur) Draw.text(ctx, '▶', 24, y, '#fc0', 12);
-                Draw.text(ctx, `${n} x${c}`, 38, y, '#fff', 12);
+
+                let prefix = '';
+                if (item.equipped) prefix = '[E]';
+
+                Draw.text(ctx, `${prefix}${item.name} x${item.count}`, 38, y, '#fff', 12);
+
+                // Show stats if equipable
+                if (item.data) {
+                    let stat = '';
+                    if (item.data.atk) stat += `攻:${item.data.atk} `;
+                    if (item.data.def) stat += `防:${item.data.def} `;
+                    if (stat) Draw.text(ctx, stat, 140, y, '#ccc', 10);
+                }
+
                 y += 20;
             }
         }
     },
 
     renderStatus(ctx) {
-        // DECEPTION_LOGIC: 表示用の偽装されたステータスを取得
         const s = PlayerStats.getDisplayStats();
-        Draw.rect(ctx, 16, 16, 140, 190, 'rgba(0,0,40,0.95)');
-        Draw.stroke(ctx, 16, 16, 140, 190, '#fff', 2);
+        Draw.rect(ctx, 16, 16, 160, 200, 'rgba(0,0,40,0.95)');
+        Draw.stroke(ctx, 16, 16, 160, 200, '#fff', 2);
         Draw.text(ctx, '【ステータス】X/Escで戻る', 24, 24, '#fc0', 10);
         Draw.text(ctx, s.name, 24, 44, '#fff', 12);
         Draw.text(ctx, `Lv: ${s.level}`, 24, 62, '#fff', 12);
@@ -173,5 +331,10 @@ const Menu = {
         Draw.text(ctx, `MDEF: ${s.mdef}`, 90, 134, '#8ff', 12);
         Draw.text(ctx, `EXP: ${s.exp}/${s.nextExp}`, 24, 152, '#ccc', 12);
         Draw.text(ctx, `Gold: ${s.gold}G`, 24, 170, '#ff0', 12);
+
+        // Equipment Display (Text Only)
+        Draw.text(ctx, `武器: ${PlayerStats.equipment.weapon || 'なし'}`, 24, 188, '#fff', 10);
+        Draw.text(ctx, `防具: ${PlayerStats.equipment.armor || 'なし'}`, 24, 200, '#fff', 10);
+        Draw.text(ctx, `装飾: ${PlayerStats.equipment.accessory || 'なし'}`, 24, 212, '#fff', 10);
     }
 };
