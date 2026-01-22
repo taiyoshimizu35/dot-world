@@ -433,6 +433,8 @@ class Game {
                     else if (t === 11) imgName = 'tree';
                     else if (t === 12) imgName = 'stairs';
                     else if (t === 13) imgName = 'stone_switch';
+                    else if (t === 14) imgName = 'stone';
+                    else if (t === 15) imgName = 'statue';
 
                     const sp = Camera.toScreen(x * TS, y * TS);
                     const img = AssetLoader.get(imgName);
