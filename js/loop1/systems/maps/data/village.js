@@ -20,8 +20,10 @@ function initVillageMap(Maps, T) {
     // 建物
     for (let y = 2; y <= 5; y++) for (let x = 3; x <= 6; x++) vt[y][x] = T.HOUSE;
     vt[5][4] = T.DOOR;
-    for (let y = 2; y <= 5; y++) for (let x = 17; x <= 21; x++) vt[y][x] = T.HOUSE;
+    vt[5][5] = T.DOOR;
+    for (let y = 2; y <= 5; y++) for (let x = 17; x <= 22; x++) vt[y][x] = T.HOUSE;
     vt[5][19] = T.DOOR;
+    vt[5][20] = T.DOOR;    
 
     // 池
     for (let y = 12; y <= 15; y++) for (let x = 18; x <= 22; x++) vt[y][x] = T.WATER;
@@ -35,7 +37,6 @@ function initVillageMap(Maps, T) {
         w: vw, h: vh, tiles: vt, encounterRate: 0.02,
         npcs: [
             { id: 'npc1', type: 'villager', x: 8, y: 9, msg: 'ようこそ！\n草原を歩くとモンスターに会うよ。', blocking: true },
-            { id: 'shop', type: 'villager', x: 19, y: 4, msg: null, shop: true, blocking: true },
             { id: 'guard', type: 'guard', x: 23, y: 9, msg: null, guard: true, blocking: true },
             { id: 'westGuard', type: 'guard', x: 1, y: 9, msg: null, westGuard: true, blocking: true },
             { id: 'sign1', type: 'signpost', x: 12, y: 7, msg: '【始まりの村】\n東西南北、全ての道はここに通ず', blocking: true },
@@ -43,7 +44,9 @@ function initVillageMap(Maps, T) {
         ],
         warps: [
             { x: 4, y: 5, to: 'magic_shop', tx: 4, ty: 6 },
+            { x: 5, y: 5, to: 'magic_shop', tx: 4, ty: 6 },
             { x: 19, y: 5, to: 'shop_interior', tx: 4, ty: 6 },
+            { x: 20, y: 5, to: 'shop_interior', tx: 4, ty: 6 },
             { x: 24, y: 9, to: 'east_stage1', tx: 2, ty: 20 },
             { x: 0, y: 9, to: 'west_stage1', tx: 38, ty: 20 },
             { x: 12, y: 0, to: 'north_stage1', tx: 20, ty: 38 },

@@ -17,7 +17,7 @@ function initWestWeek1(Maps, T) {
     w1t[20][1] = T.EXIT;
 
     Maps.data.west_stage1 = {
-        w: 41, h: 41, tiles: w1t, isDungeon: true, encounterRate: 0.15, area: 'west', week1Map: true,
+        w: 41, h: 41, tiles: w1t, isDungeon: true, encounterRate: 0.02, area: 'west', week1Map: true,
         npcs: [{ id: 'w1_sign', type: 'signpost', x: 35, y: 20, msg: '【魔法の塔】\n1層：魔力への入口', blocking: true }],
         warps: [
             { x: 39, y: 20, to: 'village', tx: 1, ty: 9 },
@@ -36,7 +36,7 @@ function initWestWeek1(Maps, T) {
     w2t[20][1] = T.EXIT;
 
     Maps.data.west_stage2 = {
-        w: 41, h: 41, tiles: w2t, isDungeon: true, encounterRate: 0.15, area: 'west', week1Map: true,
+        w: 41, h: 41, tiles: w2t, isDungeon: true, encounterRate: 0.02, area: 'west', week1Map: true,
         npcs: [{ id: 'w2_sign', type: 'signpost', x: 35, y: 20, msg: '【魔法の塔】\n2層：魔力の奔流', blocking: true }],
         warps: [
             { x: 39, y: 20, to: 'west_stage1', tx: 2, ty: 20 },

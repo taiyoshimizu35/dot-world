@@ -19,7 +19,7 @@ const Maps = {
 
     isBlocking(t) {
         const T = GameConfig.TILE_TYPES;
-        return t === T.ROCK || t === T.WATER || t === T.HOUSE || t === T.DESK || t === T.BED || t === T.COUNTER;
+        return t === T.ROCK || t === T.WATER || t === T.HOUSE || t === T.DESK || t === T.BED || t === T.COUNTER || t === T.TREE;
     },
 
     // NPCがブロッキングかチェック（仲間加入済み、ボス撃破済みは除外）

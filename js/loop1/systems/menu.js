@@ -92,6 +92,8 @@ const Menu = {
                 PlayerStats.def = PlayerStats.baseDef;
                 PlayerStats.status.defDownVal = 0; Inv.remove('守りの霧'); this.message = '防御力が戻った！';
             } else { this.message = '防御力は下がっていない！'; }
+        } else if (itemName === '魔除け薬') {
+            WorldState.useCharm(); Inv.remove('魔除け薬'); this.message = '魔除けの効果が現れた！';
         } else {
             this.message = 'このアイテムは使えない！';
         }

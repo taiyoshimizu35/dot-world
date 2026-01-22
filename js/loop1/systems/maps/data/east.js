@@ -9,16 +9,51 @@ function initEastWeek1(Maps, T) {
 
     // ステージ1 (41x41)
     const e1t = createDungeonTiles(41, 41, T);
-    // シンプルな道: 西(2,20)から東(38,20)へ
-    for (let x = 2; x <= 38; x++) e1t[20][x] = T.PATH;
-    // 分岐や少し広がりを持たせる
-    for (let y = 15; y <= 25; y++) e1t[y][20] = T.PATH;
-    for (let x = 15; x <= 25; x++) e1t[15][x] = T.PATH;
+    // 全体を草で埋める
+    for (let y = 0; y < 41; y++) for (let x = 0; x < 41; x++) e1t[y][x] = T.GRASS;
+    // ランダムに木と岩を配置して迷宮感を出す（ただし道は確保するため後で上書き）
+    for (let y = 0; y < 41; y++) {
+        for (let x = 0; x < 41; x++) {
+            if (Math.random() < 0.3) e1t[y][x] = T.TREE;
+            else if (Math.random() < 0.05) e1t[y][x] = T.ROCK;
+        }
+    }
+
+    // 一本道：西(2,20)から東(38,20)へ、蛇行させる
+    // Start(2,20) -> (10,20) -> (10, 10) -> (20, 10) -> (20, 30) -> (30, 30) -> (30, 20) -> End(38,20)
+    const pathPoints = [
+        [2, 20], [10, 20], [10, 13], [20, 13], [20, 25], [30, 25], [30, 20], [38, 20]
+    ];
+    let cx = pathPoints[0][0];
+    let cy = pathPoints[0][1];
+
+    for (let i = 1; i < pathPoints.length; i++) {
+        const tx = pathPoints[i][0];
+        const ty = pathPoints[i][1];
+        while (cx !== tx || cy !== ty) {
+            e1t[cy][cx] = T.PATH;
+            if (cx < tx) cx++;
+            else if (cx > tx) cx--;
+            else if (cy < ty) cy++;
+            else if (cy > ty) cy--;
+        }
+    }
+    e1t[20][38] = T.PATH; // End point
+
+    // 宝箱への小道（行き止まり）
+    // 右下 (38, 38)
+    //for (let y = 20; y <= 38; y++) e1t[y][30] = T.PATH; // 既存のパスから分岐
+    //for (let x = 30; x <= 38; x++) e1t[38][x] = T.PATH;
+//
+    //// 右上 (38, 2)
+    //for (let y = 20; y >= 2; y--) e1t[y][30] = T.PATH; // 既存のパスから分岐
+    //for (let x = 30; x <= 38; x++) e1t[2][x] = T.PATH;
+
     e1t[20][39] = T.EXIT;
 
     Maps.data.east_stage1 = {
-        w: 41, h: 41, tiles: e1t, isDungeon: true, encounterRate: 0.15, area: 'east', week1Map: true,
-        npcs: [{ id: 'e1_sign', type: 'signpost', x: 5, y: 20, msg: '【深緑の迷宮】\n主の間は遥か東', blocking: true }],
+        w: 41, h: 41, tiles: e1t, isDungeon: true, encounterRate: 0.02, area: 'east', week1Map: true,
+        npcs: [{ id: 'e1_sign', type: 'signpost', x: 5, y: 20, msg: '【深緑の迷宮】\n木々の隙間を進め', blocking: true }],
         warps: [
             { x: 1, y: 20, to: 'village', tx: 23, ty: 9 },
             { x: 39, y: 20, to: 'east_boss_room', tx: 2, ty: 7 }

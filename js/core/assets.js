@@ -20,6 +20,7 @@ const AssetLoader = {
             ['villager', 'assets/characters/villager.png'],
             ['guard', 'assets/characters/guard.png'],
             // タイル
+            ['tree', 'assets/tiles/tree.png'],
             ['grass', 'assets/tiles/grass.png'],
             ['rock', 'assets/tiles/rock.png'],
             ['path', 'assets/tiles/path.png'],

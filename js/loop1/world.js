@@ -25,6 +25,19 @@ const WorldState = {
         battle: null
     },
 
+    // 魔除け薬の効果
+    charmSteps: 0,
+    useCharm() {
+        this.charmSteps = 300;
+        Msg.show('魔除け薬を使った！\nしばらくの間、敵が出にくくなる。');
+    },
+    decrementCharm() {
+        if (this.charmSteps > 0) {
+            this.charmSteps--;
+            if (this.charmSteps === 0) Msg.show('魔除け薬の効果が切れた。');
+        }
+    },
+
     // ヘルパーメソッド
     isWeek1() {
         return this.week === 1;

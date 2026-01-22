@@ -167,6 +167,9 @@ class Game {
         if (currentTile === GameConfig.TILE_TYPES.PATH) encounterChance = 0;
         else if (m.isSouth && currentTile !== GameConfig.TILE_TYPES.PATH) encounterChance = 0.08;
 
+        // 魔除け薬の効果
+        if (WorldState.charmSteps > 0) encounterChance *= 0.5;
+
         if (Math.random() < encounterChance) {
             const battle = WorldState.managers.battle;
             if (battle) {
@@ -360,6 +363,7 @@ class Game {
                     else if (t === 8) imgName = 'bed';
                     else if (t === 9) imgName = 'path';
                     else if (t === 10) imgName = 'counter';
+                    else if (t === 11) imgName = 'tree';
 
                     const sp = Camera.toScreen(x * TS, y * TS);
                     const img = AssetLoader.get(imgName);

@@ -17,7 +17,7 @@ function initSouthWeek1(Maps, T) {
     s1t[1][20] = T.EXIT;
 
     Maps.data.south_stage1 = {
-        w: 41, h: 41, tiles: s1t, encounterRate: 0.15, area: 'south', week1Map: true,
+        w: 41, h: 41, tiles: s1t, encounterRate: 0.02, area: 'south', week1Map: true,
         npcs: [{ id: 's1_sign', type: 'signpost', x: 23, y: 5, msg: '【忘却の墓地】\n南へ進むほど闇は深くなる', blocking: true }],
         warps: [
             { x: 20, y: 1, to: 'village', tx: 12, ty: 16 },
@@ -36,7 +36,7 @@ function initSouthWeek1(Maps, T) {
     s2t[1][20] = T.EXIT;
 
     Maps.data.south_stage2 = {
-        w: 41, h: 41, tiles: s2t, encounterRate: 0.15, area: 'south', week1Map: true,
+        w: 41, h: 41, tiles: s2t, encounterRate: 0.02, area: 'south', week1Map: true,
         npcs: [{ id: 's2_sign', type: 'signpost', x: 23, y: 5, msg: '墓標が道を示す…', blocking: true }],
         warps: [
             { x: 20, y: 1, to: 'south_stage1', tx: 20, ty: 38 },
