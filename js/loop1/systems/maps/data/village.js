@@ -3,7 +3,7 @@
 // ===========================================
 function initVillageMap(Maps, T) {
     const { S, M, createFieldTiles } = MapHelper;
-    const vw = 25, vh = 18;
+    const vw = 25, vh = 19;
 
     // 基本タイル
     const vt = [];
@@ -16,6 +16,11 @@ function initVillageMap(Maps, T) {
     // 道（端まで）
     for (let x = 0; x < vw; x++) vt[9][x] = T.PATH;
     for (let y = 0; y < vh; y++) vt[y][12] = T.PATH;
+    for (let y = 6; y <= 8; y++) for (let x = 4; x <= 5; x++) vt[y][x] = T.PATH
+    for (let y = 6; y <= 8; y++) for (let x = 19; x <= 20; x++) vt[y][x] = T.PATH
+    for (let x = 13; x <= 20; x++) vt[16][x] = T.PATH
+    for (let x = 4; x <= 11; x++) vt[16][x] = T.PATH
+
 
     // 建物
     for (let y = 2; y <= 5; y++) for (let x = 3; x <= 6; x++) vt[y][x] = T.HOUSE;
@@ -23,10 +28,15 @@ function initVillageMap(Maps, T) {
     vt[5][5] = T.DOOR;
     for (let y = 2; y <= 5; y++) for (let x = 17; x <= 22; x++) vt[y][x] = T.HOUSE;
     vt[5][19] = T.DOOR;
-    vt[5][20] = T.DOOR;    
-
-    // 池
-    for (let y = 12; y <= 15; y++) for (let x = 18; x <= 22; x++) vt[y][x] = T.WATER;
+    vt[5][20] = T.DOOR;
+    for (let y = 12; y <= 15; y++) for (let x = 17; x <= 22; x++) vt[y][x] = T.HOUSE;
+    vt[15][19] = T.DOOR;
+    vt[15][20] = T.DOOR;
+    for (let y = 12; y <= 15; y++) for (let x = 3; x <= 6; x++) vt[y][x] = T.HOUSE;
+    vt[15][4] = T.DOOR;
+    vt[15][5] = T.DOOR;
+   
+    
 
     // 岩
     [[1, 1], [23, 3], [2, 15], [20, 1], [15, 15]].forEach(([x, y]) => {
@@ -34,9 +44,9 @@ function initVillageMap(Maps, T) {
     });
 
     Maps.data.village = {
-        w: vw, h: vh, tiles: vt, encounterRate: 0.02,
+        w: vw, h: vh, tiles: vt, encounterRate: 0.008,
         npcs: [
-            { id: 'npc1', type: 'villager', x: 8, y: 9, msg: 'ようこそ！\n草原を歩くとモンスターに会うよ。', blocking: true },
+            { id: 'npc1', type: 'villager', x: 8, y: 9, msg: '草原を歩くとモンスターに会うよ。\n勇者！魔王様を倒してね！', blocking: true },
             { id: 'guard', type: 'guard', x: 23, y: 9, msg: null, guard: true, blocking: true },
             { id: 'westGuard', type: 'guard', x: 1, y: 9, msg: null, westGuard: true, blocking: true },
             { id: 'sign1', type: 'signpost', x: 12, y: 7, msg: '【始まりの村】\n東西南北、全ての道はここに通ず', blocking: true },
@@ -50,7 +60,7 @@ function initVillageMap(Maps, T) {
             { x: 24, y: 9, to: 'east_stage1', tx: 2, ty: 20 },
             { x: 0, y: 9, to: 'west_stage1', tx: 38, ty: 20 },
             { x: 12, y: 0, to: 'north_stage1', tx: 20, ty: 38 },
-            { x: 12, y: 17, to: 'south_stage1', tx: 20, ty: 2 },
+            { x: 12, y: 18, to: 'south_stage1', tx: 20, ty: 2 },
             { x: 14, y: 12, to: 'demon_castle', tx: 10, ty: 15, requiresDemonCastle: true }
         ],
         start: { x: 12, y: 11 }

@@ -28,7 +28,7 @@ const EnemyData = {
     ghost: { name: 'ゴースト', hp: 100, atk: 20, def: 99, exp: 120, gold: 100, img: 'enemy_ghost', usesMagic: true, weakness: 'fire' },
 
     // ===== 嘘ボス（FAKE）=====
-    fake_east_boss: { name: '古代のドラゴン', hp: 10, atk: 30, def: 1, exp: 750, gold: 800, img: 'enemy_dragon', isBoss: true, usesMagic: true, bossType: 'fake' },
+    fake_east_boss: { name: '古代のドラゴン', hp: 10, atk: 30, def: 1, exp: 750, gold: 800, img: 'enemy_dragon', isBoss: true, usesMagic: true, useBreath: true, bossType: 'fake' },
     fake_west_boss: { name: '大魔術師', hp: 10, atk: 50, def: 3, exp: 1200, gold: 2000, img: 'enemy_mage', isBoss: true, usesMagic: true, weakness: 'water', bossType: 'fake' },
     fake_north_boss: { name: 'クリスタル・ゴーレム', hp: 10, atk: 55, def: 3, exp: 1500, gold: 2500, img: 'enemy_golem', isBoss: true, weakness: 'fire', bossType: 'fake' },
     fake_south_boss: { name: '幻影の騎士', hp: 10, atk: 48, def: 2, exp: 1300, gold: 2200, img: 'enemy_knight', isBoss: true, weakness: 'fire', bossType: 'fake' },

@@ -27,6 +27,8 @@ const WorldState = {
 
     // 魔除け薬の効果
     charmSteps: 0,
+    stepsUntilEncounter: 0, // 次のエンカウントまでの歩数
+
     useCharm() {
         this.charmSteps = 300;
         Msg.show('魔除け薬を使った！\nしばらくの間、敵が出にくくなる。');
@@ -36,6 +38,28 @@ const WorldState = {
             this.charmSteps--;
             if (this.charmSteps === 0) Msg.show('魔除け薬の効果が切れた。');
         }
+    },
+
+    // エンカウント歩数のリセット（再計算）
+    resetEncounterSteps(rate) {
+        if (rate <= 0) {
+            this.stepsUntilEncounter = Infinity;
+            return;
+        }
+
+        // 基本歩数 = 1 / 確率 (例: 0.05 -> 20歩)
+        let baseSteps = Math.ceil(1 / rate);
+
+        // ランダム分散 (0.8 ~ 1.2倍)
+        baseSteps = Math.floor(baseSteps * (0.8 + Math.random() * 0.4));
+
+        // 魔除け効果中なら3倍
+        if (this.charmSteps > 0) {
+            baseSteps *= 3;
+        }
+
+        this.stepsUntilEncounter = baseSteps;
+        // console.log(`Next encounter in ${this.stepsUntilEncounter} steps (Rate: ${rate}, Charmed: ${this.charmSteps > 0})`);
     },
 
     // ヘルパーメソッド

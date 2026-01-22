@@ -43,6 +43,11 @@ const BattleActions = {
             dmg = Math.floor(battle.enemy.atk * 1.5);
             effectMsg = `重い一撃が防御を貫く！ `;
         }
+        // ブレス攻撃（古代のドラゴン等）
+        else if (battle.enemy.useBreath && Math.random() < 0.3) {
+            dmg = 30; // 固定ダメージ
+            effectMsg = `${battle.enemy.name}は激しい炎を吐いた！\n`;
+        }
         else {
             // 通常攻撃の計算
             dmg = Math.max(1, battle.enemy.atk - PlayerStats.def + Math.floor(Math.random() * 3));

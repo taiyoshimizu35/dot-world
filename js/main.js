@@ -149,6 +149,11 @@ class Game {
                 this.player.x = warp.tx * TS;
                 this.player.y = warp.ty * TS;
                 if (Maps.current === 'dungeon' && !Checkpoint.saved) Checkpoint.save({ x: 23, y: 10 });
+
+                // マップ切り替え時にエンカウント歩数をリセット
+                const m = Maps.get();
+                WorldState.resetEncounterSteps(m.encounterRate);
+
                 FX.fadeIn();
             });
             return;
@@ -163,23 +168,30 @@ class Game {
         const m = Maps.get();
         const currentTile = Maps.getTile(Math.floor((this.player.x + TS / 2) / TS), Math.floor((this.player.y + TS / 2) / TS));
 
-        let encounterChance = m.encounterRate;
-        if (currentTile === GameConfig.TILE_TYPES.PATH) encounterChance = 0;
-        else if (m.isSouth && currentTile !== GameConfig.TILE_TYPES.PATH) encounterChance = 0.08;
+        // 安全地帯（道など）ではカウントしない
+        if (currentTile === GameConfig.TILE_TYPES.PATH) return;
 
-        // 魔除け薬の効果
-        if (WorldState.charmSteps > 0) encounterChance *= 0.5;
+        // 歩数減少
+        WorldState.decrementCharm();
+        WorldState.stepsUntilEncounter--;
 
-        if (Math.random() < encounterChance) {
+        if (WorldState.stepsUntilEncounter <= 0) {
             const battle = WorldState.managers.battle;
             if (battle) {
-                battle.playerRef = { x: this.player.x, y: this.player.y };
-                FX.flashRed(200);
-                Input.lock(500);
-                setTimeout(() => battle.start(Maps.current), 500);
+                this.player.moving = false;
+
+                if (m.isDungeon || m.area === 'north' || m.area === 'south' || m.area === 'west' || m.area === 'east') {
+                    battle.start(m.area);
+                } else {
+                    battle.start(Maps.current);
+                }
+
+                // 次回のエンカウント歩数をリセット
+                WorldState.resetEncounterSteps(m.encounterRate);
             }
         }
     }
+
 
     handleInteraction() {
         if (!Input.interact()) return;
