@@ -94,6 +94,23 @@ const Menu = {
             } else { this.message = '防御力は下がっていない！'; }
         } else if (itemName === '魔除け薬') {
             WorldState.useCharm(); Inv.remove('魔除け薬'); this.message = '魔除けの効果が現れた！';
+        } else if (itemName === '天使のはね') {
+            Inv.remove('天使のはね');
+            this.message = '天使のはねを使った！';
+            FX.fadeOut(() => {
+                Maps.current = 'village';
+                if (window.game && window.game.player) {
+                    const TS = GameConfig.TILE_SIZE;
+                    window.game.player.x = 12 * TS;
+                    window.game.player.y = 11 * TS;
+                    // Reset encounter steps
+                    WorldState.resetEncounterSteps(Maps.get().encounterRate);
+                }
+                FX.fadeIn();
+                this.close();
+            });
+            // Return early to prevent message overlay issue or item list update issue while fading
+            return;
         } else {
             this.message = 'このアイテムは使えない！';
         }

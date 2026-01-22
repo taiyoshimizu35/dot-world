@@ -26,6 +26,7 @@ const AssetLoader = {
             ['path', 'assets/tiles/path.png'],
             ['water', 'assets/tiles/water.png'],
             ['floor', 'assets/tiles/floor.png'],
+            ['stone', 'assets/tiles/stone.png'],
             // オブジェクト
             ['house', 'assets/objects/house.png'],
             ['signpost', 'assets/objects/signpost.png'],
@@ -35,7 +36,11 @@ const AssetLoader = {
             ['chest_closed', 'assets/objects/chest_closed.png'],
             ['chest_open', 'assets/objects/chest_open.png'],
             ['counter', 'assets/objects/counter.png'],
+            ['counter', 'assets/objects/counter.png'],
             ['shop_sign', 'assets/objects/shop_sign.png'],
+            ['stairs', 'assets/objects/stairs.png'],
+            ['stone_switch', 'assets/objects/stone_switch.png'],
+            ['statue', 'assets/objects/statue.png'],
             // 敵キャラクター
             ['enemy_slime', 'assets/enemies/enemy_slime.png'],
             ['enemy_goblin', 'assets/enemies/enemy_goblin.png'],

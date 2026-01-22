@@ -19,6 +19,10 @@ const QuestFlags = {
     // 嘘ボス撃破状況
     fakeBosses: { east: false, west: false, north: false, south: false },
 
+    // 西ダンジョンスイッチ
+    westSwitches: { stage1: false, stage2: false },
+
+
     // 嘘魔王と対面したか
     metFakeDemonKing: false,
 
@@ -38,6 +42,11 @@ const QuestFlags = {
     allTrueBossesDefeated() {
         return this.trueBosses.east && this.trueBosses.west &&
             this.trueBosses.north && this.trueBosses.south;
+    },
+
+    // 撃破済みの Loop 1 ボス数（嘘ボス）
+    countDefeatedBosses() {
+        return Object.values(this.fakeBosses).filter(b => b).length;
     },
 
     check() {
@@ -64,6 +73,7 @@ const QuestFlags = {
         this.southGateOpen = false;
         this.phantomTruthRevealed = false;
         this.fakeBosses = { east: false, west: false, north: false, south: false };
+        this.westSwitches = { stage1: false, stage2: false };
         this.metFakeDemonKing = true; // 2週目開始時は嘘魔王遭遇済み
         this.trueBosses = { east: false, west: false, north: false, south: false };
         this.canFaceTrueDemonKing = false;

@@ -84,6 +84,7 @@ class Game {
         }
         if (currentState === GameState.MENU) { Menu.update(); return; }
         if (currentState === GameState.SHOP) { Shop.update(); return; }
+        if (currentState === GameState.INN) { Inn.update(); return; } // Inn Update
         if (currentState === GameState.BATTLE) {
             const battle = WorldState.managers.battle;
             if (battle) battle.update();
@@ -139,11 +140,57 @@ class Game {
         if (dx > 0) this.player.dir = 2;
         else if (dx < 0) this.player.dir = 1;
         else if (dy > 0) this.player.dir = 0;
+        if (dx > 0) this.player.dir = 2;
+        else if (dx < 0) this.player.dir = 1;
+        else if (dy > 0) this.player.dir = 0;
         else if (dy < 0) this.player.dir = 3;
+
+        // Tile Event Check (Switch)
+        const currentT = Maps.getTile(Math.floor((this.player.x + TS / 2) / TS), Math.floor((this.player.y + TS / 2) / TS));
+        if (currentT === GameConfig.TILE_TYPES.SWITCH) {
+            // Check current map switch flag
+            const switchKey = Maps.current === 'west_stage1' ? 'stage1' : (Maps.current === 'west_stage2' ? 'stage2' : null);
+            if (switchKey && !QuestFlags.westSwitches[switchKey]) {
+                QuestFlags.westSwitches[switchKey] = true;
+                Msg.show('スイッチを踏んだ！\n遠くで何かが動く音がした。');
+                // Sound effect could go here
+            }
+        }
 
         // Warp Check
         const warp = Maps.getWarp(this.player.x, this.player.y);
         if (warp) {
+            // Demon Castle Check
+            if (warp.requiresDemonCastle && !QuestFlags.canFaceTrueDemonKing) {
+                // 1週目: 4つのボスを倒していないと通さない
+                if (!QuestFlags.allFakeBossesDefeated()) {
+                    Msg.show('結界が張られている…\n四方の魔物を倒さねば通れないようだ。');
+                    return;
+                }
+                // 2週目: 真魔王条件
+                if (WorldState.week === 2 && !QuestFlags.canFaceTrueDemonKing) {
+                    Msg.show('真の魔王への道は閉ざされている…\n全ての元凶を断て！');
+                    return;
+                }
+            }
+
+            // Switch Requirement Check (West Dungeon)
+            if (warp.requiresSwitch) {
+                if (!QuestFlags.westSwitches[warp.requiresSwitch]) {
+                    Msg.show('扉は閉ざされている…\nどこかにあるスイッチを押さなければならないようだ。');
+                    return;
+                }
+            }
+
+            // Boss Count Restriction Check (Advanced Shop)
+            if (warp.requiresBossCount) {
+                const defeated = QuestFlags.countDefeatedBosses();
+                if (defeated < warp.requiresBossCount) {
+                    Msg.show(`店主「一見さんお断りだ。\n実力を示してから出直してきな（ボス撃破数: ${defeated}/${warp.requiresBossCount}）」`);
+                    return;
+                }
+            }
+
             FX.fadeOut(() => {
                 Maps.current = warp.to;
                 this.player.x = warp.tx * TS;
@@ -264,8 +311,16 @@ class Game {
                 // 真ボス撃破済み - 何もしない
             } else {
                 Battle.playerRef = { x: this.player.x, y: this.player.y };
-                if (npc.shop) Shop.open(false);
-                else if (npc.magicShop) Shop.open(true);
+                if (npc.shop) Shop.open('normal');
+                else if (npc.magicShop) Shop.open('magic');
+                else if (npc.advancedShop) Shop.open('advanced');
+
+                // 宿屋
+                else if (npc.inn) {
+                    const cost = Math.max(1, Math.floor(PlayerStats.gold * 0.05)); // 5% cost
+                    Inn.open(cost);
+                }
+
                 // 新システム: エリアボス
                 else if (npc.areaBoss) {
                     const isTrueBoss = npc.trueAreaBoss || false;
@@ -376,6 +431,8 @@ class Game {
                     else if (t === 9) imgName = 'path';
                     else if (t === 10) imgName = 'counter';
                     else if (t === 11) imgName = 'tree';
+                    else if (t === 12) imgName = 'stairs';
+                    else if (t === 13) imgName = 'stone_switch';
 
                     const sp = Camera.toScreen(x * TS, y * TS);
                     const img = AssetLoader.get(imgName);
@@ -404,6 +461,7 @@ class Game {
         if (currentState === GameState.DIALOG) Msg.render(this.ctx);
         if (currentState === GameState.MENU) Menu.render(this.ctx);
         if (currentState === GameState.SHOP) Shop.render(this.ctx);
+        if (currentState === GameState.INN) Inn.render(this.ctx); // Inn Render
         if (currentState === GameState.BATTLE) {
             const battle = WorldState.managers.battle;
             if (battle) battle.render(this.ctx);

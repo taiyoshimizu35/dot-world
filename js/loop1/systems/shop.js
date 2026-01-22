@@ -2,14 +2,14 @@
 // ショップUI
 // ===========================================
 const Shop = {
-    visible: false, cur: 0, scroll: 0, maxVisible: 5, warning: null, isMagicShop: false,
+    visible: false, cur: 0, scroll: 0, maxVisible: 5, warning: null, shopType: 'normal',
 
-    open(isMagicShop = false) {
+    open(type = 'normal') {
         this.visible = true;
         this.cur = 0;
         this.scroll = 0;
         this.warning = null;
-        this.isMagicShop = isMagicShop;
+        this.shopType = type;
         currentState = GameState.SHOP;
         Input.lock(200);
     },
@@ -21,7 +21,11 @@ const Shop = {
         Input.lock(150);
     },
 
-    getItems() { return this.isMagicShop ? MagicShopData.items : ShopData.items; },
+    getItems() {
+        if (this.shopType === 'magic') return MagicShopData.items;
+        if (this.shopType === 'advanced') return AdvancedShopData.items;
+        return ShopData.items;
+    },
 
     update() {
         if (!this.visible) return;
@@ -103,7 +107,10 @@ const Shop = {
         const { VIEWPORT_WIDTH: VW, VIEWPORT_HEIGHT: VH } = GameConfig;
         Draw.rect(ctx, 20, 20, VW - 40, VH - 40, 'rgba(0,0,40,0.95)');
         Draw.stroke(ctx, 20, 20, VW - 40, VH - 40, '#fff', 2);
-        Draw.text(ctx, this.isMagicShop ? '【魔法ショップ】' : '【ショップ】', 32, 28, '#fc0', 14);
+        let title = '【ショップ】';
+        if (this.shopType === 'magic') title = '【魔法ショップ】';
+        else if (this.shopType === 'advanced') title = '【上級ショップ】';
+        Draw.text(ctx, title, 32, 28, '#fc0', 14);
         Draw.text(ctx, `所持金: ${PlayerStats.gold}G`, VW - 120, 28, '#ff0', 12);
 
         const items = this.getItems();

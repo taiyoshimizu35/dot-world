@@ -8,6 +8,7 @@ const ShopData = {
         { name: '上薬草', price: 50, type: 'item', desc: 'HP+60回復', sold: false },
         { name: '上薬草', price: 50, type: 'item', desc: 'HP+60回復', sold: false },
         { name: 'エリクサー', price: 100, type: 'item', desc: 'HP+100回復', sold: false },
+        { name: '天使のはね', price: 500, type: 'item', desc: '村へ帰還', sold: false },
         { name: '魔除け薬', price: 200, type: 'item', desc: '300歩の間魔除け', sold: false },
         { name: '木の棒', price: 20, type: 'weapon', atk: 2, desc: '攻撃力+2', sold: false },
         { name: '銅の剣', price: 60, type: 'weapon', atk: 5, desc: '攻撃力+5', sold: false },
@@ -45,6 +46,21 @@ const MagicShopData = {
         { name: '魔法のローブ', price: 400, type: 'robe', def: 5, maxMp: 10, desc: '防御+5,MP+10', sold: false },
         { name: '賢者の杖', price: 600, type: 'staff', atk: 5, magicBoost: 1.5, desc: '攻撃+5,魔法1.5倍', sold: false },
         { name: '大魔道士のローブ', price: 700, type: 'robe', def: 10, maxMp: 20, desc: '防御+10,MP+20', sold: false }
+    ],
+    reset() { this.items.forEach(item => item.sold = false); }
+};
+
+// ===========================================
+// 上級ショップデータ
+// ===========================================
+const AdvancedShopData = {
+    items: [
+        { name: '上薬草', price: 50, type: 'item', desc: 'HP+60回復', sold: false },
+        { name: 'エリクサー', price: 100, type: 'item', desc: 'HP+100回復', sold: false },
+        { name: '鋼の剣', price: 150, type: 'weapon', atk: 10, desc: '攻撃力+10', sold: false },
+        { name: 'ミスリル剣', price: 300, type: 'weapon', atk: 15, desc: '攻撃力+15', sold: false },
+        { name: '鋼の鎧', price: 200, type: 'armor', def: 10, desc: '防御力+10', sold: false },
+        { name: '勇者の鎧', price: 500, type: 'armor', def: 18, desc: '防御力+18', sold: false }
     ],
     reset() { this.items.forEach(item => item.sold = false); }
 };

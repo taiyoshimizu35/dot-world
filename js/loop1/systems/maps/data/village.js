@@ -35,8 +35,8 @@ function initVillageMap(Maps, T) {
     for (let y = 12; y <= 15; y++) for (let x = 3; x <= 6; x++) vt[y][x] = T.HOUSE;
     vt[15][4] = T.DOOR;
     vt[15][5] = T.DOOR;
-   
-    
+
+
 
     // 岩
     [[1, 1], [23, 3], [2, 15], [20, 1], [15, 15]].forEach(([x, y]) => {
@@ -58,10 +58,14 @@ function initVillageMap(Maps, T) {
             { x: 19, y: 5, to: 'shop_interior', tx: 4, ty: 6 },
             { x: 20, y: 5, to: 'shop_interior', tx: 4, ty: 6 },
             { x: 24, y: 9, to: 'east_stage1', tx: 2, ty: 20 },
-            { x: 0, y: 9, to: 'west_stage1', tx: 38, ty: 20 },
+            { x: 0, y: 9, to: 'west_stage1', tx: 37, ty: 20 },
             { x: 12, y: 0, to: 'north_stage1', tx: 20, ty: 38 },
             { x: 12, y: 18, to: 'south_stage1', tx: 20, ty: 2 },
-            { x: 14, y: 12, to: 'demon_castle', tx: 10, ty: 15, requiresDemonCastle: true }
+            { x: 14, y: 12, to: 'demon_castle', tx: 10, ty: 15, requiresDemonCastle: true },
+            { x: 4, y: 15, to: 'advanced_shop', tx: 4, ty: 6, requiresBossCount: 2 },
+            { x: 5, y: 15, to: 'advanced_shop', tx: 4, ty: 6, requiresBossCount: 2 },
+            { x: 19, y: 15, to: 'inn', tx: 4, ty: 6 },
+            { x: 20, y: 15, to: 'inn', tx: 4, ty: 6 }
         ],
         start: { x: 12, y: 11 }
     };
@@ -98,6 +102,34 @@ function initShopMaps(Maps, T) {
         w: sw, h: sh, tiles: st,
         npcs: [{ id: 'shopkeeper', type: 'villager', x: 4, y: 1, msg: null, shop: true, blocking: true }],
         warps: [{ x: 4, y: 7, to: 'village', tx: 19, ty: 6 }],
+        start: { x: 4, y: 5 }
+    };
+
+    // 上級ショップ
+    const aw = 9, ah = 8;
+    // タイルは通常ショップと同じものを使用
+    Maps.data.advanced_shop = {
+        w: aw, h: ah, tiles: st,
+        npcs: [{ id: 'adv_shopkeeper', type: 'villager', x: 4, y: 1, msg: null, advancedShop: true, blocking: true }],
+        warps: [{ x: 4, y: 7, to: 'village', tx: 4, ty: 16 }],
+        start: { x: 4, y: 5 }
+    };
+
+    // 宿屋
+    const iw = 9, ih = 8, it = [];
+    for (let y = 0; y < ih; y++) {
+        const r = [];
+        for (let x = 0; x < iw; x++) r.push(y === 0 || y === ih - 1 || x === 0 || x === iw - 1 ? T.HOUSE : T.FLOOR);
+        it.push(r);
+    }
+    it[2][4] = T.COUNTER; // カウンター1つ
+    it[ih - 1][4] = T.EXIT;
+    it[2][6] = T.BED; it[2][7] = T.BED; // ベッド装飾
+
+    Maps.data.inn = {
+        w: iw, h: ih, tiles: it,
+        npcs: [{ id: 'innkeeper', type: 'villager', x: 4, y: 1, msg: null, inn: true, blocking: true }],
+        warps: [{ x: 4, y: 7, to: 'village', tx: 19, ty: 16 }],
         start: { x: 4, y: 5 }
     };
 }
