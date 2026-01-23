@@ -333,12 +333,11 @@ const Menu = {
         Draw.text(ctx, `DEF: ${s.def}`, 90, 116, '#88f', 12);
         Draw.text(ctx, `MATK: ${s.matk}`, 24, 134, '#f8f', 12);
         Draw.text(ctx, `MDEF: ${s.mdef}`, 90, 134, '#8ff', 12);
-        Draw.text(ctx, `EXP: ${s.exp}/${s.nextExp}`, 24, 152, '#ccc', 12);
-        Draw.text(ctx, `Gold: ${s.gold}G`, 24, 170, '#ff0', 12);
+        Draw.text(ctx, `Gold: ${s.gold}G`, 24, 152, '#ff0', 12);
 
         // Equipment Display (Text Only)
-        Draw.text(ctx, `武器: ${PlayerStats.equipment.weapon || 'なし'}`, 24, 188, '#fff', 10);
-        Draw.text(ctx, `防具: ${PlayerStats.equipment.armor || 'なし'}`, 24, 200, '#fff', 10);
-        Draw.text(ctx, `装飾: ${PlayerStats.equipment.accessory || 'なし'}`, 24, 212, '#fff', 10);
+        Draw.text(ctx, `武器: ${PlayerStats.equipment.weapon || 'なし'}`, 24, 170, '#fff', 10);
+        Draw.text(ctx, `防具: ${PlayerStats.equipment.armor || 'なし'}`, 24, 182, '#fff', 10);
+        Draw.text(ctx, `装飾: ${PlayerStats.equipment.accessory || 'なし'}`, 24, 194, '#fff', 10);
     }
 };
