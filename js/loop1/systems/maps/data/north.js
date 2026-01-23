@@ -68,13 +68,17 @@ function initNorthWeek1(Maps, T) {
     // Boss Room (Fake North Boss: Crystal Golem)
     const nbt = createRoom();
     nbt[13][7] = T.EXIT;
+    nbt[1][7] = T.PATH;
 
     Maps.data.north_boss_room = {
         w: 15, h: 15, tiles: nbt, encounterRate: 0, area: 'north', week1Map: true,
         npcs: [
-            { id: 'northBoss', type: 'enemy_ice_golem', img: 'ice_golem_map', x: 7, y: 2, msg: null, areaBoss: 'north', blocking: true }
+            { id: 'northBoss', type: 'enemy_ice_golem', img: 'ice_golem_map', x: 7, y: 1, msg: null, areaBoss: 'north', blocking: true }
         ],
-        warps: [{ x: 7, y: 13, to: 'north_stage3', tx: 7, ty: 2 }],
+        warps: [
+            { x: 7, y: 13, to: 'north_stage3', tx: 7, ty: 2 },
+            { x: 7, y: 1, to: 'demon_castle', tx: 10, ty: 15, requiresDemonCastle: true }
+        ],
         start: { x: 7, y: 12 }
     };
 }

@@ -69,7 +69,7 @@ function initEastWeek1(Maps, T) {
     e1t[20][39] = T.EXIT;
 
     Maps.data.east_stage1 = {
-        w: 41, h: 41, tiles: e1t, isDungeon: true, encounterRate: 0.008, area: 'east', week1Map: true,
+        w: 41, h: 41, tiles: e1t, isDungeon: true, encounterRate: 0.0, area: 'east', week1Map: true,
         npcs: [{ id: 'e1_sign', type: 'signpost', x: 5, y: 20, msg: '【深緑の迷宮】\n木々の隙間を進め', blocking: true }],
         warps: [
             { x: 1, y: 20, to: 'village', tx: 23, ty: 9 },

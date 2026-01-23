@@ -46,8 +46,8 @@ function initVillageMap(Maps, T) {
     Maps.data.village = {
         w: vw, h: vh, tiles: vt, encounterRate: 0.008,
         npcs: [
-            { id: 'npc1', type: 'villager', x: 8, y: 9, msg: '草原を歩くとモンスターに会うよ。\n勇者！魔王様を倒してね！', blocking: true },
-            { id: 'sign1', type: 'signpost', x: 12, y: 7, msg: '【始まりの村】\n東西南北、全ての道はここに通ず', blocking: true },
+            { id: 'npc1', type: 'villager', x: 8, y: 9, msg: '草原を歩くとモンスターに会うぞ。\n勇者！魔王様を倒してくれよな！', blocking: true },
+            { id: 'sign1', type: 'signpost', x: 12, y: 7, msg: '四天王を倒せ。\nさすれば道は開かれん', blocking: true },
             { id: 'demon_guide', type: 'villager', x: 14, y: 11, msg: null, demonGuide: true, blocking: true }
         ],
         warps: [
@@ -59,9 +59,9 @@ function initVillageMap(Maps, T) {
             { x: 0, y: 9, to: 'west_stage1', tx: 37, ty: 20 },
             { x: 12, y: 0, to: 'north_stage1', tx: 7, ty: 12 },
             { x: 12, y: 18, to: 'south_stage1', tx: 20, ty: 2 },
-            { x: 14, y: 12, to: 'demon_castle', tx: 10, ty: 15, requiresDemonCastle: true },
-            { x: 4, y: 15, to: 'advanced_shop', tx: 4, ty: 6, requiresBossCount: 2 },
-            { x: 5, y: 15, to: 'advanced_shop', tx: 4, ty: 6, requiresBossCount: 2 },
+            // { x: 14, y: 12, to: 'demon_castle', tx: 10, ty: 15, requiresDemonCastle: true },
+            { x: 4, y: 15, to: 'advanced_shop', tx: 4, ty: 6, requiresBossCount: 1 },
+            { x: 5, y: 15, to: 'advanced_shop', tx: 4, ty: 6, requiresBossCount: 1 },
             { x: 19, y: 15, to: 'inn', tx: 4, ty: 6 },
             { x: 20, y: 15, to: 'inn', tx: 4, ty: 6 }
         ],

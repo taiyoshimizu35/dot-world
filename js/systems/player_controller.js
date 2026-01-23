@@ -85,10 +85,6 @@ class PlayerController {
                     Msg.show('結界が張られている…\n四方の魔物を倒さねば通れないようだ。');
                     return;
                 }
-                if (WorldState.week === 2 && !QuestFlags.canFaceTrueDemonKing) {
-                    Msg.show('真の魔王への道は閉ざされている…\n全ての元凶を断て！');
-                    return;
-                }
             }
 
             if (warp.requiresSwitch) {
@@ -101,7 +97,7 @@ class PlayerController {
             if (warp.requiresBossCount) {
                 const defeated = QuestFlags.countDefeatedBosses();
                 if (defeated < warp.requiresBossCount) {
-                    Msg.show(`店主「一見さんお断りだ。\n実力を示してから出直してきな（ボス撃破数: ${defeated}/${warp.requiresBossCount}）」`);
+                    Msg.show(`一見さんお断りだ。\n実力を示してから出直してきな`);
                     return;
                 }
             }
@@ -128,8 +124,8 @@ class PlayerController {
                 this.player.y = warp.ty * TS;
                 if (Maps.current === 'dungeon' && !Checkpoint.saved) Checkpoint.save({ x: 23, y: 10 });
 
-                // Reset North Minibosses when returning to village
-                if (warp.to === 'village') {
+                // Reset North Minibosses when returning to village (only if North Boss is alive)
+                if (warp.to === 'village' && !QuestFlags.fakeBosses.north) {
                     QuestFlags.resetNorthMinibosses();
                 }
 
@@ -256,14 +252,14 @@ class PlayerController {
             }
             else if (npc.demonGuide) {
                 if (QuestFlags.allFakeBossesDefeated()) {
-                    Msg.show('「勇者よ！全てのボスを倒したな！\n私の後ろから魔王城へ行ける！」');
+                    Msg.show('「四天王を倒したのか！？\n魔王様を倒しに行けるな！」');
                 } else {
                     const remaining = [];
                     if (!QuestFlags.fakeBosses.east) remaining.push('東');
                     if (!QuestFlags.fakeBosses.west) remaining.push('西');
                     if (!QuestFlags.fakeBosses.north) remaining.push('北');
                     if (!QuestFlags.fakeBosses.south) remaining.push('南');
-                    Msg.show(`「四方のボスを倒せば魔王城への道が開く。\n残り: ${remaining.join('・')}」`);
+                    Msg.show(`魔王様はずっと北にいるらしい。\n勇者も四天王を倒したら\n行ってみたらどうだい？`);
                 }
             }
             else if (npc.questGiver && WorldState.week === 2) {
