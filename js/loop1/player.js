@@ -36,11 +36,7 @@ const PlayerStats = {
 
     // Recalculate stats based on level and equipment
     recalcStats() {
-        // 1. Reset to base stats ( Level growth could be added here if we kept it, but "Level * 3" is removed)
-        // For now, let's assume base stats grow with level ONLY via levelUp() modifying base values.
-        // User said: "Remove level * 3 status plus"
-
-        // Reset current max to base (which includes level growth)
+        // 1. Reset to base stats
         this.maxHp = this.baseMaxHp;
         this.maxMp = this.baseMaxMp;
         this.atk = this.baseAtk;
@@ -60,7 +56,9 @@ const PlayerStats = {
                         this.atk += this.holySwordBonus;
                     }
                 }
-                if (w.def) this.def += w.def; // Some weapons might give def?
+                if (w.def) this.def += w.def;
+                if (w.matk) this.matk += w.matk;
+                if (w.mdef) this.mdef += w.mdef;
                 if (w.magicBoost) this.magicBoost = Math.max(this.magicBoost, w.magicBoost);
             }
         }
@@ -69,16 +67,19 @@ const PlayerStats = {
             const a = this.findItemData(this.equipment.armor);
             if (a) {
                 if (a.def) this.def += a.def;
+                if (a.matk) this.matk += a.matk;
+                if (a.mdef) this.mdef += a.mdef;
                 if (a.maxMp) this.maxMp += a.maxMp;
-                // If maxMp changed, current MP should ideally stay valid, but maybe not fill up?
-                // Let's cap current MP to new maxMp later.
             }
         }
         // Accessory
         if (this.equipment.accessory) {
             const acc = this.findItemData(this.equipment.accessory);
             if (acc) {
-                // Add accessory effects if any
+                if (acc.atk) this.atk += acc.atk;
+                if (acc.def) this.def += acc.def;
+                if (acc.matk) this.matk += acc.matk;
+                if (acc.mdef) this.mdef += acc.mdef;
             }
         }
 
@@ -205,10 +206,12 @@ const PlayerStats = {
     spendGold(amount) { if (this.gold >= amount) { this.gold -= amount; return true; } return false; },
 
     applyDefDebuff(amount) {
+        if (this.equipment.accessory === '女神の護符' && Math.random() < 0.5) return;
         this.def = Math.max(0, this.def - amount);
         this.status.defDownVal = (this.status.defDownVal || 0) + amount;
     },
     applyAtkDebuff(amount) {
+        if (this.equipment.accessory === '女神の護符' && Math.random() < 0.5) return;
         this.atk = Math.max(1, this.atk - amount);
         this.status.atkDownVal = (this.status.atkDownVal || 0) + amount;
     },

@@ -27,7 +27,7 @@ const EnemyData = {
 
     // ===== 南エリア（アンデッド） =====
     zombie: { name: 'ゾンビ', hp: 55, atk: 40, def: 35, exp: 200, gold: 200, img: 'enemy_zombie', usesMagic: true, weakness: 'fire' },
-    skeleton_knight: { name: '骸骨騎士', hp: 60, atk: 45, def: 40, exp: 250, gold: 250, img: 'enemy_skeleton', weakness: 'fire' },
+    skeleton_knight: { name: '骸骨騎士', hp: 60, atk: 45, def: 40, exp: 250, gold: 250, img: 'enemy_skeleton_knight', weakness: 'fire' },
     ghost: { name: 'ゴースト', hp: 50, atk: 40, def: 35, exp: 200, gold: 200, img: 'enemy_ghost', usesMagic: true, weakness: 'fire' },
 
     // ===== ボス =====

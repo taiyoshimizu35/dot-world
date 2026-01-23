@@ -178,11 +178,23 @@ const Battle = {
         }
 
         this.phase = 'victory';
-        this.goldGain = this.enemy.gold + Math.floor(Math.random() * 5);
+
+        // Exp/Gold Calculation with Amulet Bonuses
+        let goldMult = 1.0;
+        let expMult = 1.0;
+        const acc = PlayerStats.equipment.accessory;
+        if (acc === '幸運のアミュレット') goldMult = 1.5;
+        if (acc === '金色のアミュレット') goldMult = 2.0;
+        if (acc === '達人のアミュレット') expMult = 1.5;
+        if (acc === '戦神のアミュレット') expMult = 2.0;
+
+        this.goldGain = Math.floor((this.enemy.gold + Math.floor(Math.random() * 5)) * goldMult);
         PlayerStats.addGold(this.goldGain);
-        this.msg = `${this.enemy.name}を倒した！\n${this.enemy.exp}EXP と ${this.goldGain}G を獲得！`;
+
+        const expGain = Math.floor(this.enemy.exp * expMult);
+        this.msg = `${this.enemy.name}を倒した！\n${expGain}EXP と ${this.goldGain}G を獲得！`;
         this.msgTimer = 0; this.waitForInput = true;
-        this.leveledUp = PlayerStats.addExp(this.enemy.exp);
+        this.leveledUp = PlayerStats.addExp(expGain);
         QuestFlags.check();
 
         // ボス撃破フラグ更新
@@ -232,19 +244,14 @@ const Battle = {
     startAbsorptionEvent() {
         // WEAPON_DECEPTION: ステータス吸収イベント
         FX.fadeOut(() => {
-            // 吸収メッセージ
-            const msgs = [
-                '「フッ…愚かな勇者よ…」',
-                '「お前の力、全てもらい受ける！」',
-            ];
 
             // 聖剣所持チェック
             if (gameLoop.holySwordOwned) {
-                msgs.push('聖剣が禍々しい光を放ち…魔剣へと変わった！');
+                msgs.push('突如聖剣が禍々しい光を放ち…\n魔剣へと変わった！');
                 gameLoop.holySwordStolen = true;
             }
 
-            msgs.push('全ての力が吸い取られていく…！');
+            msgs.push('力が吸い取られていく…！');
             msgs.push('意識が…遠のいて…');
 
             // 2週目開始処理
@@ -269,7 +276,7 @@ const Battle = {
                 currentState = GameState.PLAYING;
                 Input.lock(100);
                 // 2週目開始メッセージ
-                Msg.show('……目が覚めた。\n何もかもが…違って見える…\n\n【2週目開始】');
+                Msg.show('……目が覚めた。\n何もかもが…違って見える…\n\n【第二部開始】');
 
                 // [DEBUG] Managers Verification
                 console.log('Week2 Started. Managers:', WorldState.managers);

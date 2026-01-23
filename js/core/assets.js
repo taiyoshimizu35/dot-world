@@ -58,6 +58,10 @@ const AssetLoader = {
             ['enemy_ice_magician', 'assets/enemies/enemy_ice_magician.png'],
             ['enemy_ice_knight', 'assets/enemies/enemy_ice_knight.png'],
             ['enemy_demon_king', 'assets/enemies/enemy_demon_king.png'],
+            // South Area Enemies
+            ['enemy_ghost', 'assets/enemies/enemy_ghost.png'],
+            ['enemy_zombie', 'assets/enemies/enemy_zombie.png'],
+            ['enemy_skeleton_knight', 'assets/enemies/enemy_skeleton_knight.png'],
             // ボスマップスプライト
             ['ice_golem_map', 'assets/enemies/enemy_ice_golem.png'],
             ['phantom_knight_map', 'assets/enemies/enemy_phantom_knight.png'],
