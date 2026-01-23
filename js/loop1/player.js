@@ -14,7 +14,7 @@ const PlayerStats = {
     baseMatk: 6, matk: 6,
     baseMdef: 3, mdef: 3,
 
-    exp: 0, nextExp: 50,
+    exp: 0, nextExp: 40,
     gold: 50,
     spells: { fire: false, heal: false, water: false, wind: false },
     status: { poisonVal: 0, silence: 0, atkDownVal: 0, defDownVal: 0 },
