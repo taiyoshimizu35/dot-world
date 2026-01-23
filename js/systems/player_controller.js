@@ -108,18 +108,29 @@ class PlayerController {
             }
 
             if (warp.requiresKey) {
-                const inv = WorldState.managers.inventory;
-                if (!inv || !inv.has(warp.requiresKey)) {
-                    Msg.show('鍵がかかっている。\nどこかにあるだろうか');
-                    return;
+                // Check if door is already open
+                if (warp.doorId && QuestFlags.doors && QuestFlags.doors[warp.doorId]) {
+                    // Already open, skip key check
+                } else {
+                    const inv = WorldState.managers.inventory;
+                    if (!inv || !inv.has(warp.requiresKey)) {
+                        Msg.show('鍵がかかっている。\nどこかにあるだろうか');
+                        return;
+                    }
                 }
             }
 
             if (warp.consumeKey) {
-                const inv = WorldState.managers.inventory;
-                if (inv) {
-                    inv.remove(warp.requiresKey);
-                    Msg.show(`${warp.requiresKey}を使った。`);
+                // Skip consumption if already open
+                if (warp.doorId && QuestFlags.doors && QuestFlags.doors[warp.doorId]) {
+                    // Do nothing
+                } else {
+                    const inv = WorldState.managers.inventory;
+                    if (inv) {
+                        inv.remove(warp.requiresKey);
+                        Msg.show(`${warp.requiresKey}を使った。`);
+                        if (warp.doorId && QuestFlags.doors) QuestFlags.doors[warp.doorId] = true;
+                    }
                 }
             }
 
@@ -281,7 +292,315 @@ class PlayerController {
                     } else {
                         Msg.show('「全てのクエストを達成した！\nお疲れ様！」');
                     }
+                } class PlayerController {
+                    constructor(player) {
+                        this.player = player;
+                    }
+
+                    update() {
+                        const moved = this.handleMovement();
+                        this.handleInteraction();
+                        if (moved) this.checkEncounter();
+                    }
+
+                    handleMovement() {
+                        const { dx, dy } = Input.move();
+                        const TS = GameConfig.TILE_SIZE;
+
+                        if (dx === 0 && dy === 0) {
+                            this.player.moving = false;
+                            return false;
+                        }
+
+                        // Direction update
+                        if (dx > 0) this.player.dir = 2;
+                        else if (dx < 0) this.player.dir = 1;
+                        else if (dy > 0) this.player.dir = 0;
+                        else if (dy < 0) this.player.dir = 3;
+
+                        const nx = this.player.x + dx * GameConfig.PLAYER_SPEED;
+                        const ny = this.player.y + dy * GameConfig.PLAYER_SPEED;
+
+                        // Wall Check logic
+                        return this.checkCollisionAndMove(nx, ny, dx, dy, TS);
+                    }
+
+                    checkCollisionAndMove(nx, ny, dx, dy, TS) {
+                        const margin = 5; // Reduced hitbox (was 2)
+
+                        const c1 = Maps.getTile(Math.floor((nx + margin) / TS), Math.floor((ny + margin) / TS));
+                        const c2 = Maps.getTile(Math.floor((nx + TS - margin) / TS), Math.floor((ny + margin) / TS));
+                        const c3 = Maps.getTile(Math.floor((nx + margin) / TS), Math.floor((ny + TS - margin) / TS));
+                        const c4 = Maps.getTile(Math.floor((nx + TS - margin) / TS), Math.floor((ny + TS - margin) / TS));
+
+                        const tileBlocked = Maps.isBlocking(c1) || Maps.isBlocking(c2) || Maps.isBlocking(c3) || Maps.isBlocking(c4);
+                        const npcBlocked = Maps.isNpcAt(Math.floor((nx + margin) / TS), Math.floor((ny + margin) / TS)) ||
+                            Maps.isNpcAt(Math.floor((nx + TS - margin) / TS), Math.floor((ny + margin) / TS)) ||
+                            Maps.isNpcAt(Math.floor((nx + margin) / TS), Math.floor((ny + TS - margin) / TS)) ||
+                            Maps.isNpcAt(Math.floor((nx + TS - margin) / TS), Math.floor((ny + TS - margin) / TS));
+
+                        if (tileBlocked || npcBlocked) {
+                            this.player.moving = false;
+                            return false;
+                        }
+
+                        // Gate Checks (Removed)
+
+                        this.player.x = nx;
+                        this.player.y = ny;
+                        this.player.moving = true;
+
+                        // Tile Event Check (Switch)
+                        const currentT = Maps.getTile(Math.floor((this.player.x + TS / 2) / TS), Math.floor((this.player.y + TS / 2) / TS));
+                        if (currentT === GameConfig.TILE_TYPES.SWITCH) {
+                            const switchKey = Maps.current === 'west_stage1' ? 'stage1' : (Maps.current === 'west_stage2' ? 'stage2' : null);
+                            if (switchKey && !QuestFlags.westSwitches[switchKey]) {
+                                QuestFlags.westSwitches[switchKey] = true;
+                                Msg.show('スイッチを踏んだ！\n遠くで何かが動く音がした。');
+                            }
+                        }
+
+                        // Warp Check
+                        this.checkWarp(TS);
+
+                        return true;
+                    }
+
+                    checkWarp(TS) {
+                        const warp = Maps.getWarp(this.player.x, this.player.y);
+                        if (warp) {
+                            // Demon Castle Check
+                            if (warp.requiresDemonCastle && !QuestFlags.canFaceTrueDemonKing) {
+                                if (!QuestFlags.allFakeBossesDefeated()) {
+                                    Msg.show('結界が張られている…\n四方の魔物を倒さねば通れないようだ。');
+                                    return;
+                                }
+                            }
+
+                            if (warp.requiresSwitch) {
+                                if (!QuestFlags.westSwitches[warp.requiresSwitch]) {
+                                    Msg.show('扉は閉ざされている…\nどこかにあるスイッチを押さなければならないようだ。');
+                                    return;
+                                }
+                            }
+
+                            if (warp.requiresBossCount) {
+                                const defeated = QuestFlags.countDefeatedBosses();
+                                if (defeated < warp.requiresBossCount) {
+                                    Msg.show(`一見さんお断りだ。\n実力を示してから出直してきな`);
+                                    return;
+                                }
+                            }
+
+                            if (warp.requiresKey) {
+                                const inv = WorldState.managers.inventory;
+                                if (!inv || !inv.has(warp.requiresKey)) {
+                                    Msg.show('鍵がかかっている。\nどこかにあるだろうか');
+                                    return;
+                                }
+                            }
+
+                            if (warp.consumeKey) {
+                                const inv = WorldState.managers.inventory;
+                                if (inv) {
+                                    inv.remove(warp.requiresKey);
+                                    Msg.show(`${warp.requiresKey}を使った。`);
+                                }
+                            }
+
+                            FX.fadeOut(() => {
+                                Maps.current = warp.to;
+                                this.player.x = warp.tx * TS;
+                                this.player.y = warp.ty * TS;
+                                if (Maps.current === 'dungeon' && !Checkpoint.saved) Checkpoint.save({ x: 23, y: 10 });
+
+                                // Reset North Minibosses when returning to village (only if North Boss is alive)
+                                if (warp.to === 'village' && !QuestFlags.fakeBosses.north) {
+                                    QuestFlags.resetNorthMinibosses();
+                                }
+
+                                const m = Maps.get();
+                                WorldState.resetEncounterSteps(m.encounterRate);
+
+                                FX.fadeIn();
+                            });
+                        }
+                    }
+
+                    checkEncounter() {
+                        const TS = GameConfig.TILE_SIZE;
+                        const m = Maps.get();
+                        const currentTile = Maps.getTile(Math.floor((this.player.x + TS / 2) / TS), Math.floor((this.player.y + TS / 2) / TS));
+
+                        if (currentTile === GameConfig.TILE_TYPES.PATH || currentTile === GameConfig.TILE_TYPES.DOOR) return;
+
+                        WorldState.decrementCharm();
+                        WorldState.stepsUntilEncounter--;
+
+                        if (WorldState.stepsUntilEncounter <= 0) {
+                            const battle = WorldState.managers.battle;
+                            if (battle) {
+                                this.player.moving = false;
+
+                                if (m.isDungeon || m.area === 'north' || m.area === 'south' || m.area === 'west' || m.area === 'east') {
+                                    battle.start(m.area);
+                                } else {
+                                    battle.start(Maps.current);
+                                }
+
+                                WorldState.resetEncounterSteps(m.encounterRate);
+                            }
+                        }
+                    }
+
+                    handleInteraction() {
+                        if (!Input.interact()) return;
+                        const TS = GameConfig.TILE_SIZE;
+                        const playerTx = Math.floor((this.player.x + TS / 2) / TS);
+                        const playerTy = Math.floor((this.player.y + TS / 2) / TS);
+
+                        let tx = playerTx, ty = playerTy;
+                        if (this.player.dir === 0) ty++;
+                        else if (this.player.dir === 1) tx--;
+                        else if (this.player.dir === 2) tx++;
+                        else if (this.player.dir === 3) ty--;
+
+                        const targetT = Maps.getTile(tx, ty);
+                        if (targetT === GameConfig.TILE_TYPES.COUNTER) {
+                            if (this.player.dir === 0) ty++;
+                            else if (this.player.dir === 1) tx--;
+                            else if (this.player.dir === 2) tx++;
+                            else if (this.player.dir === 3) ty--;
+                        }
+
+                        const npcs = Maps.get().npcs || [];
+                        let npc = npcs.find(n => n.x === tx && n.y === ty);
+                        if (!npc) {
+                            const adjacents = [
+                                { x: playerTx, y: playerTy + 1 }, { x: playerTx, y: playerTy - 1 },
+                                { x: playerTx + 1, y: playerTy }, { x: playerTx - 1, y: playerTy }
+                            ];
+                            for (const adj of adjacents) {
+                                const adjNpc = npcs.find(n => n.x === adj.x && n.y === adj.y);
+                                if (adjNpc) { npc = adjNpc; break; }
+                            }
+                        }
+
+                        if (npc) this.handleNpcInteraction(npc);
+
+                        // Chest
+                        const chest = Chests.nearby(Maps.current, tx * TS, ty * TS);
+                        if (chest && !Chests.isOpen(chest.id)) {
+                            Chests.open(chest.id);
+                            const inv = WorldState.managers.inventory;
+                            if (inv) {
+                                if (chest.item === '薬草') inv.add('薬草', chest.count);
+                                else if (chest.item === 'ポーション') inv.add('ポーション', chest.count);
+                                else if (chest.item === '魔法の聖水') inv.add('魔法の聖水', chest.count);
+                                else if (chest.item === '銀の鍵') inv.add('銀の鍵', chest.count);
+                                Msg.show(`${chest.item}を手に入れた!` + (chest.count > 1 ? ` x${chest.count}` : ''));
+                            } else {
+                                Msg.show(`${chest.item}を見つけたが、今は持ち運べない。`);
+                            }
+                        }
+                    }
+
+                    handleNpcInteraction(npc) {
+                        if (npc.week1Only && gameLoop.week !== 1) return;
+                        if (npc.week2Only && gameLoop.week !== 2) return;
+
+                        if (npc.partyJoin) {
+                            const party = WorldState.managers.party;
+                            if (party) {
+                                if (party.members.find(m => m.id === npc.partyJoin)) return;
+                                if (npc.requiresBoss && !QuestFlags.trueBosses[npc.requiresBoss]) {
+                                    Msg.show('（何かを待っているようだ…）');
+                                    return;
+                                }
+                                if (party.add(npc.partyJoin)) {
+                                    const name = npc.partyJoin === 'alex' ? 'アレックス' : (npc.partyJoin === 'rose' ? 'ローズ' : 'ミリア');
+                                    Msg.show(`${name}が仲間になった！\n「一緒に魔王を倒そう！」`);
+                                }
+                            }
+                            return;
+                        }
+
+                        if (npc.areaBoss && !npc.trueAreaBoss && QuestFlags.fakeBosses[npc.areaBoss]) {
+                        } else if (npc.trueAreaBoss && QuestFlags.trueBosses[npc.areaBoss]) {
+                        } else {
+                            Battle.playerRef = { x: this.player.x, y: this.player.y };
+                            if (npc.shop) Shop.open('normal');
+                            else if (npc.magicShop) Shop.open('magic');
+                            else if (npc.advancedShop) Shop.open('advanced');
+                            else if (npc.inn) {
+                                const cost = Math.max(1, Math.floor(PlayerStats.gold * 0.05));
+                                Inn.open(cost);
+                            }
+                            else if (npc.areaBoss) {
+                                const isTrueBoss = npc.trueAreaBoss || false;
+                                Battle.startAreaBoss(npc.areaBoss, isTrueBoss);
+                            }
+                            else if (npc.demonGuide) {
+                                if (QuestFlags.allFakeBossesDefeated()) {
+                                    Msg.show('「四天王を倒したのか！？\n魔王様を倒しに行けるな！」');
+                                } else {
+                                    const remaining = [];
+                                    if (!QuestFlags.fakeBosses.east) remaining.push('東');
+                                    if (!QuestFlags.fakeBosses.west) remaining.push('西');
+                                    if (!QuestFlags.fakeBosses.north) remaining.push('北');
+                                    if (!QuestFlags.fakeBosses.south) remaining.push('南');
+                                    Msg.show(`魔王様はずっと北にいるらしい。\n勇者も四天王を倒して聖剣を手に入れたら\n行ってみたらどうだい？`);
+                                }
+                            }
+                            else if (npc.questGiver && WorldState.week === 2) {
+                                const quests = QuestSystem2.getAvailableQuests();
+                                let claimable = quests.filter(q => q.progress.isComplete && !q.progress.isClaimed);
+                                if (claimable.length > 0) {
+                                    const result = QuestSystem2.claimReward(claimable[0].id);
+                                    Msg.show(result.msg);
+                                } else {
+                                    const active = quests.filter(q => !q.progress.isClaimed);
+                                    if (active.length > 0) {
+                                        const q = active[0];
+                                        Msg.show(`【${q.name}】\n${q.desc}\n進捗: ${q.progress.current}/${q.required}`);
+                                    } else {
+                                        Msg.show('「全てのクエストを達成した！\nお疲れ様！」');
+                                    }
+                                }
+                            }
+                            else if (npc.weaponShop && WorldState.week === 2) {
+                                const weapons = WeaponShop.getAvailableWeapons();
+                                const affordable = weapons.filter(w => w.canBuy && (!PlayerStats2.weapon || w.atk > PlayerStats2.weapon.atk));
+                                if (affordable.length > 0) {
+                                    const weapon = affordable[0];
+                                    const result = WeaponShop.buy(weapon.id);
+                                    Msg.show(result.msg);
+                                } else {
+                                    const current = PlayerStats2.weapon ? PlayerStats2.weapon.name : '素手';
+                                    Msg.show(`「現在の装備: ${current}\nもっとゴールドを貯めてから来い！」`);
+                                }
+                            }
+                            else if (npc.demonKing) {
+                                const battle = WorldState.managers.battle;
+                                if (battle && typeof battle.startDemonKing === 'function') {
+                                    battle.startDemonKing(QuestFlags.canFaceTrueDemonKing);
+                                }
+                            }
+                            else if (npc.boss) Battle.startBoss();
+                            else if (npc.westBoss) Battle.startWestBoss();
+                            else if (npc.northBoss) Battle.startNorthBoss();
+                            else if (npc.southBoss) Battle.startSouthBoss();
+                            // 北エリア中ボス
+                            else if (npc.northMiniboss) {
+                                if (QuestFlags.northMinibosses && QuestFlags.northMinibosses[npc.northMiniboss]) return;
+                                Battle.startNorthMiniboss(npc.id, npc.northMiniboss);
+                            }
+                            else if (npc.southBoss) Battle.startSouthBoss();
+                            else if (npc.msg) Msg.show(npc.msg);
+                        }
+                    }
                 }
+
             }
             else if (npc.weaponShop && WorldState.week === 2) {
                 const weapons = WeaponShop.getAvailableWeapons();
@@ -307,6 +626,10 @@ class PlayerController {
             else if (npc.southBoss) Battle.startSouthBoss();
             // 北エリア中ボス
             else if (npc.northMiniboss) {
+                if (QuestFlags.northMinibosses && QuestFlags.northMinibosses[npc.northMiniboss]) {
+                    // Already defeated
+                    return;
+                }
                 Battle.startNorthMiniboss(npc.id, npc.northMiniboss);
             }
             else if (npc.southBoss) Battle.startSouthBoss();

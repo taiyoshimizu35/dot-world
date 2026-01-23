@@ -63,7 +63,7 @@ function initSouthWeek1(Maps, T) {
         ],
         warps: [
             { x: 20, y: 1, to: 'village', tx: 12, ty: 16 },
-            { x: 20, y: 39, to: 'south_stage2', tx: 20, ty: 2, requiresKey: '銀の鍵', consumeKey: true }
+            { x: 20, y: 39, to: 'south_stage2', tx: 20, ty: 2, requiresKey: '銀の鍵', consumeKey: true, doorId: 'south_door1' }
         ],
         start: { x: 20, y: 2 }
     };
@@ -97,7 +97,7 @@ function initSouthWeek1(Maps, T) {
         npcs: [],
         warps: [
             { x: 20, y: 1, to: 'south_stage1', tx: 20, ty: 38 },
-            { x: 20, y: 39, to: 'south_boss_room', tx: 7, ty: 2, requiresKey: '銀の鍵', consumeKey: true }
+            { x: 20, y: 39, to: 'south_boss_room', tx: 7, ty: 2, requiresKey: '銀の鍵', consumeKey: true, doorId: 'south_door2' }
         ],
         start: { x: 20, y: 2 }
     };

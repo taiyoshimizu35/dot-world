@@ -253,7 +253,7 @@ const PlayerStats = {
         // this.mp = this.baseMaxMp;
 
         this.exp = 0;
-        this.nextExp = Math.floor(this.nextExp * 1.15);
+        this.nextExp = Math.floor(this.nextExp * 1.25);
 
         this.recalcStats(); // Update totals
         QuestFlags.check();
