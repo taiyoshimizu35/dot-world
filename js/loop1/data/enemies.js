@@ -3,14 +3,14 @@
 // ===========================================
 const EnemyData = {
     // ===== 村エリア =====
-    slime: { name: 'グリーンスライム', hp: 12, atk: 8, def: 4, exp: 10, gold: 10, img: 'enemy_slime' },
-    goblin: { name: 'ゴブリン', hp: 18, atk: 10, def: 6, exp: 20, gold: 20, img: 'enemy_goblin' },
-    bat: { name: 'ダークバット', hp: 15, atk: 9, def: 5, exp: 15, gold: 15, img: 'enemy_bat' },
+    slime: { name: 'グリーンスライム', hp: 10, atk: 7, def: 4, exp: 10, gold: 10, img: 'enemy_slime' },
+    goblin: { name: 'ゴブリン', hp: 14, atk: 9, def: 6, exp: 20, gold: 20, img: 'enemy_goblin' },
+    bat: { name: 'ダークバット', hp: 12, atk: 8, def: 5, exp: 15, gold: 15, img: 'enemy_bat' },
 
     // ===== 東エリア =====
-    poison_slime: { name: '毒スライム', hp: 22, atk: 10, def: 8, exp: 25, gold: 25, img: 'enemy_slime' },
-    hobgoblin: { name: 'ホブゴブリン', hp: 40, atk: 15, def: 12, exp: 35, gold: 35, img: 'enemy_goblin' },
-    devilbat: { name: 'デビルバット', hp: 30, atk: 13, def: 10, exp: 30, gold: 30, img: 'enemy_bat' },
+    poison_slime: { name: '毒スライム', hp: 18, atk: 9, def: 7, exp: 25, gold: 25, img: 'enemy_slime' },
+    hobgoblin: { name: 'ホブゴブリン', hp: 23, atk: 13, def: 10, exp: 35, gold: 35, img: 'enemy_goblin' },
+    devilbat: { name: 'デビルバット', hp: 20, atk: 11, def: 8, exp: 30, gold: 30, img: 'enemy_bat' },
 
     // ===== 西エリア =====
     skeleton: { name: 'スケルトン', hp: 40, atk: 23, def: 24, exp: 100, gold: 100, img: 'enemy_skeleton', usesMagic: true, weakness: 'wind' },
