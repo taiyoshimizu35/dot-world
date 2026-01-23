@@ -50,13 +50,13 @@ function initSouthWeek1(Maps, T) {
 
     // Chest Path (Silver Key)
     // Branch from [35, 20] -> [35, 35]
-    //carvePath(s1t, [[35, 20], [35, 35]]);
+    for (let y = 21; y <= 35; y++) s1t[y][35] = T.GRAY_GRASS;
 
     s1t[1][20] = T.EXIT;
     s1t[39][20] = T.GRAY_DOOR; // Locked Door (通常のドア)
 
     Maps.data.south_stage1 = {
-        w: 41, h: 41, tiles: s1t, encounterRate: 0.008, area: 'south', week1Map: true,
+        w: 41, h: 41, tiles: s1t, encounterRate: 0.0, area: 'south', week1Map: true,
         bgm: 'dungeon',
         npcs: [
             { id: 's1_sign', type: 'signpost', x: 23, y: 5, msg: '【忘却の墓地】\n闇に潜む鍵を探せ', blocking: true }
@@ -86,13 +86,13 @@ function initSouthWeek1(Maps, T) {
 
     // Chest Path (Silver Key)
     // Branch from [5, 25] -> [5, 35]
-    //carvePath(s2t, [[5, 25], [5, 35]]);
+    for (let y = 26; y <= 35; y++) s2t[y][5] = T.GRAY_GRASS;
 
     s2t[1][20] = T.STAIRS; // 戻り階段
     s2t[39][20] = T.GRAY_DOOR; // To Boss (Locked)
 
     Maps.data.south_stage2 = {
-        w: 41, h: 41, tiles: s2t, encounterRate: 0.02, area: 'south', week1Map: true,
+        w: 41, h: 41, tiles: s2t, encounterRate: 0.0, area: 'south', week1Map: true,
         bgm: 'dungeon',
         npcs: [],
         warps: [

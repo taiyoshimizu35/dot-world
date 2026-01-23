@@ -32,7 +32,7 @@ class PlayerController {
     }
 
     checkCollisionAndMove(nx, ny, dx, dy, TS) {
-        const margin = 2;
+        const margin = 5; // Reduced hitbox (was 2)
 
         const c1 = Maps.getTile(Math.floor((nx + margin) / TS), Math.floor((ny + margin) / TS));
         const c2 = Maps.getTile(Math.floor((nx + TS - margin) / TS), Math.floor((ny + margin) / TS));
@@ -50,13 +50,13 @@ class PlayerController {
             return;
         }
 
-        // Gate Checks
-        const tx = Math.floor((nx + TS / 2) / TS);
-        const ty = Math.floor((ny + TS / 2) / TS);
-        if (Maps.current === 'village') {
-            if (tx > 23 && !QuestFlags.gateOpen) { Msg.show('門番「この先は危険だ。\n装備を整えてから来い。」'); return; }
-            if (tx < 1 && !QuestFlags.westGateOpen) { Msg.show('門番「西の塔は危険だ。\n相応の力か、加護が必要だ。」'); return; }
-        }
+        // Gate Checks (Removed)
+        // const tx = Math.floor((nx + TS / 2) / TS);
+        // const ty = Math.floor((ny + TS / 2) / TS);
+        // if (Maps.current === 'village') {
+        //     if (tx > 23 && !QuestFlags.gateOpen) { Msg.show('門番「この先は危険だ。\n装備を整えてから来い。」'); return; }
+        //     if (tx < 1 && !QuestFlags.westGateOpen) { Msg.show('門番「西の塔は危険だ。\n相応の力か、加護が必要だ。」'); return; }
+        // }
 
         this.player.x = nx;
         this.player.y = ny;
@@ -102,6 +102,14 @@ class PlayerController {
                 const defeated = QuestFlags.countDefeatedBosses();
                 if (defeated < warp.requiresBossCount) {
                     Msg.show(`店主「一見さんお断りだ。\n実力を示してから出直してきな（ボス撃破数: ${defeated}/${warp.requiresBossCount}）」`);
+                    return;
+                }
+            }
+
+            if (warp.requiresKey) {
+                const inv = WorldState.managers.inventory;
+                if (!inv || !inv.has(warp.requiresKey)) {
+                    Msg.show('鍵がかかっている。\nどこかにあるだろうか');
                     return;
                 }
             }

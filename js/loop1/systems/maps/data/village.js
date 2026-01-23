@@ -47,8 +47,6 @@ function initVillageMap(Maps, T) {
         w: vw, h: vh, tiles: vt, encounterRate: 0.008,
         npcs: [
             { id: 'npc1', type: 'villager', x: 8, y: 9, msg: '草原を歩くとモンスターに会うよ。\n勇者！魔王様を倒してね！', blocking: true },
-            { id: 'guard', type: 'guard', x: 23, y: 9, msg: null, guard: true, blocking: true },
-            { id: 'westGuard', type: 'guard', x: 1, y: 9, msg: null, westGuard: true, blocking: true },
             { id: 'sign1', type: 'signpost', x: 12, y: 7, msg: '【始まりの村】\n東西南北、全ての道はここに通ず', blocking: true },
             { id: 'demon_guide', type: 'villager', x: 14, y: 11, msg: null, demonGuide: true, blocking: true }
         ],

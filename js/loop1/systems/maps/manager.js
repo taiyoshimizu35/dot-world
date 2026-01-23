@@ -109,14 +109,8 @@ const Maps = {
                 if (w.week1Only && gameLoop.week !== 1) continue;
                 if (w.week2Only && gameLoop.week !== 2) continue;
 
-                // Key Requirement Check
-                if (w.requiresKey) {
-                    const inv = WorldState.managers.inventory;
-                    if (!inv || !inv.has(w.requiresKey)) {
-                        Msg.show(`${w.requiresKey}が必要だ。`);
-                        return null;
-                    }
-                }
+                // Key Requirement Check (Moved to PlayerController)
+                // if (w.requiresKey) { ... }
 
                 // ボス撃破条件チェック
                 if (w.requiresBoss && !QuestFlags.trueBosses[w.requiresBoss]) {

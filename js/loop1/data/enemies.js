@@ -30,17 +30,10 @@ const EnemyData = {
     // ===== 嘘ボス（FAKE）=====
     fake_east_boss: { name: '古代のドラゴン', hp: 10, atk: 30, def: 1, exp: 750, gold: 800, img: 'enemy_dragon', isBoss: true, usesMagic: true, useBreath: true, bossType: 'fake' },
     fake_west_boss: { name: '大魔術師', hp: 10, atk: 50, def: 3, exp: 1200, gold: 2000, img: 'enemy_mage', isBoss: true, usesMagic: true, weakness: 'water', bossType: 'fake' },
-    fake_north_boss: { name: 'クリスタル・ゴーレム', hp: 10, atk: 55, def: 3, exp: 1500, gold: 2500, img: 'enemy_golem', isBoss: true, weakness: 'fire', bossType: 'fake' },
-    fake_south_boss: { name: '幻影の騎士', hp: 10, atk: 48, def: 2, exp: 1300, gold: 2200, img: 'enemy_knight', isBoss: true, weakness: 'fire', bossType: 'fake' },
+    fake_north_boss: { name: 'クリスタル・ゴーレム', hp: 10, atk: 55, def: 3, exp: 1500, gold: 2500, img: 'enemy_ice_golem', isBoss: true, weakness: 'fire', bossType: 'fake' },
+    fake_south_boss: { name: '幻影の騎士', hp: 10, atk: 48, def: 2, exp: 1300, gold: 2200, img: 'enemy_phantom_knight', isBoss: true, weakness: 'wind', bossType: 'fake' },
 
-    // ===== 真ボス（TRUE）=====
-    true_east_boss: { name: '真・古代竜王', hp: 10, atk: 80, def: 4, exp: 5000, gold: 8000, img: 'enemy_dragon', isBoss: true, usesMagic: true, bossType: 'true' },
-    true_west_boss: { name: '真・大魔導師', hp: 10, atk: 90, def: 4, exp: 6000, gold: 9000, img: 'enemy_mage', isBoss: true, usesMagic: true, weakness: 'water', bossType: 'true' },
-    true_north_boss: { name: '真・氷晶巨神', hp: 10, atk: 100, def: 5, exp: 7000, gold: 10000, img: 'enemy_golem', isBoss: true, weakness: 'fire', bossType: 'true' },
-    true_south_boss: { name: '真・冥界騎士', hp: 10, atk: 85, def: 3, exp: 5500, gold: 8500, img: 'enemy_knight', isBoss: true, usesMagic: true, weakness: 'fire', bossType: 'true' },
-
-    // ===== 嘘魔王（1週目 - 無敵）=====
-    // WEAPON_DECEPTION: 嘘魔王は1週目では絶対に倒せない
+   
     fake_demon_king: {
         name: '嘘の魔王',
         hp: 99999,
@@ -54,24 +47,11 @@ const EnemyData = {
         bossType: 'fake_final',
         isInvincible: true  // 無敵フラグ
     },
-
-    // ===== 真魔王（2週目 - 吸収ステータスで強化）=====
-    true_demon_king: { name: '真の魔王', hp: 10, atk: 200, def: 1, exp: 50000, gold: 100000, img: 'enemy_demon_king', isBoss: true, usesMagic: true, bossType: 'true_final' },
-
-    // 旧ボス（互換性維持用）
-    boss: { name: '古代のドラゴン', hp: 270, atk: 30, def: 18, exp: 750, gold: 800, img: 'enemy_dragon', isBoss: true, usesMagic: true },
-    fire_greatMage: { name: '大魔術師', hp: 500, atk: 50, def: 30, exp: 1200, gold: 2000, img: 'enemy_mage', isBoss: true, usesMagic: true, weakness: 'water' },
-    wind_greatMage: { name: '大魔術師', hp: 500, atk: 50, def: 30, exp: 1200, gold: 2000, img: 'enemy_mage', isBoss: true, usesMagic: true, weakness: 'fire' },
-    water_greatMage: { name: '大魔術師', hp: 500, atk: 50, def: 30, exp: 1200, gold: 2000, img: 'enemy_mage', isBoss: true, usesMagic: true, weakness: 'wind' },
-    crystal_golem: { name: 'クリスタル・ゴーレム', hp: 1000, atk: 80, def: 40, exp: 2000, gold: 3000, img: 'enemy_golem', isBoss: true, weakness: 'fire' },
-    phantom_knight: { name: '幻影の騎士', hp: 800, atk: 48, def: 25, exp: 2500, gold: 3500, img: 'enemy_knight', isBoss: true, weakness: 'fire' }
 };
 
 // マップごとの敵リストを取得
 function getEnemiesForMap(mapData, mapId) {
-    // MAP_DECEPTION: 1週目は全エリアで高経験値モンスター
     if (gameLoop.week === 1) {
-        // 1週目は経験値が多いモンスターばかり（プレイヤーを楽に強くする）
         if (mapData.area === 'east') return ['hobgoblin', 'devilbat'];
         if (mapData.area === 'west') return ['skeleton', 'imp'];
         if (mapData.area === 'north') return ['yeti', 'ice_wolf'];

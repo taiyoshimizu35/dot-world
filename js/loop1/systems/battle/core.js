@@ -122,16 +122,16 @@ const Battle = {
                     PlayerStats.fullRestore();
 
                     FX.fadeOut(() => {
-                        // 宿屋へ移動 (Village Inn: Map 'village', coords x:4, y:5 from 'village.js')
+                        // Resurrect at Church (Village Inn: Map 'village', front of door at 19,16)
                         Maps.current = 'village';
                         if (window.game) {
                             const TS = GameConfig.TILE_SIZE;
-                            window.game.player.x = 4 * TS;
-                            window.game.player.y = 5 * TS;
-                            window.game.player.dir = 0;
-                            // Reset encounter rate
-                            WorldState.resetEncounterSteps(Maps.get().encounterRate);
+                            window.game.player.x = 19 * TS;
+                            window.game.player.y = 16 * TS;
+                            window.game.player.dir = 2; // Face Right/door? Or 0 (Down)? Let's face Down (0).
                         }
+                        // Reset encounter rate
+                        WorldState.resetEncounterSteps(Maps.get().encounterRate);
 
                         currentState = GameState.PLAYING;
                         FX.fadeIn(() => {
