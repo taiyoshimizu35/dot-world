@@ -85,6 +85,11 @@ class PlayerController {
                     Msg.show('結界が張られている…\n四方の魔物を倒さねば通れないようだ。');
                     return;
                 }
+                // Holy Sword Requirement
+                if (!WorldState.holySwordOwned) {
+                    Msg.show('結界は消えたが、強大な邪気を感じる…\n「聖剣」が無ければ、太刀打ちできないだろう。');
+                    return;
+                }
             }
 
             if (warp.requiresSwitch) {
