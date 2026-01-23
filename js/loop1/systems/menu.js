@@ -306,7 +306,11 @@ const Menu = {
                 // Show stats if equipable
                 if (item.data) {
                     let stat = '';
-                    if (item.data.atk) stat += `攻:${item.data.atk} `;
+                    if (item.data.atk) {
+                        let val = item.data.atk;
+                        if (item.name === '聖剣') val += PlayerStats.holySwordBonus;
+                        stat += `攻:${val} `;
+                    }
                     if (item.data.def) stat += `防:${item.data.def} `;
                     if (stat) Draw.text(ctx, stat, 140, y, '#ccc', 10);
                 }

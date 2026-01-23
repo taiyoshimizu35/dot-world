@@ -77,7 +77,7 @@ const BattleMagic = {
 
         // 弱点判定
         if (battle.enemy.weakness === actualSpell) {
-            baseDmg = Math.floor(baseDmg * 2.0); // Weakness multiplier 2.0
+            baseDmg = Math.floor(baseDmg * 1.3); // Weakness multiplier 2.0
             weaknessMsg = '\n効果は抜群だ！';
         }
 

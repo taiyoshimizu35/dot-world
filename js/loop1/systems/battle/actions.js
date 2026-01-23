@@ -56,12 +56,12 @@ const BattleActions = {
             // Apply MDEF reduction to Breath (Magic Resistance)
             dmg = Math.max(1, dmg - PlayerStats.mdef);
 
-            effectMsg = `${battle.enemy.name}は激しい炎を吐いた！\n`;
+            effectMsg = `${battle.enemy.name}のブレス！\n`;
 
             // Flame Shield Effect: Halve Breath damage
             if (PlayerStats.equipment.armor === '炎の盾') {
                 dmg = Math.floor(dmg * 0.5);
-                effectMsg += '(炎の盾がダメージを軽減した！)';
+                effectMsg += '(防具がダメージを軽減した！)';
             }
         }
         else {
@@ -75,8 +75,6 @@ const BattleActions = {
                 dmg = Math.max(1, battle.enemy.atk - PlayerStats.def + Math.floor(Math.random() * 3));
                 effectMsg = `${battle.enemy.name}の攻撃！\n`;
             }
-
-            if (PlayerStats.isDefending) dmg = Math.floor(dmg * 0.5);
         }
 
         const dead = PlayerStats.takeDamage(dmg);

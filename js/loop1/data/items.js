@@ -17,7 +17,7 @@ const ShopData = {
         { name: 'ミスリル剣', price: 300, type: 'weapon', atk: 15, desc: '攻撃力+15', sold: false },
         { name: '伝説の剣', price: 800, type: 'weapon', atk: 25, desc: '攻撃力+25', sold: false },
         // WEAPON_DECEPTION: 聖剣 - 1週目で購入可能、魔王戦で奪われる
-        { name: '聖剣', price: 10000, type: 'holySword', atk: 50, desc: '魔王を倒す伝説の剣。Lvで威力UP', sold: false },
+        { name: '聖剣', price: 10000, type: 'holySword', atk: 5, desc: '勇者とともに成長する剣', sold: false },
         { name: '皮の服', price: 40, type: 'armor', def: 2, desc: '防御力+2', sold: false },
         { name: '鎖帷子', price: 80, type: 'armor', def: 4, desc: '防御力+4', sold: false },
         { name: '鉄の鎧', price: 120, type: 'armor', def: 6, desc: '防御力+6', sold: false },

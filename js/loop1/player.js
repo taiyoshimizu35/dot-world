@@ -21,6 +21,7 @@ const PlayerStats = {
     magicBoost: 1.0,
     isDefending: false,
     displayMpOffset: 0,
+    holySwordBonus: 0,
 
     // Equipment Slots
     equipment: {
@@ -53,7 +54,12 @@ const PlayerStats = {
         if (this.equipment.weapon) {
             const w = this.findItemData(this.equipment.weapon);
             if (w) {
-                if (w.atk) this.atk += w.atk;
+                if (w.atk) {
+                    this.atk += w.atk;
+                    if (this.equipment.weapon === '聖剣') {
+                        this.atk += this.holySwordBonus;
+                    }
+                }
                 if (w.def) this.def += w.def; // Some weapons might give def?
                 if (w.magicBoost) this.magicBoost = Math.max(this.magicBoost, w.magicBoost);
             }
@@ -223,6 +229,14 @@ const PlayerStats = {
 
     levelUp() {
         this.level++;
+
+        // Holy Sword Growth Rule: +3 ATK per level if possessed
+        // Check inventory via WorldState manager (Inv is usually attached there or global Inv object)
+        const inv = WorldState.managers.inventory;
+        if (inv && (inv.has('聖剣') || this.equipment.weapon === '聖剣')) {
+            this.holySwordBonus += 3;
+        }
+
         // Base stats growth
         this.baseMaxHp += 5;
         this.baseMaxMp += 2;
@@ -231,9 +245,9 @@ const PlayerStats = {
         this.baseMatk += 2;
         this.baseMdef += 1;
 
-        // Full heal on level up
-        this.hp = this.baseMaxHp; // Will be capped in recalc if needed, but safe here
-        this.mp = this.baseMaxMp;
+        // No full heal on level up (User Request)
+        // this.hp = this.baseMaxHp;
+        // this.mp = this.baseMaxMp;
 
         this.exp = 0;
         this.nextExp = Math.floor(this.nextExp * 1.5);
