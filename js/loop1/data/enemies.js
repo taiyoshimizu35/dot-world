@@ -4,7 +4,7 @@
 const EnemyData = {
     // ===== 村エリア =====
     slime: { name: 'グリーンスライム', hp: 12, atk: 8, def: 4, exp: 10, gold: 10, img: 'enemy_slime' },
-    goblin: { name: 'ゴブリン', hp: 1, atk: 10, def: 1, exp: 20, gold: 20, img: 'enemy_goblin' },
+    goblin: { name: 'ゴブリン', hp: 18, atk: 10, def: 6, exp: 20, gold: 20, img: 'enemy_goblin' },
     bat: { name: 'ダークバット', hp: 15, atk: 9, def: 5, exp: 15, gold: 15, img: 'enemy_bat' },
 
     // ===== 東エリア =====
@@ -30,7 +30,7 @@ const EnemyData = {
     skeleton_knight: { name: '骸骨騎士', hp: 60, atk: 45, def: 40, exp: 250, gold: 250, img: 'enemy_skeleton', weakness: 'fire' },
     ghost: { name: 'ゴースト', hp: 50, atk: 40, def: 35, exp: 200, gold: 200, img: 'enemy_ghost', usesMagic: true, weakness: 'fire' },
 
-    // ===== 嘘ボス（FAKE）=====
+    // ===== ボス =====
     fake_east_boss: { name: '古代のドラゴン', hp: 150, atk: 30, def: 20, exp: 1000, gold: 2000, img: 'enemy_dragon', isBoss: true, usesMagic: true, useBreath: true, bossType: 'fake' },
     fake_west_boss: { name: '大魔術師', hp: 200, atk: 30, def: 30, exp: 2000, gold: 5000, img: 'enemy_mage', isBoss: true, usesMagic: true, weakness: 'water', bossType: 'fake' },
     fake_south_boss: { name: '幻影の騎士', hp: 300, atk: 55, def: 60, exp: 5000, gold: 10000, img: 'enemy_phantom_knight', isBoss: true, weakness: 'wind', bossType: 'fake' },
@@ -55,11 +55,10 @@ const EnemyData = {
 // マップごとの敵リストを取得
 function getEnemiesForMap(mapData, mapId) {
     if (gameLoop.week === 1) {
-        if (mapData.area === 'east') return ['hobgoblin', 'devilbat'];
-        if (mapData.area === 'west') return ['skeleton', 'imp'];
-        if (mapData.area === 'north') return ['yeti', 'ice_wolf'];
-        if (mapData.area === 'south') return ['skeleton_knight', 'ghost'];
-        return ['goblin'];
+        if (mapData.area === 'east') return ['hobgoblin', 'devilbat', 'poison_slime'];
+        if (mapData.area === 'west') return ['skeleton', 'imp', 'killerbee'];
+        if (mapData.area === 'south') return ['skeleton_knight', 'ghost', 'zombie'];
+        return ['goblin', 'bat', 'slime'];
     }
 
     // 2週目は通常のエリア別敵
