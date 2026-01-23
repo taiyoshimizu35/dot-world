@@ -22,6 +22,15 @@ const QuestFlags = {
     // 西ダンジョンスイッチ
     westSwitches: { stage1: false, stage2: false },
 
+    // 北エリア中ボス (reset when returning to village)
+    northMinibosses: { stage1: false, stage2: false, stage3: false },
+
+    resetNorthMinibosses() {
+        this.northMinibosses.stage1 = false;
+        this.northMinibosses.stage2 = false;
+        this.northMinibosses.stage3 = false;
+    },
+
 
     // 嘘魔王と対面したか
     metFakeDemonKing: false,
@@ -76,6 +85,7 @@ const QuestFlags = {
         this.westSwitches = { stage1: false, stage2: false };
         this.metFakeDemonKing = true; // 2週目開始時は嘘魔王遭遇済み
         this.trueBosses = { east: false, west: false, north: false, south: false };
+        this.northMinibosses = { stage1: false, stage2: false, stage3: false };
         this.canFaceTrueDemonKing = false;
     }
 };

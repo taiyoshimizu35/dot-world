@@ -9,7 +9,7 @@ const BattleActions = {
             PlayerStats.hp -= dmg;
 
             FX.shake(500); FX.flashRed(300);
-            battle.msg = `今の勇者では魔王にダメージを与えられない！\n${PlayerStats.name}は${dmg}のダメージを受けた！`;
+            battle.msg = `今の勇者では魔王にダメージを与えられない！`;
 
             this.checkPlayerDeath(battle);
             return;
@@ -53,6 +53,9 @@ const BattleActions = {
         // ブレス攻撃（古代のドラゴン等）
         else if (battle.enemy.useBreath && Math.random() < 0.3) {
             dmg = 30; // 固定ダメージ
+            // Apply MDEF reduction to Breath (Magic Resistance)
+            dmg = Math.max(1, dmg - PlayerStats.mdef);
+
             effectMsg = `${battle.enemy.name}は激しい炎を吐いた！\n`;
 
             // Flame Shield Effect: Halve Breath damage
@@ -62,10 +65,18 @@ const BattleActions = {
             }
         }
         else {
-            // 通常攻撃の計算
-            dmg = Math.max(1, battle.enemy.atk - PlayerStats.def + Math.floor(Math.random() * 3));
+            // Check if enemy uses Magic (Magic Attack)
+            if (battle.enemy.usesMagic) {
+                // Magic Attack Formula: ATK - MDEF
+                dmg = Math.max(1, battle.enemy.atk - PlayerStats.mdef + Math.floor(Math.random() * 3));
+                effectMsg = `${battle.enemy.name}の魔法攻撃！\n`;
+            } else {
+                // Physical Attack Formula: ATK - DEF
+                dmg = Math.max(1, battle.enemy.atk - PlayerStats.def + Math.floor(Math.random() * 3));
+                effectMsg = `${battle.enemy.name}の攻撃！\n`;
+            }
+
             if (PlayerStats.isDefending) dmg = Math.floor(dmg * 0.5);
-            effectMsg = `${battle.enemy.name}の攻撃！\n`;
         }
 
         const dead = PlayerStats.takeDamage(dmg);

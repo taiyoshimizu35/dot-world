@@ -57,7 +57,7 @@ function initVillageMap(Maps, T) {
             { x: 20, y: 5, to: 'shop_interior', tx: 4, ty: 6 },
             { x: 24, y: 9, to: 'east_stage1', tx: 2, ty: 20 },
             { x: 0, y: 9, to: 'west_stage1', tx: 37, ty: 20 },
-            { x: 12, y: 0, to: 'north_stage1', tx: 20, ty: 38 },
+            { x: 12, y: 0, to: 'north_stage1', tx: 7, ty: 12 },
             { x: 12, y: 18, to: 'south_stage1', tx: 20, ty: 2 },
             { x: 14, y: 12, to: 'demon_castle', tx: 10, ty: 15, requiresDemonCastle: true },
             { x: 4, y: 15, to: 'advanced_shop', tx: 4, ty: 6, requiresBossCount: 2 },

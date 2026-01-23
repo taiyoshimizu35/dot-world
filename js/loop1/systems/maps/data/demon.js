@@ -33,7 +33,7 @@ function initDemonCastleMaps(Maps, T) {
 
     Maps.data.demon_throne = {
         w: 16, h: 14, tiles: dc2t, isDungeon: true, encounterRate: 0, area: 'demon',
-        npcs: [{ id: 'demonKing', type: 'enemy_slime', img: 'enemy_slime', x: 8, y: 4, msg: null, demonKing: true, blocking: true }],
+        npcs: [{ id: 'demonKing', type: 'enemy_slime', img: 'enemy_demon_king', x: 8, y: 4, msg: null, demonKing: true, blocking: true }],
         warps: [{ x: 8, y: 12, to: 'demon_castle', tx: 10, ty: 3 }],
         start: { x: 8, y: 11 }
     };

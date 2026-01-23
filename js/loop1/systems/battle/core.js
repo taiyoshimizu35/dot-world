@@ -56,7 +56,17 @@ const Battle = {
     startNorthBoss() { this.startAreaBoss('north', QuestFlags.metFakeDemonKing); },
     startSouthBoss() { this.startAreaBoss('south', QuestFlags.metFakeDemonKing); },
 
+    // 北エリア中ボス戦開始
+    startNorthMiniboss(enemyId, stageId) {
+        // EnemyDataから敵情報を取得
+        this.enemy = { ...EnemyData[enemyId] };
+        this.northMinibossStage = stageId;
+        this.startCommon();
+        this.isBoss = true; // 逃走不可など
+    },
+
     startCommon() {
+        if (!this.northMinibossStage) this.northMinibossStage = null; // Reset stage flag if not set
         this.enemyHp = this.enemy.hp;
         this.phase = 'wait_input'; this.nextPhase = 'command'; this.cur = 0;
         this.msg = `${this.enemy.name}が現れた！`;
@@ -178,6 +188,11 @@ const Battle = {
         // ボス撃破フラグ更新
         if (this.isBoss && this.currentArea) {
             this.updateBossFlags();
+        }
+
+        // 北エリア中ボス撃破フラグ更新
+        if (this.northMinibossStage) {
+            QuestFlags.northMinibosses[this.northMinibossStage] = true;
         }
 
         // 真魔王撃破でエンディング

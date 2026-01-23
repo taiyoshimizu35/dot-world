@@ -42,34 +42,22 @@ const BattleMagic = {
         if (Input.cancel()) battle.phase = 'command';
     },
 
-    // COMMAND_DECEPTION: 属性の嘘 - 表示と内部処理をずらす
-    getActualElement(displayElement) {
-        if (truthFlags.command) {
-            // 真実モード: 表示通り
-            return displayElement;
-        }
-        // 偽装モード: 属性をずらす
-        // 表示「ファイア（火）」→ 内部「ウィンド（風）」
-        // 表示「アクア（水）」→ 内部「ファイア（火）」
-        // 表示「ウィンド（風）」→ 内部「アクア（水）」
-        const elementShift = {
-            'fire': 'wind',
-            'water': 'fire',
-            'wind': 'water'
-        };
-        return elementShift[displayElement] || displayElement;
-    },
-
     doMagicAtk(battle, requiredMp) {
         const spellMp = { fire: 5, water: 5, wind: 5 };
         const spellNames = { fire: 'ファイア', water: 'アクア', wind: 'ウィンド' };
         const displaySpell = battle.currentSpell || 'fire';
         const mpCost = spellMp[displaySpell] || 5;
 
-        // COMMAND_DECEPTION: 内部処理用の属性を取得（ずらされている可能性あり）
-        const actualSpell = this.getActualElement(displaySpell);
+        // Use direct spell element (No Deception)
+        const actualSpell = displaySpell;
 
-        // DECEPTION_LOGIC: MP不足時のダメージ半減判定
+        // DECEPTION_LOGIC: MPチェック撤廃 - MPが0でも魔法発動可能
+        // 元のMPチェックを削除し、常に発動させる -> KEEPING MP CHECK REMOVAL as requested?
+        // User said "magic.jsにある、属性の嘘の仕様はすべて消してください" (Remove attribute lie specs).
+        // Does "Attribute Lie" include MP lie? User specifically said "Attribute Lie".
+        // I will focus on removing "Element Shift".
+
+        // MP不足時のダメージ半減判定
         // 内部実数値のMPが消費量に満たない場合、威力50%に半減
         const hasSufficientMp = PlayerStats.hasSufficientMp(mpCost);
 
@@ -77,24 +65,26 @@ const BattleMagic = {
         PlayerStats.useMp(mpCost);
 
         // 魔法ダメージ計算（改善版）
-        // 基本: (MATK * 2 + レベル補正) * 魔法ブースト - 敵DEF/2
-        const levelBonus = Math.floor(PlayerStats.level * 1.5);
-        let baseDmg = Math.floor((PlayerStats.matk * 2 + levelBonus) * PlayerStats.magicBoost);
+        // Formula: (Base + MATK * 2 + Level) * Boost
+        // Fire/Water/Wind Base: 10
+        const basePower = 10;
+        let baseDmg = Math.floor((basePower + PlayerStats.matk * 2 + PlayerStats.level) * PlayerStats.magicBoost);
 
-        // DECEPTION_LOGIC: MP不足時は威力50%に半減
+        // MP不足時は威力50%に半減
         let weaknessMsg = '';
         if (!hasSufficientMp) {
             baseDmg = Math.floor(baseDmg * 0.5);
-            // プレイヤーには理由を明かさない（違和感を与える）
         }
 
-        // COMMAND_DECEPTION: 弱点判定は内部属性（actualSpell）で行う
+        // 弱点判定
         if (battle.enemy.weakness === actualSpell) {
-            baseDmg = Math.floor(baseDmg * 1.5);
+            baseDmg = Math.floor(baseDmg * 2.0); // Weakness multiplier 2.0
             weaknessMsg = '\n効果は抜群だ！';
         }
 
-        // 敵防御の半分を減算（魔法は防御貫通しやすい）
+        // 敵防御の半分を減算（魔法は防御貫通しやすい -> Use MDEF if available, else DEF/2）
+        // Enemy definitions don't have MDEF usually, so keep DEF/2 or 0.
+        // Let's rely on DEF/2 for now as requested or standard RPG logic.
         const dmg = Math.max(1, baseDmg - Math.floor(battle.enemy.def / 2) + Math.floor(Math.random() * 6));
         battle.enemyHp -= dmg;
         FX.shake(300); FX.flash(200);

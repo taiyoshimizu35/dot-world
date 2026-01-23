@@ -128,6 +128,11 @@ class PlayerController {
                 this.player.y = warp.ty * TS;
                 if (Maps.current === 'dungeon' && !Checkpoint.saved) Checkpoint.save({ x: 23, y: 10 });
 
+                // Reset North Minibosses when returning to village
+                if (warp.to === 'village') {
+                    QuestFlags.resetNorthMinibosses();
+                }
+
                 const m = Maps.get();
                 WorldState.resetEncounterSteps(m.encounterRate);
 
@@ -298,6 +303,11 @@ class PlayerController {
             else if (npc.boss) Battle.startBoss();
             else if (npc.westBoss) Battle.startWestBoss();
             else if (npc.northBoss) Battle.startNorthBoss();
+            else if (npc.southBoss) Battle.startSouthBoss();
+            // 北エリア中ボス
+            else if (npc.northMiniboss) {
+                Battle.startNorthMiniboss(npc.id, npc.northMiniboss);
+            }
             else if (npc.southBoss) Battle.startSouthBoss();
             else if (npc.msg) Msg.show(npc.msg);
         }

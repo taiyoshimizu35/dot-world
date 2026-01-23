@@ -56,6 +56,12 @@ const Maps = {
             // 魔王
             if (npc.demonKing) return true;
 
+            // まだ倒していない中ボスはブロックする
+            if (npc.northMiniboss) {
+                if (!QuestFlags.northMinibosses[npc.northMiniboss]) return true;
+                continue; // Defeated -> pass through (though getVisibleNpcs handles drawing, this handles collision)
+            }
+
             // 旧システム互換
             if (npc.boss || npc.westBoss || npc.northBoss || npc.southBoss) return true;
         }
@@ -85,6 +91,11 @@ const Maps = {
             if (npc.areaBoss) {
                 if (!npc.trueAreaBoss && QuestFlags.fakeBosses[npc.areaBoss]) return false;
                 if (npc.trueAreaBoss && QuestFlags.trueBosses[npc.areaBoss]) return false;
+            }
+
+            // 北エリア中ボス (defeated -> hidden)
+            if (npc.northMiniboss) {
+                if (QuestFlags.northMinibosses[npc.northMiniboss]) return false;
             }
 
             return true;

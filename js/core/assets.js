@@ -54,6 +54,9 @@ const AssetLoader = {
             ['enemy_killerbee', 'assets/enemies/enemy_killerbee.png'],
             ['enemy_ice_golem', 'assets/enemies/enemy_ice_golem.png'],
             ['enemy_phantom_knight', 'assets/enemies/enemy_phantom_knight.png'],
+            ['enemy_ice_dragon', 'assets/enemies/enemy_ice_dragon.png'],
+            ['enemy_ice_magician', 'assets/enemies/enemy_ice_magician.png'],
+            ['enemy_ice_knight', 'assets/enemies/enemy_ice_knight.png'],
             // ボスマップスプライト
             ['ice_golem_map', 'assets/enemies/enemy_ice_golem.png'],
             ['phantom_knight_map', 'assets/enemies/enemy_phantom_knight.png'],

@@ -1,5 +1,5 @@
 // ===========================================
-// オープニングムービー
+// オープニングムービー（1行ずつ進む版）
 // ===========================================
 const Opening = {
     active: false,
@@ -7,15 +7,12 @@ const Opening = {
     phase: 0, // 0:FadeIn, 1:Wait, 2:FadeOut, 3:Next
     currentLine: 0,
     alpha: 0,
+    waitForKey: false, // 連続入力を防ぐフラグ
 
     // ムービーテキスト
     lines: [
-        "かつて、この世界は光に満ちていた",
-        "しかし、突如現れた魔王により",
-        "全ては闇に覆われた",
-        "人々は希望を失いかけていたが",
-        "ある日、一人の勇者が立ち上がる",
-        "これは、運命に抗う物語である"
+        "もっと、強くならなければ",
+        "もう一度、目をさまさなければ"
     ],
 
     init() {
@@ -24,15 +21,37 @@ const Opening = {
         this.phase = 0;
         this.currentLine = 0;
         this.alpha = 0;
+        this.waitForKey = true; // 開始直後の誤作動防止
     },
 
     update() {
-        // スキップ
-        if (Input.interact()) {
-            this.end();
-            return;
+        // ---------------------------------------------------------
+        // 1. 入力判定（1行進める処理）
+        // ---------------------------------------------------------
+        if (!Input.interact()) {
+            this.waitForKey = false; // ボタンを離したらロック解除
         }
 
+        if (Input.interact() && !this.waitForKey) {
+            this.waitForKey = true; // ロックをかける
+            
+            // 次の行へ強制移行
+            this.currentLine++;
+            
+            if (this.currentLine >= this.lines.length) {
+                this.end(); // 全行終われば終了
+            } else {
+                // 次の行を最初から再生
+                this.phase = 0;
+                this.alpha = 0;
+                this.timer = 0;
+            }
+            return; // 以降の通常処理はスキップ
+        }
+
+        // ---------------------------------------------------------
+        // 2. 通常の自動進行処理
+        // ---------------------------------------------------------
         if (this.phase === 0) { // Fade In
             this.alpha += 0.02;
             if (this.alpha >= 1) {
@@ -57,6 +76,7 @@ const Opening = {
                 this.end();
             } else {
                 this.phase = 0;
+                this.timer = 0;
             }
         }
     },
@@ -75,8 +95,9 @@ const Opening = {
             ctx.restore();
         }
 
-        // スキップ案内
-        Draw.text(ctx, 'Press Action to Skip', VW - 10, VH - 10, '#666', 10, 'right');
+        // 案内表示
+        const guide = this.currentLine === this.lines.length - 1 ? 'Press Action to Start' : 'Press Action to Next';
+        Draw.text(ctx, guide, VW - 10, VH - 10, '#666', 10, 'right');
     },
 
     end() {

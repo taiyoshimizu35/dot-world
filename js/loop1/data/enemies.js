@@ -17,10 +17,13 @@ const EnemyData = {
     imp: { name: 'インプ', hp: 100, atk: 23, def: 10, exp: 100, gold: 90, img: 'enemy_imp', usesMagic: true, weakness: 'water' },
     killerbee: { name: 'キラービー', hp: 95, atk: 24, def: 8, exp: 100, gold: 90, img: 'enemy_killerbee', usesMagic: true, weakness: 'fire' },
 
-    // ===== 北エリア（氷属性） =====
-    ice_wolf: { name: 'アイスウルフ', hp: 150, atk: 30, def: 15, exp: 150, gold: 120, img: 'enemy_wolf', weakness: 'fire' },
-    snow_spirit: { name: '雪の精霊', hp: 140, atk: 28, def: 20, exp: 160, gold: 130, img: 'enemy_spirit', usesMagic: true, weakness: 'fire' },
-    yeti: { name: 'イエティ', hp: 200, atk: 35, def: 10, exp: 200, gold: 150, img: 'enemy_yeti', weakness: 'fire' },
+    // ===== 北エリア =====
+    //1層目
+    ice_dragon: { name: 'アイスドラゴン', hp: 1, atk: 30, def: 15, exp: 150, gold: 120, img: 'enemy_ice_dragon', useBreath: true, isBoss: true },
+    //2層目
+    ice_magician: { name: 'アイスマジシャン', hp: 1, atk: 28, def: 20, exp: 160, gold: 130, img: 'enemy_ice_magician', usesMagic: true, weakness: 'fire', isBoss: true },
+    //3層目
+    ice_knight: { name: 'アイスナイト', hp: 2, atk: 35, def: 10, exp: 200, gold: 150, img: 'enemy_ice_knight', usesMagic: true, isBoss: true },
 
     // ===== 南エリア（アンデッド） =====
     zombie: { name: 'ゾンビ', hp: 180, atk: 25, def: 5, exp: 140, gold: 80, img: 'enemy_zombie', weakness: 'fire' },
@@ -30,10 +33,10 @@ const EnemyData = {
     // ===== 嘘ボス（FAKE）=====
     fake_east_boss: { name: '古代のドラゴン', hp: 10, atk: 30, def: 1, exp: 750, gold: 800, img: 'enemy_dragon', isBoss: true, usesMagic: true, useBreath: true, bossType: 'fake' },
     fake_west_boss: { name: '大魔術師', hp: 10, atk: 50, def: 3, exp: 1200, gold: 2000, img: 'enemy_mage', isBoss: true, usesMagic: true, weakness: 'water', bossType: 'fake' },
-    fake_north_boss: { name: 'クリスタル・ゴーレム', hp: 10, atk: 55, def: 3, exp: 1500, gold: 2500, img: 'enemy_ice_golem', isBoss: true, weakness: 'fire', bossType: 'fake' },
     fake_south_boss: { name: '幻影の騎士', hp: 10, atk: 48, def: 2, exp: 1300, gold: 2200, img: 'enemy_phantom_knight', isBoss: true, weakness: 'wind', bossType: 'fake' },
+    fake_north_boss: { name: 'クリスタル・ゴーレム', hp: 10, atk: 55, def: 3, exp: 1500, gold: 2500, img: 'enemy_ice_golem', isBoss: true, usesMagic: true, useBreath: true, bossType: 'fake' },
 
-   
+
     fake_demon_king: {
         name: '嘘の魔王',
         hp: 99999,
