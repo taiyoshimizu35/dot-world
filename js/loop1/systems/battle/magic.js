@@ -71,13 +71,13 @@ const BattleMagic = {
         // Formula: (Base + MATK * 2 + Level) * Boost
         // Fire/Water/Wind Base: 10
         const basePower = 10;
-        let baseDmg = Math.floor((PlayerStats.matk * 1.1) * PlayerStats.magicBoost);
+        let baseDmg = Math.floor((PlayerStats.matk * 1.2) * PlayerStats.magicBoost);
 
         let weaknessMsg = '';
 
         // 弱点判定
         if (battle.enemy.weakness === actualSpell) {
-            baseDmg = Math.floor(baseDmg * 1.1); // Weakness multiplier 2.0
+            baseDmg = Math.floor(baseDmg * 1.2); // Weakness multiplier 2.0
             weaknessMsg = '\n効果は抜群だ！';
         }
 
