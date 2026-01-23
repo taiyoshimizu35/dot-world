@@ -27,11 +27,18 @@ const BattleMagic = {
 
         if (Input.interact()) {
             const spell = spells[battle.magicCur];
-            // DECEPTION_LOGIC: MPチェック撤廃 - MPが0でも魔法発動可能
-            // 元のMPチェックを削除し、常に発動させる
+
+            // MP Check
+            if (PlayerStats.mp < spell.mp) {
+                battle.msg = 'MPが足りない！';
+                battle.msgTimer = 0;
+                battle.waitForInput = true;
+                return;
+            }
+
             if (spell.id === 'fire' || spell.id === 'water' || spell.id === 'wind') {
                 battle.currentSpell = spell.id;
-                battle.displaySpell = spell.id; // 表示用に元の呪文IDを保存
+                battle.displaySpell = spell.id;
                 battle.phase = 'magicAttack';
                 this.doMagicAtk(battle, spell.mp);
             } else if (spell.id === 'heal') {
@@ -57,24 +64,16 @@ const BattleMagic = {
         // Does "Attribute Lie" include MP lie? User specifically said "Attribute Lie".
         // I will focus on removing "Element Shift".
 
-        // MP不足時のダメージ半減判定
-        // 内部実数値のMPが消費量に満たない場合、威力50%に半減
-        const hasSufficientMp = PlayerStats.hasSufficientMp(mpCost);
-
-        // MP消費（0以下にはならない）
+        // MP消費
         PlayerStats.useMp(mpCost);
 
-        // 魔法ダメージ計算（改善版）
+        // 魔法ダメージ計算
         // Formula: (Base + MATK * 2 + Level) * Boost
         // Fire/Water/Wind Base: 10
         const basePower = 10;
         let baseDmg = Math.floor((basePower + PlayerStats.matk * 2 + PlayerStats.level) * PlayerStats.magicBoost);
 
-        // MP不足時は威力50%に半減
         let weaknessMsg = '';
-        if (!hasSufficientMp) {
-            baseDmg = Math.floor(baseDmg * 0.5);
-        }
 
         // 弱点判定
         if (battle.enemy.weakness === actualSpell) {

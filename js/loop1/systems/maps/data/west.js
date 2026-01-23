@@ -138,7 +138,7 @@ function initWestWeek1(Maps, T) {
         w: 15, h: 15, tiles: wbt, isDungeon: true, encounterRate: 0, area: 'west', week1Map: true,
         bgm: 'boss',
         npcs: [
-            { id: 'westBoss', type: 'enemy_monster', img: 'enemy_monster', x: 4, y: 7, msg: null, areaBoss: 'west', blocking: true, name: '大魔道士', atk: 18, def: 5, hp: 80, exp: 50 }
+            { id: 'westBoss', type: 'enemy_monster', img: 'enemy_mage', x: 4, y: 7, msg: null, areaBoss: 'west', blocking: true, name: '大魔道士', atk: 18, def: 5, hp: 80, exp: 50 }
         ],
         warps: [
             { x: 14, y: 7, to: 'west_stage2', tx: 2, ty: 20 }

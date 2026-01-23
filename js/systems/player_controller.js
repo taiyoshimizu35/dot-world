@@ -259,7 +259,7 @@ class PlayerController {
                     if (!QuestFlags.fakeBosses.west) remaining.push('西');
                     if (!QuestFlags.fakeBosses.north) remaining.push('北');
                     if (!QuestFlags.fakeBosses.south) remaining.push('南');
-                    Msg.show(`魔王様はずっと北にいるらしい。\n勇者も四天王を倒したら\n行ってみたらどうだい？`);
+                    Msg.show(`魔王様はずっと北にいるらしい。\n勇者も四天王を倒して聖剣を手に入れたら\n行ってみたらどうだい？`);
                 }
             }
             else if (npc.questGiver && WorldState.week === 2) {

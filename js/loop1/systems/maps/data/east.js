@@ -39,7 +39,7 @@ function initEastWeek1(Maps, T) {
     // 一本道：西(2,20)から東(38,20)へ、蛇行させる
     // Start(2,20) -> (10,20) -> (10, 10) -> (20, 10) -> (20, 30) -> (30, 30) -> (30, 20) -> End(38,20)
     const pathPoints = [
-        [2, 20], [10, 20], [10, 13], [20, 13], [20, 25], [30, 25], [30, 20], [38, 20]
+        [0, 20], [10, 20], [10, 13], [20, 13], [20, 25], [30, 25], [30, 20], [38, 20]
     ];
     let cx = pathPoints[0][0];
     let cy = pathPoints[0][1];
@@ -72,7 +72,7 @@ function initEastWeek1(Maps, T) {
         w: 41, h: 41, tiles: e1t, isDungeon: true, encounterRate: 0.0, area: 'east', week1Map: true,
         npcs: [{ id: 'e1_sign', type: 'signpost', x: 5, y: 20, msg: '【深緑の迷宮】\n木々の隙間を進め', blocking: true }],
         warps: [
-            { x: 1, y: 20, to: 'village', tx: 23, ty: 9 },
+            { x: 0, y: 20, to: 'village', tx: 23, ty: 9 },
             { x: 39, y: 20, to: 'east_boss_room', tx: 2, ty: 7 }
         ],
         start: { x: 2, y: 20 }
