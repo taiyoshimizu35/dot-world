@@ -4,9 +4,9 @@ class PlayerController {
     }
 
     update() {
-        this.handleMovement();
+        const moved = this.handleMovement();
         this.handleInteraction();
-        this.checkEncounter();
+        if (moved) this.checkEncounter();
     }
 
     handleMovement() {
@@ -15,7 +15,7 @@ class PlayerController {
 
         if (dx === 0 && dy === 0) {
             this.player.moving = false;
-            return;
+            return false;
         }
 
         // Direction update
@@ -28,7 +28,7 @@ class PlayerController {
         const ny = this.player.y + dy * GameConfig.PLAYER_SPEED;
 
         // Wall Check logic
-        this.checkCollisionAndMove(nx, ny, dx, dy, TS);
+        return this.checkCollisionAndMove(nx, ny, dx, dy, TS);
     }
 
     checkCollisionAndMove(nx, ny, dx, dy, TS) {
@@ -47,16 +47,11 @@ class PlayerController {
 
         if (tileBlocked || npcBlocked) {
             this.player.moving = false;
-            return;
+            return false;
         }
 
         // Gate Checks (Removed)
-        // const tx = Math.floor((nx + TS / 2) / TS);
-        // const ty = Math.floor((ny + TS / 2) / TS);
-        // if (Maps.current === 'village') {
-        //     if (tx > 23 && !QuestFlags.gateOpen) { Msg.show('門番「この先は危険だ。\n装備を整えてから来い。」'); return; }
-        //     if (tx < 1 && !QuestFlags.westGateOpen) { Msg.show('門番「西の塔は危険だ。\n相応の力か、加護が必要だ。」'); return; }
-        // }
+
 
         this.player.x = nx;
         this.player.y = ny;
@@ -74,6 +69,8 @@ class PlayerController {
 
         // Warp Check
         this.checkWarp(TS);
+
+        return true;
     }
 
     checkWarp(TS) {
