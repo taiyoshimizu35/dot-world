@@ -71,20 +71,20 @@ const BattleMagic = {
         // Formula: (Base + MATK * 2 + Level) * Boost
         // Fire/Water/Wind Base: 10
         const basePower = 10;
-        let baseDmg = Math.floor((basePower + PlayerStats.matk * 2 + PlayerStats.level) * PlayerStats.magicBoost);
+        let baseDmg = Math.floor((PlayerStats.matk * 1.1) * PlayerStats.magicBoost);
 
         let weaknessMsg = '';
 
         // 弱点判定
         if (battle.enemy.weakness === actualSpell) {
-            baseDmg = Math.floor(baseDmg * 1.3); // Weakness multiplier 2.0
+            baseDmg = Math.floor(baseDmg * 1.1); // Weakness multiplier 2.0
             weaknessMsg = '\n効果は抜群だ！';
         }
 
         // 敵防御の半分を減算（魔法は防御貫通しやすい -> Use MDEF if available, else DEF/2）
         // Enemy definitions don't have MDEF usually, so keep DEF/2 or 0.
         // Let's rely on DEF/2 for now as requested or standard RPG logic.
-        const dmg = Math.max(1, baseDmg - Math.floor(battle.enemy.def / 2) + Math.floor(Math.random() * 6));
+        const dmg = Math.max(1, baseDmg - Math.floor(battle.enemy.def) + Math.floor(Math.random() * 6));
         battle.enemyHp -= dmg;
         FX.shake(300); FX.flash(200);
 
