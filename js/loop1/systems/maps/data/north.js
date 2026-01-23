@@ -20,7 +20,7 @@ function initNorthWeek1(Maps, T) {
     n1t[1][7] = T.PATH;  // Warp point behind boss
 
     Maps.data.north_stage1 = {
-        w: 15, h: 15, tiles: n1t, encounterRate: 0, area: 'north', week1Map: true,
+        w: 15, h: 15, tiles: n1t, encounterRate: 0.008, area: 'north', week1Map: true,
         npcs: [
             { id: 'ice_dragon', type: 'enemy_ice_dragon', img: 'enemy_ice_dragon', x: 7, y: 1, msg: null, northMiniboss: 'stage1', blocking: true }
         ],
@@ -37,7 +37,7 @@ function initNorthWeek1(Maps, T) {
     n2t[1][7] = T.PATH;
 
     Maps.data.north_stage2 = {
-        w: 15, h: 15, tiles: n2t, encounterRate: 0, area: 'north', week1Map: true,
+        w: 15, h: 15, tiles: n2t, encounterRate: 0.008, area: 'north', week1Map: true,
         npcs: [
             { id: 'ice_magician', type: 'enemy_ice_magician', img: 'enemy_ice_magician', x: 7, y: 1, msg: null, northMiniboss: 'stage2', blocking: true }
         ],
@@ -54,7 +54,7 @@ function initNorthWeek1(Maps, T) {
     n3t[1][7] = T.PATH;
 
     Maps.data.north_stage3 = {
-        w: 15, h: 15, tiles: n3t, encounterRate: 0, area: 'north', week1Map: true,
+        w: 15, h: 15, tiles: n3t, encounterRate: 0.008, area: 'north', week1Map: true,
         npcs: [
             { id: 'ice_knight', type: 'enemy_ice_knight', img: 'enemy_ice_knight', x: 7, y: 1, msg: null, northMiniboss: 'stage3', blocking: true }
         ],
@@ -71,7 +71,7 @@ function initNorthWeek1(Maps, T) {
     nbt[1][7] = T.PATH;
 
     Maps.data.north_boss_room = {
-        w: 15, h: 15, tiles: nbt, encounterRate: 0, area: 'north', week1Map: true,
+        w: 15, h: 15, tiles: nbt, encounterRate: 0.008, area: 'north', week1Map: true,
         npcs: [
             { id: 'northBoss', type: 'enemy_ice_golem', img: 'ice_golem_map', x: 7, y: 1, msg: null, areaBoss: 'north', blocking: true }
         ],

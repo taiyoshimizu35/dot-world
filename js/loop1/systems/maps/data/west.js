@@ -74,7 +74,7 @@ function initWestWeek1(Maps, T) {
     w1t[20][40] = T.EXIT; // To Village
 
     Maps.data.west_stage1 = {
-        w: 41, h: 41, tiles: w1t, isDungeon: true, encounterRate: 0.0, area: 'west', week1Map: true,
+        w: 41, h: 41, tiles: w1t, isDungeon: true, encounterRate: 0.008, area: 'west', week1Map: true,
         bgm: 'dungeon',
         npcs: [
             { id: 'w1_sign', type: 'signpost', x: 38, y: 19, msg: '【西の塔 1階】\n石像の迷宮', blocking: true }
@@ -113,7 +113,7 @@ function initWestWeek1(Maps, T) {
     w2t[20][40] = T.STAIRS; // Back to Stage 1
 
     Maps.data.west_stage2 = {
-        w: 41, h: 41, tiles: w2t, isDungeon: true, encounterRate: 0.0, area: 'west', week1Map: true,
+        w: 41, h: 41, tiles: w2t, isDungeon: true, encounterRate: 0.008, area: 'west', week1Map: true,
         bgm: 'dungeon',
         npcs: [],
         warps: [
@@ -135,7 +135,7 @@ function initWestWeek1(Maps, T) {
     wbt[7][14] = T.STAIRS; // 戻り
 
     Maps.data.west_boss_room = {
-        w: 15, h: 15, tiles: wbt, isDungeon: true, encounterRate: 0, area: 'west', week1Map: true,
+        w: 15, h: 15, tiles: wbt, isDungeon: true, encounterRate: 0.008, area: 'west', week1Map: true,
         bgm: 'boss',
         npcs: [
             { id: 'westBoss', type: 'enemy_monster', img: 'enemy_mage', x: 4, y: 7, msg: null, areaBoss: 'west', blocking: true, name: '大魔道士', atk: 18, def: 5, hp: 80, exp: 50 }
