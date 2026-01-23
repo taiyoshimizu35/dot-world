@@ -51,7 +51,7 @@ const BattleActions = {
             effectMsg = `重い一撃が防御を貫く！ `;
         }
         // ブレス攻撃（古代のドラゴン等）
-        else if (battle.enemy.useBreath && Math.random() < 0.3) {
+        else if (battle.enemy.useBreath && Math.random() < 0.15) {
             dmg = 30; // 固定ダメージ
             // Apply MDEF reduction to Breath (Magic Resistance)
             dmg = Math.max(1, dmg - PlayerStats.mdef);

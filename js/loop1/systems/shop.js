@@ -77,8 +77,8 @@ const Shop = {
             Msg.show(`${item.name}を購入した！\nメニューから装備しよう。`, () => { Input.lock(100); }, 'overlay');
         } else if (item.type === 'holySword') {
             // WEAPON_DECEPTION: 聖剣購入
-            gameLoop.holySwordOwned = true;
-            Msg.show(`${item.name}を購入した！\n「これで魔王を倒せる…！」`, () => { Input.lock(100); }, 'overlay');
+            WorldState.holySwordOwned = true;
+            Msg.show(`${item.name}を購入した！\n「特別な力を感じる...」`, () => { Input.lock(100); }, 'overlay');
         } else if (item.type === 'armor') {
             Msg.show(`${item.name}を購入した！\nメニューから装備しよう。`, () => { Input.lock(100); }, 'overlay');
         } else if (item.type === 'spell') {
@@ -111,13 +111,19 @@ const Shop = {
         let y = 52;
         for (let i = this.scroll; i < Math.min(this.scroll + this.maxVisible, items.length); i++) {
             const item = items[i];
-            const isSoldOut = item.sold && ['weapon', 'armor', 'spell', 'staff', 'robe', 'amulet'].includes(item.type);
+            const isSoldOut = item.sold && ['weapon', 'armor', 'spell', 'staff', 'robe', 'amulet', 'holySword'].includes(item.type);
             const affordable = PlayerStats.gold >= item.price && !isSoldOut;
             if (i === this.cur) Draw.text(ctx, '▶', 32, y, '#fc0', 12);
             Draw.text(ctx, item.name, 48, y, affordable ? '#fff' : '#666', 12);
             Draw.text(ctx, `${item.price}G`, 140, y, affordable ? '#ff0' : '#664', 12);
             Draw.text(ctx, item.desc, 48, y + 14, isSoldOut ? '#333' : '#aaa', 10);
             y += 32;
+        }
+
+        if (this.warning) {
+            Draw.rect(ctx, 40, VH / 2 - 20, VW - 80, 40, 'rgba(0,0,0,0.9)');
+            Draw.stroke(ctx, 40, VH / 2 - 20, VW - 80, 40, '#f00', 2);
+            Draw.text(ctx, this.warning, 50, VH / 2 + 5, '#fff', 12);
         }
     }
 };

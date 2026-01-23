@@ -19,11 +19,11 @@ const EnemyData = {
 
     // ===== 北エリア =====
     //1層目
-    ice_dragon: { name: 'アイスドラゴン', hp: 250, atk: 50, def: 55, exp: 0, gold: 0, img: 'enemy_ice_dragon', useBreath: true, isBoss: true },
+    ice_dragon: { name: 'アイスドラゴン', hp: 250, atk: 45, def: 55, exp: 0, gold: 0, img: 'enemy_ice_dragon', useBreath: true, isBoss: true },
     //2層目
-    ice_magician: { name: 'アイスマジシャン', hp: 250, atk: 50, def: 55, exp: 0, gold: 0, img: 'enemy_ice_magician', usesMagic: true, weakness: 'fire', isBoss: true },
+    ice_magician: { name: 'アイスマジシャン', hp: 250, atk: 45, def: 55, exp: 0, gold: 0, img: 'enemy_ice_magician', usesMagic: true, weakness: 'fire', isBoss: true },
     //3層目
-    ice_knight: { name: 'アイスナイト', hp: 250, atk: 50, def: 55, exp: 0, gold: 0, img: 'enemy_ice_knight', usesMagic: true, isBoss: true },
+    ice_knight: { name: 'アイスナイト', hp: 250, atk: 45, def: 55, exp: 0, gold: 0, img: 'enemy_ice_knight', usesMagic: true, isBoss: true },
 
     // ===== 南エリア（アンデッド） =====
     zombie: { name: 'ゾンビ', hp: 55, atk: 40, def: 35, exp: 200, gold: 200, img: 'enemy_zombie', usesMagic: true, weakness: 'fire' },
@@ -31,10 +31,10 @@ const EnemyData = {
     ghost: { name: 'ゴースト', hp: 50, atk: 40, def: 35, exp: 200, gold: 200, img: 'enemy_ghost', usesMagic: true, weakness: 'fire' },
 
     // ===== ボス =====
-    fake_east_boss: { name: '古代のドラゴン', hp: 150, atk: 30, def: 20, exp: 1000, gold: 2000, img: 'enemy_dragon', isBoss: true, usesMagic: true, useBreath: true, bossType: 'fake' },
-    fake_west_boss: { name: '大魔術師', hp: 200, atk: 30, def: 30, exp: 2000, gold: 5000, img: 'enemy_mage', isBoss: true, usesMagic: true, weakness: 'water', bossType: 'fake' },
-    fake_south_boss: { name: '幻影の騎士', hp: 300, atk: 55, def: 60, exp: 5000, gold: 10000, img: 'enemy_phantom_knight', isBoss: true, weakness: 'wind', bossType: 'fake' },
-    fake_north_boss: { name: 'クリスタル・ゴーレム', hp: 400, atk: 65, def: 70, exp: 10000, gold: 20000, img: 'enemy_ice_golem', isBoss: true, usesMagic: true, useBreath: true, bossType: 'fake' },
+    fake_east_boss: { name: '古代のドラゴン', hp: 150, atk: 25, def: 20, exp: 1000, gold: 2000, img: 'enemy_dragon', isBoss: true, useBreath: true, weakness: 'water', bossType: 'fake' },
+    fake_west_boss: { name: '大魔術師', hp: 200, atk: 30, def: 30, exp: 2000, gold: 5000, img: 'enemy_mage', isBoss: true, usesMagic: true, weakness: 'fire', bossType: 'fake' },
+    fake_south_boss: { name: '幻影の騎士', hp: 300, atk: 52, def: 60, exp: 5000, gold: 10000, img: 'enemy_phantom_knight', isBoss: true, weakness: 'wind', bossType: 'fake' },
+    fake_north_boss: { name: 'クリスタル・ゴーレム', hp: 400, atk: 62, def: 70, exp: 10000, gold: 20000, img: 'enemy_ice_golem', isBoss: true, usesMagic: true, useBreath: true, bossType: 'fake' },
 
 
     fake_demon_king: {
