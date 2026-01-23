@@ -62,6 +62,8 @@ const AssetLoader = {
             ['enemy_ghost', 'assets/enemies/enemy_ghost.png'],
             ['enemy_zombie', 'assets/enemies/enemy_zombie.png'],
             ['enemy_skeleton_knight', 'assets/enemies/enemy_skeleton_knight.png'],
+            ['enemy_exp_fairy', 'assets/enemies/enemy_exp_fairy.png'],
+            ['enemy_gold_fairy', 'assets/enemies/enemy_gold_fairy.png'],
             // ボスマップスプライト
             ['ice_golem_map', 'assets/enemies/enemy_ice_golem.png'],
             ['phantom_knight_map', 'assets/enemies/enemy_phantom_knight.png'],

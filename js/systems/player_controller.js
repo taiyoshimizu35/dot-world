@@ -217,10 +217,7 @@ class PlayerController {
             Chests.open(chest.id);
             const inv = WorldState.managers.inventory;
             if (inv) {
-                if (chest.item === '薬草') inv.add('薬草', chest.count);
-                else if (chest.item === 'ポーション') inv.add('ポーション', chest.count);
-                else if (chest.item === '魔法の聖水') inv.add('魔法の聖水', chest.count);
-                else if (chest.item === '銀の鍵') inv.add('銀の鍵', chest.count);
+                inv.add(chest.item, chest.count);
                 Msg.show(`${chest.item}を手に入れた!` + (chest.count > 1 ? ` x${chest.count}` : ''));
             } else {
                 Msg.show(`${chest.item}を見つけたが、今は持ち運べない。`);

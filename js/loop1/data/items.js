@@ -64,12 +64,12 @@ const MagicShopData = {
 const AdvancedShopData = {
     items: [
         { name: 'エリクサー', price: 100, type: 'item', desc: 'HP+200回復', sold: false },
-        { name: '伝説の剣', price: 4000, type: 'weapon', atk: 25, desc: '攻撃力+25', sold: false },
+        { name: '伝説の剣', price: 4000, type: 'weapon', atk: 25, desc: '攻撃力+30', sold: false },
         { name: '伝説の鎧', price: 4000, type: 'armor', def: 20, desc: '防御力+20', sold: false },
         { name: '幸運のアミュレット', price: 2000, type: 'amulet', desc: '獲得Gを1.5倍にする', sold: false},
-        { name: '達人のアミュレット', price: 2000, type: 'amulet', desc: '獲得経験値を1.5倍にする', sold: false},
-        { name: '金色のアミュレット', price: 4000, type: 'amulet', desc: '獲得Gを2倍にする', sold: false},
-        { name: '戦神のアミュレット', price: 4000, type: 'amulet', desc: '獲得経験値を2倍にする', sold: false},
+        { name: '達人のアミュレット', price: 2000, type: 'amulet', desc: '獲得経験値を2倍にする', sold: false},
+        { name: '金色のアミュレット', price: 4000, type: 'amulet', desc: '獲得Gを3倍にする', sold: false},
+        { name: '戦神のアミュレット', price: 4000, type: 'amulet', desc: '獲得経験値を5倍にする', sold: false},
         { name: '女神の護符', price: 4000, type: 'amulet', desc: '状態異常を50%で回避する', sold:false}
     ],
     reset() { this.items.forEach(item => item.sold = false); }

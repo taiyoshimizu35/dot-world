@@ -253,7 +253,7 @@ const PlayerStats = {
         // this.mp = this.baseMaxMp;
 
         this.exp = 0;
-        this.nextExp = Math.floor(this.nextExp * 1.25);
+        this.nextExp = Math.floor(this.nextExp * 1.15);
 
         this.recalcStats(); // Update totals
         QuestFlags.check();
@@ -269,6 +269,15 @@ const PlayerStats = {
     resetSpells() {
         this.spells = { fire: false, heal: false, water: false, wind: false };
         this.magicBoost = 1.0;
+    },
+
+    // Reset temporary battle statuses (called after battle)
+    resetBattleStatus() {
+        this.status.atkDownVal = 0;
+        this.status.defDownVal = 0;
+        this.status.silence = 0;
+        // Keep Poison as it persists
+        this.recalcStats();
     },
 
     // 2週目開始時のリセット

@@ -31,7 +31,7 @@ function initEastWeek1(Maps, T) {
 
     for (let y = 0; y < 41; y++) {
         for (let x = 0; x < 41; x++) {
-            if (Math.random() < 0.3) e1t[y][x] = T.TREE;
+            if (Math.random() < 0.2) e1t[y][x] = T.TREE;
             else if (Math.random() < 0.05) e1t[y][x] = T.ROCK;
         }
     }

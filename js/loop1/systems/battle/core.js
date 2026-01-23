@@ -184,9 +184,9 @@ const Battle = {
         let expMult = 1.0;
         const acc = PlayerStats.equipment.accessory;
         if (acc === '幸運のアミュレット') goldMult = 1.5;
-        if (acc === '金色のアミュレット') goldMult = 2.0;
-        if (acc === '達人のアミュレット') expMult = 1.5;
-        if (acc === '戦神のアミュレット') expMult = 2.0;
+        if (acc === '金色のアミュレット') goldMult = 3.0;
+        if (acc === '達人のアミュレット') expMult = 2.0;
+        if (acc === '戦神のアミュレット') expMult = 5.0;
 
         this.goldGain = Math.floor((this.enemy.gold + Math.floor(Math.random() * 5)) * goldMult);
         PlayerStats.addGold(this.goldGain);
@@ -303,6 +303,10 @@ const Battle = {
         this.active = false;
         currentState = GameState.PLAYING;
         this.phase = 'command';
+
+        // Reset Battle Status
+        PlayerStats.resetBattleStatus();
+
         // フラグリセット
         this.isDemonKing = false;
         this.isTrueBoss = false;

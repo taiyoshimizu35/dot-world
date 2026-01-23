@@ -46,15 +46,20 @@ const BattleActions = {
         let effectMsg = '';
 
         // 特殊行動（クリスタル・ゴーレム等）
-        if (battle.enemy.name === 'クリスタル・ゴーレム' && PlayerStats.isDefending) {
-            dmg = Math.floor(battle.enemy.atk * 1.5);
+        if (battle.enemy.name === 'クリスタル・ゴーレム' && Math.random() < 0.1) {
+            dmg = Math.floor(battle.enemy.atk * 1.5) - PlayerStats.def;
+            effectMsg = 'ゴーレムが振りかぶった！'
             effectMsg = `重い一撃が防御を貫く！ `;
         }
         // ブレス攻撃（古代のドラゴン等）
         else if (battle.enemy.useBreath && Math.random() < 0.15) {
-            dmg = 30; // 固定ダメージ
+            if (battle.enemy.name === '古代のドラゴン'){
+                dmg = 20;
+            }
+            if (battle.enemy.name === 'クリスタル・ゴーレム'){
+                dmg = 30;
+            }
             // Apply MDEF reduction to Breath (Magic Resistance)
-            dmg = Math.max(1, dmg - PlayerStats.mdef);
 
             effectMsg = `${battle.enemy.name}のブレス！\n`;
 
@@ -66,7 +71,7 @@ const BattleActions = {
         }
         else {
             // Check if enemy uses Magic (Magic Attack)
-            if (battle.enemy.usesMagic) {
+            if (battle.enemy.usesMagic && Math.random() < 0.2) {
                 // Magic Attack Formula: ATK - MDEF
                 dmg = Math.max(1, battle.enemy.atk - PlayerStats.mdef + Math.floor(Math.random() * 3));
                 effectMsg = `${battle.enemy.name}の魔法攻撃！\n`;

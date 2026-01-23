@@ -30,6 +30,10 @@ const EnemyData = {
     skeleton_knight: { name: '骸骨騎士', hp: 60, atk: 45, def: 40, exp: 250, gold: 250, img: 'enemy_skeleton_knight', weakness: 'fire' },
     ghost: { name: 'ゴースト', hp: 50, atk: 40, def: 35, exp: 200, gold: 200, img: 'enemy_ghost', usesMagic: true, weakness: 'fire' },
 
+    // ===== 特殊 ==== //
+    exp_fairy: { name: '武運の妖精', hp: 1, atk: 1, def: 1, exp: 1000, gold: 0, img: 'enemy_exp_fairy', isRare: true },
+    gold_fairy: { name: '金運の妖精', hp: 1, atk: 1, def: 1, exp: 0, gold: 1000, img: 'enemy_gold_fairy', isRare: true },
+
     // ===== ボス =====
     fake_east_boss: { name: '古代のドラゴン', hp: 150, atk: 25, def: 20, exp: 1000, gold: 2000, img: 'enemy_dragon', isBoss: true, useBreath: true, weakness: 'water', bossType: 'fake' },
     fake_west_boss: { name: '大魔術師', hp: 200, atk: 30, def: 30, exp: 2000, gold: 5000, img: 'enemy_mage', isBoss: true, usesMagic: true, weakness: 'fire', bossType: 'fake' },
@@ -54,23 +58,33 @@ const EnemyData = {
 
 // マップごとの敵リストを取得
 function getEnemiesForMap(mapData, mapId) {
-    if (gameLoop.week === 1) {
-        if (mapData.area === 'east') return ['hobgoblin', 'devilbat', 'poison_slime'];
-        if (mapData.area === 'west') return ['skeleton', 'imp', 'killerbee'];
-        if (mapData.area === 'south') return ['skeleton_knight', 'ghost', 'zombie'];
-        return ['goblin', 'bat', 'slime'];
+    let enemies = [];
+
+    // 1/20 Chance (5%) to encounter a Fairy
+    if (Math.random() < 0.05) {
+        return Math.random() < 0.5 ? ['exp_fairy'] : ['gold_fairy'];
     }
 
-    // 2週目は通常のエリア別敵
-    if (mapData.isDungeon) {
-        if (mapData.area === 'west') return ['skeleton', 'imp', 'killerbee'];
-        if (mapData.area === 'east') return ['hobgoblin', 'devilbat', 'poison_slime'];
-    } else if (mapData.area === 'north' || mapData.isNorth) {
-        return ['ice_wolf', 'snow_spirit', 'yeti'];
-    } else if (mapData.area === 'south' || mapData.isSouth) {
-        return ['zombie', 'skeleton_knight', 'ghost'];
+    if (gameLoop.week === 1) {
+        if (mapData.area === 'east') enemies = ['hobgoblin', 'devilbat', 'poison_slime'];
+        else if (mapData.area === 'west') enemies = ['skeleton', 'imp', 'killerbee'];
+        else if (mapData.area === 'south') enemies = ['skeleton_knight', 'ghost', 'zombie'];
+        else enemies = ['goblin', 'bat', 'slime'];
+    } else {
+        // 2週目は通常のエリア別敵
+        if (mapData.isDungeon) {
+            if (mapData.area === 'west') enemies = ['skeleton', 'imp', 'killerbee'];
+            else if (mapData.area === 'east') enemies = ['hobgoblin', 'devilbat', 'poison_slime'];
+            else enemies = ['goblin', 'bat', 'slime'];
+        } else if (mapData.area === 'north' || mapData.isNorth) {
+            enemies = ['ice_wolf', 'snow_spirit', 'yeti'];
+        } else if (mapData.area === 'south' || mapData.isSouth) {
+            enemies = ['zombie', 'skeleton_knight', 'ghost'];
+        } else {
+            enemies = ['slime', 'goblin', 'bat'];
+        }
     }
-    return ['slime', 'goblin', 'bat'];
+    return enemies;
 }
 
 // エリアに対応するボスを取得
