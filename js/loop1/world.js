@@ -98,6 +98,10 @@ const WorldState = {
         this.managers.party = Party2;
         this.managers.inventory = null; // 2週目はインベントリなし（または別途実装）
         this.managers.battle = Battle2;
+        this.managers.menu = null; // Loop 2 Menu (TBD)
+        this.managers.shop = null; // Loop 2 Shop (TBD)
+        this.managers.inn = null; // Loop 2 Inn (TBD)
+        this.managers.controllerClass = PlayerController; // Shared or PlayerController2
 
         // システム初期化
         if (this.managers.party) this.managers.party.init();
@@ -123,6 +127,11 @@ const WorldState = {
         this.managers.party = null; // 1週目は仲間なし
         this.managers.inventory = Inv;
         this.managers.battle = Battle;
+        // Loop 2 Abstraction
+        this.managers.menu = Menu;
+        this.managers.shop = Shop;
+        this.managers.inn = Inn;
+        this.managers.controllerClass = PlayerController;
     }
 };
 

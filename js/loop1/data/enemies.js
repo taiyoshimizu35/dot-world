@@ -4,7 +4,7 @@
 const EnemyData = {
     // ===== 村エリア =====
     slime: { name: 'グリーンスライム', hp: 10, atk: 7, def: 4, exp: 10, gold: 10, img: 'enemy_slime' },
-    goblin: { name: 'ゴブリン', hp: 14, atk: 9, def: 6, exp: 20, gold: 20, img: 'enemy_goblin' },
+    goblin: { name: 'ゴブリン', hp: 1, atk: 9, def: 1, exp: 10000, gold: 20000, img: 'enemy_goblin' },
     bat: { name: 'ダークバット', hp: 12, atk: 8, def: 5, exp: 15, gold: 15, img: 'enemy_bat' },
 
     // ===== 東エリア =====
@@ -19,11 +19,11 @@ const EnemyData = {
 
     // ===== 北エリア =====
     //1層目
-    ice_dragon: { name: 'アイスドラゴン', hp: 250, atk: 45, def: 55, exp: 0, gold: 0, img: 'enemy_ice_dragon', useBreath: true, isBoss: true },
+    ice_dragon: { name: 'アイスドラゴン', hp: 1, atk: 45, def: 1, exp: 0, gold: 0, img: 'enemy_ice_dragon', useBreath: true, isBoss: true },
     //2層目
-    ice_magician: { name: 'アイスマジシャン', hp: 250, atk: 45, def: 55, exp: 0, gold: 0, img: 'enemy_ice_magician', usesMagic: true, weakness: 'fire', isBoss: true },
+    ice_magician: { name: 'アイスマジシャン', hp: 1, atk: 45, def: 1, exp: 0, gold: 0, img: 'enemy_ice_magician', usesMagic: true, weakness: 'fire', isBoss: true },
     //3層目
-    ice_knight: { name: 'アイスナイト', hp: 250, atk: 45, def: 55, exp: 0, gold: 0, img: 'enemy_ice_knight', usesMagic: true, isBoss: true },
+    ice_knight: { name: 'アイスナイト', hp: 1, atk: 45, def: 1, exp: 0, gold: 0, img: 'enemy_ice_knight', usesMagic: true, isBoss: true },
 
     // ===== 南エリア（アンデッド） =====
     zombie: { name: 'ゾンビ', hp: 55, atk: 40, def: 35, exp: 200, gold: 200, img: 'enemy_zombie', usesMagic: true, weakness: 'fire' },
@@ -35,10 +35,10 @@ const EnemyData = {
     gold_fairy: { name: '金運の妖精', hp: 1, atk: 1, def: 1, exp: 0, gold: 1000, img: 'enemy_gold_fairy', isRare: true },
 
     // ===== ボス =====
-    fake_east_boss: { name: '古代のドラゴン', hp: 150, atk: 25, def: 20, exp: 1000, gold: 2000, img: 'enemy_dragon', isBoss: true, useBreath: true, weakness: 'water', bossType: 'fake' },
-    fake_west_boss: { name: '大魔術師', hp: 200, atk: 30, def: 30, exp: 2000, gold: 5000, img: 'enemy_mage', isBoss: true, usesMagic: true, weakness: 'fire', bossType: 'fake' },
-    fake_south_boss: { name: '幻影の騎士', hp: 300, atk: 52, def: 60, exp: 5000, gold: 10000, img: 'enemy_phantom_knight', isBoss: true, weakness: 'wind', bossType: 'fake' },
-    fake_north_boss: { name: 'クリスタル・ゴーレム', hp: 400, atk: 62, def: 70, exp: 10000, gold: 20000, img: 'enemy_ice_golem', isBoss: true, usesMagic: true, useBreath: true, bossType: 'fake' },
+    fake_east_boss: { name: '古代のドラゴン', hp: 1, atk: 25, def: 1, exp: 1000, gold: 2000, img: 'enemy_dragon', isBoss: true, useBreath: true, weakness: 'water', bossType: 'fake' },
+    fake_west_boss: { name: '大魔術師', hp: 1, atk: 30, def: 1, exp: 2000, gold: 5000, img: 'enemy_mage', isBoss: true, usesMagic: true, weakness: 'fire', bossType: 'fake' },
+    fake_south_boss: { name: '幻影の騎士', hp: 1, atk: 52, def: 1, exp: 5000, gold: 10000, img: 'enemy_phantom_knight', isBoss: true, weakness: 'wind', bossType: 'fake' },
+    fake_north_boss: { name: 'クリスタル・ゴーレム', hp: 1, atk: 62, def: 1, exp: 10000, gold: 20000, img: 'enemy_ice_golem', isBoss: true, usesMagic: true, useBreath: true, bossType: 'fake' },
 
 
     fake_demon_king: {
@@ -69,7 +69,7 @@ function getEnemiesForMap(mapData, mapId) {
         if (mapData.area === 'east') enemies = ['hobgoblin', 'devilbat', 'poison_slime'];
         else if (mapData.area === 'west') enemies = ['skeleton', 'imp', 'killerbee'];
         else if (mapData.area === 'south') enemies = ['skeleton_knight', 'ghost', 'zombie'];
-        else enemies = ['goblin', 'bat', 'slime'];
+        else enemies = ['goblin'];
     } else {
         // 2週目は通常のエリア別敵
         if (mapData.isDungeon) {

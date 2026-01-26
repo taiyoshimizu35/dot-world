@@ -5,27 +5,38 @@
 class PlayingState extends BaseState {
     constructor(game) {
         super(game);
-        this.playerController = new PlayerController(game.player);
         this.mapRenderer = new MapRenderer();
+        this.playerController = null;
     }
 
     enter() {
-        // Logic when entering playing state (e.g. from Menu)
-        // Usually nothing special unless resuming music etc.
+        // Init/Switch Controller if needed (e.g. Week 1 vs Week 2)
+        const ControllerClass = WorldState.managers.controllerClass;
+        if (ControllerClass) {
+            // Simple check: if class name changed or instance missing
+            if (!this.playerController || this.playerController.constructor !== ControllerClass) {
+                this.playerController = new ControllerClass(this.game.player);
+            }
+        }
     }
 
     update() {
         // Menu Trigger
-        if (Input.justPressed('KeyX') && !Menu.visible) {
-            Menu.open(); // This currently sets currentState = MENU
-            // In the new system, Menu.open should trigger state change
-            // For now, we rely on main loop to check if state changed? 
-            // OR better: Menu.open() calls game.stateMachine.change('menu')
-            this.game.stateMachine.change('menu');
+        // Menu Trigger
+        const menu = WorldState.managers.menu;
+        if (Input.justPressed('KeyX') && (!menu || !menu.visible)) {
+            // Open Menu via State Machine if menu manager exists
+            if (menu) {
+                // Menu.open(); // Handled by MenuState enter?
+                // Actually MenuState.enter calls open().
+                this.game.stateMachine.change('menu');
+            }
             return;
         }
 
-        this.playerController.update();
+        if (this.playerController) {
+            this.playerController.update();
+        }
     }
 
     draw(ctx) {

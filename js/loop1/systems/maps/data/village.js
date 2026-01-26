@@ -44,7 +44,7 @@ function initVillageMap(Maps, T) {
     });
 
     Maps.data.village = {
-        w: vw, h: vh, tiles: vt, encounterRate: 0.008,
+        w: vw, h: vh, tiles: vt, encounterRate: 0.5,
         npcs: [
             { id: 'npc1', type: 'villager', x: 8, y: 9, msg: '草原を歩くとモンスターに会うぞ。\n勇者！魔王様を倒してくれよな！', blocking: true },
             { id: 'sign1', type: 'signpost', x: 12, y: 7, msg: '四天王を倒せ。\nさすれば道は開かれん', blocking: true },

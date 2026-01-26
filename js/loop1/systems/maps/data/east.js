@@ -69,7 +69,7 @@ function initEastWeek1(Maps, T) {
     e1t[20][39] = T.EXIT;
 
     Maps.data.east_stage1 = {
-        w: 41, h: 41, tiles: e1t, isDungeon: true, encounterRate: 0.008, area: 'east', week1Map: true,
+        w: 41, h: 41, tiles: e1t, isDungeon: true, encounterRate: 0.0, area: 'east', week1Map: true,
         npcs: [{ id: 'e1_sign', type: 'signpost', x: 5, y: 20, msg: '【深緑の迷宮】\n木々の隙間を進め', blocking: true }],
         warps: [
             { x: 0, y: 20, to: 'village', tx: 23, ty: 9 },
@@ -84,7 +84,7 @@ function initEastWeek1(Maps, T) {
     ebt[7][1] = T.EXIT;
 
     Maps.data.east_boss_room = {
-        w: 15, h: 15, tiles: ebt, isDungeon: true, encounterRate: 0.008, area: 'east', week1Map: true,
+        w: 15, h: 15, tiles: ebt, isDungeon: true, encounterRate: 0.0, area: 'east', week1Map: true,
         npcs: [{ id: 'eastBoss', type: 'enemy_slime', img: 'dragon_map', x: 10, y: 7, msg: null, areaBoss: 'east', blocking: true }],
         warps: [{ x: 1, y: 7, to: 'east_stage1', tx: 38, ty: 20 }],
         start: { x: 2, y: 7 }

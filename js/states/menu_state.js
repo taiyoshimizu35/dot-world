@@ -6,24 +6,27 @@ class MenuState extends BaseState {
     }
 
     enter() {
-        // Menu.open() handles visibility and input lock
-        // But if we transition here, maybe we should call Menu.open() here?
-        // Or assume it was called before?
-        // Let's assume the State Machine transition is the SOURCE of truth.
-        // So:
-        if (!Menu.visible) Menu.open();
+        const menu = WorldState.managers.menu;
+        if (menu && !menu.visible) menu.open();
     }
 
     exit() {
         // When leaving menu state
-        if (Menu.visible) Menu.close();
+        const menu = WorldState.managers.menu;
+        if (menu && menu.visible) menu.close();
     }
 
     update() {
-        Menu.update();
+        const menu = WorldState.managers.menu;
+        if (!menu) {
+            this.game.stateMachine.change('playing');
+            return;
+        }
+
+        menu.update();
         // Menu.update() checks input and calls Menu.close() which sets currentState = PLAYING
         // We need to intercept that or change Menu.close()
-        if (!Menu.visible) {
+        if (!menu.visible) {
             this.game.stateMachine.change('playing');
         }
     }
@@ -65,6 +68,7 @@ class MenuState extends BaseState {
             this.game.stateMachine.states['playing'].draw(ctx);
         }
 
-        Menu.render(ctx);
+        const menu = WorldState.managers.menu;
+        if (menu) menu.render(ctx);
     }
 }

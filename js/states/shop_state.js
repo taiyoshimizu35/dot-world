@@ -10,8 +10,14 @@ class ShopState extends BaseState {
             }
             return;
         }
-        Shop.update();
-        if (!Shop.visible) {
+        const shop = WorldState.managers.shop;
+        if (!shop) {
+            this.game.stateMachine.change('playing');
+            return;
+        }
+
+        shop.update();
+        if (!shop.visible) {
             this.game.stateMachine.change('playing');
         }
     }
@@ -20,7 +26,8 @@ class ShopState extends BaseState {
         if (this.game.stateMachine.states['playing']) {
             this.game.stateMachine.states['playing'].draw(ctx);
         }
-        Shop.render(ctx);
+        const shop = WorldState.managers.shop;
+        if (shop) shop.render(ctx);
         // Msg.render(ctx); // Handled globally in main.js to sort with FX
     }
 }
