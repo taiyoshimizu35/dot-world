@@ -125,29 +125,37 @@ class PlayerController {
                     const inv = WorldState.managers.inventory;
                     if (inv) {
                         inv.remove(warp.requiresKey);
-                        Msg.show(`${warp.requiresKey}を使った。`);
                         if (warp.doorId && QuestFlags.doors) QuestFlags.doors[warp.doorId] = true;
+
+                        Msg.show(`${warp.requiresKey}を使った。`, () => {
+                            this.executeWarp(warp, TS);
+                        });
+                        return; // Wait for callback
                     }
                 }
             }
 
-            FX.fadeOut(() => {
-                Maps.current = warp.to;
-                this.player.x = warp.tx * TS;
-                this.player.y = warp.ty * TS;
-                if (Maps.current === 'dungeon' && !Checkpoint.saved) Checkpoint.save({ x: 23, y: 10 });
-
-                // Reset North Minibosses when returning to village (only if North Boss is alive)
-                if (warp.to === 'village' && !QuestFlags.fakeBosses.north) {
-                    QuestFlags.resetNorthMinibosses();
-                }
-
-                const m = Maps.get();
-                WorldState.resetEncounterSteps(m.encounterRate);
-
-                FX.fadeIn();
-            });
+            this.executeWarp(warp, TS);
         }
+    }
+
+    executeWarp(warp, TS) {
+        FX.fadeOut(() => {
+            Maps.current = warp.to;
+            this.player.x = warp.tx * TS;
+            this.player.y = warp.ty * TS;
+            if (Maps.current === 'dungeon' && !Checkpoint.saved) Checkpoint.save({ x: 23, y: 10 });
+
+            // Reset North Minibosses when returning to village (only if North Boss is alive)
+            if (warp.to === 'village' && !QuestFlags.fakeBosses.north) {
+                QuestFlags.resetNorthMinibosses();
+            }
+
+            const m = Maps.get();
+            WorldState.resetEncounterSteps(m.encounterRate);
+
+            FX.fadeIn();
+        });
     }
 
     checkEncounter() {

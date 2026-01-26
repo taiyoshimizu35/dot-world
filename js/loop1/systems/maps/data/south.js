@@ -56,7 +56,7 @@ function initSouthWeek1(Maps, T) {
     s1t[39][20] = T.GRAY_DOOR; // Locked Door (通常のドア)
 
     Maps.data.south_stage1 = {
-        w: 41, h: 41, tiles: s1t, encounterRate: 0.008, area: 'south', week1Map: true,
+        w: 41, h: 41, tiles: s1t, encounterRate: 0.0, area: 'south', week1Map: true,
         bgm: 'dungeon',
         npcs: [
             { id: 's1_sign', type: 'signpost', x: 23, y: 5, msg: '【忘却の墓地】\n闇に潜む鍵を探せ', blocking: true }
@@ -92,7 +92,7 @@ function initSouthWeek1(Maps, T) {
     s2t[39][20] = T.GRAY_DOOR; // To Boss (Locked)
 
     Maps.data.south_stage2 = {
-        w: 41, h: 41, tiles: s2t, encounterRate: 0.008, area: 'south', week1Map: true,
+        w: 41, h: 41, tiles: s2t, encounterRate: 0.0, area: 'south', week1Map: true,
         bgm: 'dungeon',
         npcs: [],
         warps: [

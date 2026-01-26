@@ -22,6 +22,9 @@ const QuestFlags = {
     // 西ダンジョンスイッチ
     westSwitches: { stage1: false, stage2: false },
 
+    // 持続的なドアの状態 (South keys etc)
+    doors: {},
+
     // 北エリア中ボス (reset when returning to village)
     northMinibosses: { stage1: false, stage2: false, stage3: false },
 
@@ -83,6 +86,7 @@ const QuestFlags = {
         this.phantomTruthRevealed = false;
         this.fakeBosses = { east: false, west: false, north: false, south: false };
         this.westSwitches = { stage1: false, stage2: false };
+        this.doors = {};
         this.metFakeDemonKing = true; // 2週目開始時は嘘魔王遭遇済み
         this.trueBosses = { east: false, west: false, north: false, south: false };
         this.northMinibosses = { stage1: false, stage2: false, stage3: false };
