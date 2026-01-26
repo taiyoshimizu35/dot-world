@@ -106,19 +106,19 @@ const Loop1Ending = {
         if (this.currentLine < this.lines.length) {
             ctx.save();
             ctx.globalAlpha = this.alpha;
-            
+
             const text = this.lines[this.currentLine];
             const lines = text.split('\n');
             const lineHeight = 20;
             const startY = VH / 2 - (lines.length - 1) * lineHeight / 2;
-            
+
             // 最終行は特別な色
             const color = this.currentLine === this.lines.length - 1 ? '#ffcc00' : '#fff';
-            
+
             lines.forEach((line, i) => {
                 Draw.text(ctx, line, VW / 2, startY + i * lineHeight, color, 14, 'center');
             });
-            
+
             ctx.restore();
         }
 
@@ -137,7 +137,12 @@ const Loop1Ending = {
     },
 
     startWeek2() {
-        // ステータスリセット
+        // Init Loop 2 Systems (Capture stats before reset)
+        if (typeof WorldState !== 'undefined') {
+            WorldState.startWeek2(PlayerStats);
+        }
+
+        // ステータスリセット (Legacy Loop 1 resets)
         PlayerStats.resetForWeek2();
         ShopData.reset();
         MagicShopData.reset();
@@ -156,17 +161,27 @@ const Loop1Ending = {
             window.game.player.y = start.y * GameConfig.TILE_SIZE;
             window.game.player.dir = 0;
             window.game.player.moving = false;
+
+            // Immediately update camera so we don't show wrong location for 1 frame
+            Camera.update(window.game.player.x, window.game.player.y, Maps.get().w, Maps.get().h);
         }
 
-        // フェードイン
+        // Transition Logic:
+        // 1. Force Black Screen overlay (to hide the sudden state switch)
+        FX.fadeVal = 1;
+
+        // 2. Switch State immediately so PlayingState starts drawing the village
+        currentState = GameState.PLAYING;
+
+        // 3. Start Fade In (Black -> Transparent)
         FX.fadeIn(() => {
-            currentState = GameState.PLAYING;
             Input.lock(100);
             // 2週目開始メッセージ
             Msg.show('……目が覚めた。\n何もかもが…違って見える…\n\n【2週目開始】');
 
-            if (window.game) {
-                Camera.update(window.game.player.x, window.game.player.y, Maps.get().w, Maps.get().h);
+            // Ensure controller is ready for input
+            if (window.game && window.game.playerController) {
+                // If specific reset needed
             }
         });
     }
