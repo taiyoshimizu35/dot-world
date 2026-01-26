@@ -80,7 +80,7 @@ function initWestWeek1(Maps, T) {
             { id: 'w1_sign', type: 'signpost', x: 38, y: 19, msg: '【西の塔 1階】\n石像の迷宮', blocking: true }
         ],
         warps: [
-            { x: 40, y: 20, to: 'village', tx: 1, ty: 12 },
+            { x: 40, y: 20, to: 'village', tx: 1, ty: 9 },
             { x: 1, y: 20, to: 'west_stage2', tx: 39, ty: 20, requiresSwitch: 'stage1' } // ty修正
         ],
         start: { x: 39, y: 20 }
