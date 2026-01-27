@@ -6,6 +6,10 @@ function initMapData2(Maps) {
 
     // 2週目マップデータの読み込み
     initVillageWeek2(Maps, T);
+    initStartWeek2(Maps, T);
+    initTown1Week2(Maps, T);
+    initTown2Week2(Maps, T);
+    initTown3Week2(Maps, T);
     initEastWeek2(Maps, T);
     initWestWeek2(Maps, T);
     initNorthWeek2(Maps, T);
@@ -19,7 +23,8 @@ function initMapData2(Maps) {
 // MapsマネージャーにWeek 2初期化機能を追加
 if (window.Maps) {
     window.Maps.initWeek2 = function () {
-        console.log("Initializing Week 2 Maps...");
+        console.log("Initializing Week 2 Maps... calling initMapData2");
         initMapData2(this);
+        console.log("Maps.data after initWeek2:", this.data);
     };
 }

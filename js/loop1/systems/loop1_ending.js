@@ -154,7 +154,14 @@ const Loop1Ending = {
         }
 
         // 村に戻る
-        Maps.current = 'village';
+        // 村に戻る、またはStartMapへ
+        if (Maps.data && Maps.data.start) {
+            Maps.current = 'start';
+        } else {
+            console.warn("Start map not found, falling back to village");
+            Maps.current = 'village';
+        }
+
         const start = Maps.get().start;
         if (window.game) {
             window.game.player.x = start.x * GameConfig.TILE_SIZE;
@@ -163,7 +170,9 @@ const Loop1Ending = {
             window.game.player.moving = false;
 
             // Immediately update camera so we don't show wrong location for 1 frame
-            Camera.update(window.game.player.x, window.game.player.y, Maps.get().w, Maps.get().h);
+            if (Maps.get()) {
+                Camera.update(window.game.player.x, window.game.player.y, Maps.get().w, Maps.get().h);
+            }
         }
 
         // Transition Logic:
@@ -177,12 +186,13 @@ const Loop1Ending = {
         FX.fadeIn(() => {
             Input.lock(100);
             // 2週目開始メッセージ
-            Msg.show('……目が覚めた。\n何もかもが…違って見える…\n\n【2週目開始】');
-
-            // Ensure controller is ready for input
-            if (window.game && window.game.playerController) {
-                // If specific reset needed
-            }
+            Msg.show('……目が覚めた。\n何もかもが…違って見える…\n\n【2週目開始】', () => {
+                // Auto-Save after message closed
+                if (typeof SaveSystem !== 'undefined') {
+                    SaveSystem.save();
+                    Msg.show('セーブしました。');
+                }
+            });
         });
     }
 };

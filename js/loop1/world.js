@@ -98,7 +98,7 @@ const WorldState = {
         this.managers.party = Party2;
         this.managers.inventory = null; // 2週目はインベントリなし（または別途実装）
         this.managers.battle = Battle2;
-        this.managers.menu = null; // Loop 2 Menu (TBD)
+        this.managers.menu = Menu2; // Loop 2 Menu (Save Enabled)
         this.managers.shop = null; // Loop 2 Shop (TBD)
         this.managers.inn = null; // Loop 2 Inn (TBD)
         this.managers.controllerClass = PlayerController; // Shared or PlayerController2
@@ -132,6 +132,9 @@ const WorldState = {
         this.managers.shop = Shop;
         this.managers.inn = Inn;
         this.managers.controllerClass = PlayerController;
+
+        // マップ初期化 (Loop 1 Data Reset)
+        if (window.Maps) window.Maps.init();
     }
 };
 

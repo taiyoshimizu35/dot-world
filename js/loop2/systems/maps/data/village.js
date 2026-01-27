@@ -32,7 +32,7 @@ function initVillageWeek2(Maps, T) {
     });
 
     Maps.data.village = {
-        w: vw, h: vh, tiles: vt, encounterRate: 0.02,
+        w: vw, h: vh, tiles: vt, encounterRate: 0.0,
         npcs: [
             { id: 'npc1', type: 'villager', x: 8, y: 9, msg: 'ようこそ！\n草原を歩くとモンスターに会うよ。', blocking: true },
             { id: 'shop', type: 'villager', x: 19, y: 4, msg: null, shop: true, blocking: true },
@@ -51,7 +51,7 @@ function initVillageWeek2(Maps, T) {
             { x: 24, y: 9, to: 'east_stage1', tx: 3, ty: 6 },
             { x: 0, y: 9, to: 'west_stage1', tx: 16, ty: 9 },
             { x: 12, y: 0, to: 'north_stage1', tx: 9, ty: 16 },
-            { x: 12, y: 17, to: 'south_stage1', tx: 9, ty: 1 }
+            { x: 12, y: 17, to: 'town3', tx: 12, ty: 1 }
         ],
         start: { x: 12, y: 11 }
     };

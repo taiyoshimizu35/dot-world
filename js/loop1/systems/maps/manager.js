@@ -6,6 +6,7 @@ const Maps = {
     current: 'village',
 
     init() {
+        this.data = {};
         initMapData(this);
     },
 
@@ -159,8 +160,9 @@ const Maps = {
         return QuestFlags.allFakeBossesDefeated();
     },
 
-    // 真魔王戦へ進めるかチェック
     canFaceTrueDemonKing() {
         return QuestFlags.canFaceTrueDemonKing;
     }
 };
+
+window.Maps = Maps;
