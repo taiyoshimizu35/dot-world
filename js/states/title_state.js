@@ -18,6 +18,10 @@ class TitleState extends BaseState {
             this.options = ['はじめから'];
             this.cur = 0;
         }
+
+        if (GameConfig.DEBUG_MODE) {
+            this.options.push('DEBUG: Loop 2');
+        }
     }
 
     update() {
@@ -43,6 +47,46 @@ class TitleState extends BaseState {
                     // Load Failed
                     // Maybe play error sound
                 }
+            } else if (selected === 'DEBUG: Loop 2') {
+                // Debug Start directly to Loop 2
+                WorldState.reset();
+                SaveSystem.clear();
+
+                // Initialize Week 2
+                // Create dummy stats for transition
+                const dummyStats = {
+                    level: 50,
+                    maxHp: 500, maxMp: 200,
+                    atk: 100, def: 100,
+                    matk: 80, mdef: 80
+                };
+                WorldState.startWeek2(dummyStats);
+
+                // Jump to Start Map
+                if (window.Maps && window.Maps.initWeek2) {
+                    window.Maps.initWeek2(); // Ensure Loop 2 maps are loaded
+                }
+
+                if (Maps.data && Maps.data.start) {
+                    Maps.current = 'start';
+                } else {
+                    Maps.current = 'village';
+                }
+
+                // Initial Position in Start Map
+                const start = Maps.get().start;
+                this.game.player.x = start.x * GameConfig.TILE_SIZE;
+                this.game.player.y = start.y * GameConfig.TILE_SIZE;
+                this.game.player.dir = 0;
+                this.game.player.moving = false;
+
+                // Sync Camera
+                Camera.update(this.game.player.x, this.game.player.y, Maps.get().w, Maps.get().h);
+
+                // Start Game
+                currentState = GameState.PLAYING;
+                this.game.stateMachine.change('playing');
+                FX.fadeIn();
             } else {
                 // New Game
                 // Reset everything strictly (WorldState.reset() does this)

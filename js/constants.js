@@ -9,6 +9,9 @@ const GameConfig = {
     PLAYER_SPEED: 1.5,
     ENCOUNTER_RATE: 0.008,
 
+    // デバッグ設定
+    DEBUG_MODE: true,
+
     TILE_TYPES: {
         GRASS: 0, ROCK: 1, PATH: 2, WATER: 3, HOUSE: 4,
         DOOR: 5, FLOOR: 6, DESK: 7, BED: 8, EXIT: 9, COUNTER: 10,
