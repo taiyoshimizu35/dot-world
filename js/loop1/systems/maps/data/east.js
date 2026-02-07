@@ -39,7 +39,7 @@ function initEastWeek1(Maps, T) {
     // 一本道：西(2,20)から東(38,20)へ、蛇行させる
     // Start(2,20) -> (10,20) -> (10, 10) -> (20, 10) -> (20, 30) -> (30, 30) -> (30, 20) -> End(38,20)
     const pathPoints = [
-        [0, 20], [10, 20], [10, 13], [20, 13], [20, 25], [30, 25], [30, 20], [38, 20]
+        [0, 20], [10, 20], [10, 13], [20, 13], [20, 25], [30, 25], [30, 20], [40, 20]
     ];
     let cx = pathPoints[0][0];
     let cy = pathPoints[0][1];
@@ -55,7 +55,7 @@ function initEastWeek1(Maps, T) {
             else if (cy > ty) cy--;
         }
     }
-    e1t[20][38] = T.PATH; // End point
+    e1t[20][40] = T.PATH; // End point
 
     // 宝箱への小道（行き止まり）
     // 右下 (38, 38)
@@ -73,7 +73,7 @@ function initEastWeek1(Maps, T) {
         npcs: [{ id: 'e1_sign', type: 'signpost', x: 5, y: 20, msg: '【深緑の迷宮】\n木々の隙間を進め', blocking: true }],
         warps: [
             { x: 0, y: 20, to: 'village', tx: 23, ty: 9 },
-            { x: 39, y: 20, to: 'east_boss_room', tx: 2, ty: 7 }
+            { x: 40, y: 20, to: 'east_boss_room', tx: 2, ty: 7 }
         ],
         start: { x: 2, y: 20 }
     };
