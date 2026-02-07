@@ -109,6 +109,11 @@ const SaveSystem = {
             WorldState.managers.party = Party2;
             WorldState.managers.inventory = null;
             WorldState.managers.battle = Battle2;
+
+            // Initialize Week 2 Maps
+            if (window.Maps && window.Maps.initWeek2) {
+                window.Maps.initWeek2();
+            }
             // Managers menu/shop/inn will be set by their respective systems or init?
             // We need to set them here if we are loading directly from Title.
             // But we don't have Menu2 yet.
