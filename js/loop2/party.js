@@ -1,56 +1,47 @@
-// ===========================================
-// 2週目仲間システム
-// ===========================================
-
-const PartyMemberData2 = {
-    alex: {
-        id: 'alex',
-        name: 'アレックス',
-        hp: 40, maxHp: 40,
-        mp: 5, maxMp: 5,
-        atk: 12, def: 6,
-        matk: 3, mdef: 4,
-        type: 'physical',  // 物理特化
-        skills: ['強撃', '守護'],
-        joinCondition: null  // 村で話すだけ
-    },
-    rose: {
-        id: 'rose',
-        name: 'ローズ',
-        hp: 25, maxHp: 25,
-        mp: 20, maxMp: 20,
-        atk: 5, def: 3,
-        matk: 15, mdef: 8,
-        type: 'magic',  // 魔法特化
-        skills: ['ファイア', 'ブリザド'],
-        joinCondition: 'east'  // 東ボス撃破後
-    },
-    milia: {
-        id: 'milia',
-        name: 'ミリア',
-        hp: 30, maxHp: 30,
-        mp: 15, maxMp: 15,
-        atk: 6, def: 4,
-        matk: 10, mdef: 10,
-        type: 'healer',  // 回復特化
-        skills: ['ヒール', 'プロテク'],
-        joinCondition: 'west'  // 西ボス撃破後
-    }
-};
-
 const Party2 = {
     members: [],  // 現在のパーティメンバー
 
     // 仲間追加
     add(memberId) {
-        const data = PartyMemberData2[memberId];
+        // データ取得
+        // Note: PartyMemberData2 is defined in data/companions.js (which has been reset/deleted).
+        // User must create data/companions.js to use this.
+        const data = window.PartyMemberData2 ? window.PartyMemberData2[memberId] : null;
         if (!data) return false;
+
+        // すでに仲間にいる
         if (this.members.find(m => m.id === memberId)) return false;
+
+        // 一度別れた仲間は再加入不可
+        if (QuestSystem2.departed && QuestSystem2.departed[memberId]) {
+            Msg.show('「ごめん、もう一緒には行けないよ…」');
+            return false;
+        }
+
+        // 3人制限
+        if (this.members.length >= 3) {
+            Msg.show('パーティがいっぱいです。（最大3人）\n誰かと別れる必要があります。');
+            return false;
+        }
 
         this.members.push({
             ...data,
             hiddenExp: 0
         });
+        return true;
+    },
+
+    // 仲間と別れる
+    remove(memberId) {
+        const idx = this.members.findIndex(m => m.id === memberId);
+        if (idx === -1) return false;
+
+        // 別れフラグを立てる
+        if (QuestSystem2.departed) {
+            QuestSystem2.departed[memberId] = true;
+        }
+
+        this.members.splice(idx, 1);
         return true;
     },
 

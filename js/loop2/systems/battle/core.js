@@ -3,11 +3,15 @@
 // ===========================================
 const Battle2 = {
     active: false, enemy: null, enemyHp: 0, phase: 'command', cur: 0, msg: '', msgTimer: 0,
-    commands: ['こうげき', '魔法', 'アイテム', 'にげる'], itemCur: 0, magicCur: 0,
+    commands: ['こうげき', 'スキル', 'アイテム', 'にげる'], itemCur: 0, magicCur: 0,
     isBoss: false, enemyAttackCount: 0, playerRef: null, waitForInput: false, nextPhase: null,
     currentArea: null, isTrueBoss: false, isDemonKing: false,
 
     start(mapId) {
+        if (typeof EnemyData2 === 'undefined') {
+            console.warn('EnemyData2 not found. Battle cannot start.');
+            return;
+        }
         const m = Maps.get();
         const enemies = getEnemiesForMap2(m, mapId);
         const id = enemies[Math.floor(Math.random() * enemies.length)];
@@ -16,6 +20,7 @@ const Battle2 = {
     },
 
     startTrueBoss(area) {
+        if (typeof EnemyData2 === 'undefined') return;
         const key = `true_${area}_boss`;
         this.enemy = { ...EnemyData2[key], type: key };
         this.currentArea = area;
@@ -24,6 +29,7 @@ const Battle2 = {
     },
 
     startTrueDemonKing() {
+        if (typeof EnemyData2 === 'undefined') return;
         this.enemy = { ...EnemyData2.true_demon_king, type: 'true_demon_king' };
         this.currentArea = 'demon';
         this.isTrueBoss = true;
@@ -170,7 +176,7 @@ const Battle2 = {
             this.msg = 'ボス戦からは逃げられない！';
             this.phase = 'wait_input';
             this.nextPhase = 'command';
-        } else if (Math.random() < 0.5) {
+        } else if (Math.random() < 0.8) {
             this.msg = 'うまく逃げ切れた！';
             this.phase = 'victory';  // 報酬なしで終了
             this.enemy.exp = 0;
@@ -193,10 +199,20 @@ const Battle2 = {
         Party2.addExpToAll(this.enemy.exp);
 
         // 討伐カウント
-        QuestSystem2.recordKill(this.enemy.type);
+        // 討伐クエスト廃止のためコメントアウト
+        // QuestSystem2.recordKill(this.enemy.type);
 
         this.msg = `${this.enemy.name}を倒した！\n${goldGain}G を獲得！`;
         if (grew) this.msg += '\n（力が少し強くなった）';
+
+        // Item Drop Logic
+        if (this.enemy.drop) {
+            if (Math.random() < this.enemy.drop.rate) {
+                const itemName = this.enemy.drop.item;
+                if (window.Inv) Inv.add(itemName);
+                this.msg += `\n${itemName}を手に入れた！`;
+            }
+        }
 
         this.msgTimer = 0;
         this.waitForInput = true;

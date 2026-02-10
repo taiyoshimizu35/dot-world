@@ -50,10 +50,10 @@ const MagicShopData = {
         { name: '火の魔導書', price: 200, type: 'spell', spell: 'fire', desc: 'ファイア習得', sold: false },
         { name: '水の魔導書', price: 200, type: 'spell', spell: 'water', desc: 'アクア習得', sold: false },
         { name: '風の魔導書', price: 200, type: 'spell', spell: 'wind', desc: 'ウィンド習得', sold: false },
-        { name: '銀の杖', price: 350, type: 'staff', atk:3, matk: 3, magicBoost: 1.3, desc: '攻撃+3,魔攻+3,魔法1.3倍', sold: false },
-        { name: '賢者の杖', price: 1000, type: 'staff', atk: 5, matk:5, magicBoost: 1.5, desc: '攻撃+5,魔攻+5,魔法1.5倍', sold: false },
-        { name: '魔法のローブ', price: 400, type: 'robe', def: 5, mdef:5, maxMp: 10, desc: '防御+5,魔防+5,MP+10', sold: false },        
-        { name: '大魔道士のローブ', price: 1200, type: 'robe', def: 8, mdef:8, maxMp: 20, desc: '防御+10,魔防+10,MP+20', sold: false }
+        { name: '銀の杖', price: 350, type: 'staff', atk: 3, matk: 3, magicBoost: 1.3, desc: '攻撃+3,魔攻+3,魔法1.3倍', sold: false },
+        { name: '賢者の杖', price: 1000, type: 'staff', atk: 5, matk: 5, magicBoost: 1.5, desc: '攻撃+5,魔攻+5,魔法1.5倍', sold: false },
+        { name: '魔法のローブ', price: 400, type: 'robe', def: 5, mdef: 5, maxMp: 10, desc: '防御+5,魔防+5,MP+10', sold: false },
+        { name: '大魔道士のローブ', price: 1200, type: 'robe', def: 8, mdef: 8, maxMp: 20, desc: '防御+10,魔防+10,MP+20', sold: false }
     ],
     reset() { this.items.forEach(item => item.sold = false); }
 };
@@ -66,13 +66,36 @@ const AdvancedShopData = {
         { name: 'エリクサー', price: 100, type: 'item', desc: 'HP+200回復', sold: false },
         { name: '伝説の剣', price: 4000, type: 'weapon', atk: 25, desc: '攻撃力+30', sold: false },
         { name: '伝説の鎧', price: 4000, type: 'armor', def: 20, desc: '防御力+20', sold: false },
-        { name: '幸運のアミュレット', price: 2000, type: 'amulet', desc: '獲得Gを1.5倍にする', sold: false},
-        { name: '達人のアミュレット', price: 2000, type: 'amulet', desc: '獲得経験値を2倍にする', sold: false},
-        { name: '金色のアミュレット', price: 4000, type: 'amulet', desc: '獲得Gを3倍にする', sold: false},
-        { name: '戦神のアミュレット', price: 4000, type: 'amulet', desc: '獲得経験値を5倍にする', sold: false},
-        { name: '女神の護符', price: 4000, type: 'amulet', desc: '状態異常を50%で回避する', sold:false}
+        { name: '幸運のアミュレット', price: 2000, type: 'amulet', desc: '獲得Gを1.5倍にする', sold: false },
+        { name: '達人のアミュレット', price: 2000, type: 'amulet', desc: '獲得経験値を2倍にする', sold: false },
+        { name: '金色のアミュレット', price: 4000, type: 'amulet', desc: '獲得Gを3倍にする', sold: false },
+        { name: '戦神のアミュレット', price: 4000, type: 'amulet', desc: '獲得経験値を5倍にする', sold: false },
+        { name: '女神の護符', price: 4000, type: 'amulet', desc: '状態異常を50%で回避する', sold: false }
     ],
     reset() { this.items.forEach(item => item.sold = false); }
+};
+
+// ===========================================
+// 素材・換金アイテムデータ
+// ===========================================
+// 敵からドロップする非売品（売却専用）
+const MaterialData = {
+    items: [
+        { name: 'スライムの粘液', price: 10, type: 'material', desc: 'スライムの体液' },
+        { name: 'ボロボロの布', price: 15, type: 'material', desc: 'ゴブリンの服の切れ端' },
+        { name: 'コウモリの牙', price: 12, type: 'material', desc: '鋭い牙' },
+        { name: 'オークの骨', price: 30, type: 'material', desc: '頑丈な骨' },
+        { name: '狼の毛皮', price: 25, type: 'material', desc: '温かい毛皮' },
+        { name: '不死者の骨', price: 30, type: 'material', desc: '魔力を帯びた骨' },
+        { name: '悪魔の尻尾', price: 60, type: 'material', desc: '怪しい光を放つ尻尾' },
+        { name: '竜の鱗', price: 80, type: 'material', desc: '非常に硬い鱗' },
+        // Boss Drops
+        { name: '古代竜の宝玉', price: 1000, type: 'material', desc: '古代竜の力が宿る宝玉' },
+        { name: '魔導師の秘伝書', price: 1000, type: 'material', desc: '強力な魔法が記された書' },
+        { name: '氷晶の核', price: 1000, type: 'material', desc: '絶対零度の核' },
+        { name: '冥界の魂', price: 1000, type: 'material', desc: '冥界の住人の魂' },
+        { name: '魔王の心臓', price: 5000, type: 'material', desc: '魔王の魔力の源' }
+    ]
 };
 
 // ===========================================

@@ -514,15 +514,32 @@ class PlayerController {
                         if (npc.partyJoin) {
                             const party = WorldState.managers.party;
                             if (party) {
-                                if (party.members.find(m => m.id === npc.partyJoin)) return;
-                                if (npc.requiresBoss && !QuestFlags.trueBosses[npc.requiresBoss]) {
-                                    Msg.show('（何かを待っているようだ…）');
+                                // Already in party check
+                                if (party.members.find(m => m.id === npc.partyJoin)) {
+                                    if (npc.msg) Msg.show(npc.msg);
+                                    else Msg.show('「一緒に行こう！」');
                                     return;
                                 }
-                                if (party.add(npc.partyJoin)) {
-                                    const name = npc.partyJoin === 'alex' ? 'アレックス' : (npc.partyJoin === 'rose' ? 'ローズ' : 'ミリア');
-                                    Msg.show(`${name}が仲間になった！\n「一緒に魔王を倒そう！」`);
-                                }
+
+                                // Choice: Talk or Recruit
+                                Msg.choice('どうする？', ['話しかける', '仲間にさそう'], (idx) => {
+                                    if (idx === 0) {
+                                        // Talk
+                                        if (npc.msg) Msg.show(npc.msg);
+                                        else Msg.show('「こんにちは！」');
+                                    } else {
+                                        // Recruit
+                                        if (npc.requiresBoss && !QuestFlags.trueBosses[npc.requiresBoss]) {
+                                            Msg.show('（何かを待っているようだ…）');
+                                            return;
+                                        }
+                                        if (party.add(npc.partyJoin)) {
+                                            // Look up name safely
+                                            const memberData = (window.PartyMemberData2 && window.PartyMemberData2[npc.partyJoin]) || { name: '仲間' };
+                                            Msg.show(`${memberData.name}が仲間になった！\n「一緒に魔王を倒そう！」`);
+                                        }
+                                    }
+                                });
                             }
                             return;
                         }
@@ -620,6 +637,13 @@ class PlayerController {
                 const battle = WorldState.managers.battle;
                 if (battle && typeof battle.startDemonKing === 'function') {
                     battle.startDemonKing(QuestFlags.canFaceTrueDemonKing);
+                }
+            }
+            else if (npc.savePoint) {
+                if (window.SaveMenu) {
+                    SaveMenu.open();
+                } else {
+                    Msg.show('セーブ機能はまだ利用できません。');
                 }
             }
             else if (npc.boss) Battle.startBoss();

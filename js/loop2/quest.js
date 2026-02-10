@@ -3,46 +3,9 @@
 // ===========================================
 
 const QuestData2 = {
-    slime_hunt: {
-        id: 'slime_hunt',
-        name: 'スライム退治',
-        desc: 'スライムを10体討伐せよ',
-        target: 'slime',
-        required: 10,
-        reward: { gold: 100 }
-    },
-    goblin_hunt: {
-        id: 'goblin_hunt',
-        name: 'ゴブリン狩り',
-        desc: 'ゴブリンを10体討伐せよ',
-        target: 'goblin',
-        required: 10,
-        reward: { gold: 200 }
-    },
-    bat_hunt: {
-        id: 'bat_hunt',
-        name: 'コウモリ駆除',
-        desc: 'コウモリを15体討伐せよ',
-        target: 'bat',
-        required: 15,
-        reward: { gold: 150 }
-    },
-    monster_slayer: {
-        id: 'monster_slayer',
-        name: '魔物掃討',
-        desc: '任意のモンスターを50体討伐せよ',
-        target: 'any',
-        required: 50,
-        reward: { atk: 3, gold: 300 }
-    },
-    veteran: {
-        id: 'veteran',
-        name: '熟練の証',
-        desc: '任意のモンスターを100体討伐せよ',
-        target: 'any',
-        required: 100,
-        reward: { def: 3, mdef: 3, gold: 500 }
-    }
+    // クエストデータをここに記述
+    // example:
+    // slime_hunt: { id: 'slime_hunt', name: 'スライム退治', ... }
 };
 
 const QuestSystem2 = {
@@ -131,9 +94,13 @@ const QuestSystem2 = {
         }));
     },
 
+    // 離脱した仲間リスト（再加入不可）
+    departed: {},
+
     // 初期化
     init() {
         this.killCount = { slime: 0, goblin: 0, bat: 0, any: 0 };
         this.completed = {};
+        this.departed = {};
     }
 };

@@ -1,17 +1,46 @@
 // ===========================================
-// セーブシステム (Loop 2以降専用)
+// セーブシステム (Loop 2以降専用・10スロット)
 // ===========================================
 const SaveSystem = {
-    KEY: 'dot_world_save',
+    KEY_BASE: 'dot_world_save_',
 
-    hasSave() {
-        return !!localStorage.getItem(this.KEY);
+    // 特定のスロットにセーブデータがあるか
+    hasSave(slot = 0) {
+        return !!localStorage.getItem(this.KEY_BASE + slot);
     },
 
-    save() {
+    // セーブデータリスト取得（メタデータのみ）
+    getSaveList() {
+        const list = [];
+        for (let i = 0; i < 10; i++) {
+            const json = localStorage.getItem(this.KEY_BASE + i);
+            if (json) {
+                try {
+                    const data = JSON.parse(json);
+                    list.push({
+                        slot: i,
+                        exists: true,
+                        timestamp: data.timestamp,
+                        week: data.week,
+                        name: data.player.name, // Player name
+                        hp: data.player.hp,
+                        maxHp: data.player.maxHp,
+                        map: (data.map && data.map.id) ? data.map.id : 'unknown'
+                    });
+                } catch (e) {
+                    list.push({ slot: i, exists: false, error: true });
+                }
+            } else {
+                list.push({ slot: i, exists: false });
+            }
+        }
+        return list;
+    },
+
+    save(slot = 0) {
         if (WorldState.week !== 2) {
             console.warn('Save is only available in Week 2');
-            return;
+            return false;
         }
 
         const data = {
@@ -25,8 +54,15 @@ const SaveSystem = {
                 absorbedStats: WorldState.absorbedStats ? { ...WorldState.absorbedStats } : null
             },
 
+            // Loop 2 World State
+            world2: {
+                trueBosses: { ...WorldState2.trueBosses },
+                trueDemonKingDefeated: WorldState2.trueDemonKingDefeated
+            },
+
             // Player Stats
             player: {
+                name: PlayerStats2.name,
                 hp: PlayerStats2.hp,
                 maxHp: PlayerStats2.maxHp,
                 mp: PlayerStats2.mp,
@@ -37,14 +73,7 @@ const SaveSystem = {
                 mdef: PlayerStats2.mdef,
                 gold: PlayerStats2.gold,
                 hiddenExp: PlayerStats2.hiddenExp,
-                weapon: PlayerStats2.weapon, // Object or null? Weapon is object reference usually?
-                // Wait, weapon in PlayerStats2 is passed as object reference in equipWeapon?
-                // Just saving name/ID might be safer if we have a registry. 
-                // Loop 2 Weapon system TBD. Assuming it's simple for now. 
-                // If it's an object, we need to reconstruct it.
-                // Let's verify PlayerStats2.weapon usage. It seems to be an object.
-                // We'll save 'weaponId' if possible, or just the whole object if it's static data.
-
+                weapon: PlayerStats2.weapon, // Object or null
                 status: { ...PlayerStats2.status },
                 spells: { ...PlayerStats2.spells },
                 magicBoost: PlayerStats2.magicBoost
@@ -60,10 +89,11 @@ const SaveSystem = {
                 hiddenExp: m.hiddenExp
             })),
 
-            // Quests
+            // Quests & Flags
             quest: {
                 killCount: { ...QuestSystem2.killCount },
-                completed: { ...QuestSystem2.completed }
+                completed: { ...QuestSystem2.completed },
+                departed: { ...QuestSystem2.departed }
             },
 
             // Map Location
@@ -76,8 +106,8 @@ const SaveSystem = {
         };
 
         try {
-            localStorage.setItem(this.KEY, JSON.stringify(data));
-            console.log('Game Saved', data);
+            localStorage.setItem(this.KEY_BASE + slot, JSON.stringify(data));
+            console.log(`Game Saved to Slot ${slot}`, data);
             return true;
         } catch (e) {
             console.error('Save Failed', e);
@@ -85,26 +115,25 @@ const SaveSystem = {
         }
     },
 
-    load() {
-        const json = localStorage.getItem(this.KEY);
+    load(slot = 0) {
+        const json = localStorage.getItem(this.KEY_BASE + slot);
         if (!json) return false;
 
         try {
             const data = JSON.parse(json);
-
-            // Validate Version / Week
-            // if (data.version !== 1) ...
 
             // Restore World State
             WorldState.week = data.week;
             WorldState.truthFlags = data.world.truthFlags;
             WorldState.absorbedStats = data.world.absorbedStats;
 
-            // Initialize Week 2 Managers FIRST
-            // This is critical because loading Loop 2 save means we are in Loop 2.
-            // We can reuse WorldState.startWeek2 logic but without resetting stats?
-            // Or just manually set managers.
+            // Restore Loop 2 World State
+            if (data.world2) {
+                WorldState2.trueBosses = data.world2.trueBosses;
+                WorldState2.trueDemonKingDefeated = data.world2.trueDemonKingDefeated;
+            }
 
+            // Initialize Week 2 Managers FIRST
             WorldState.managers.player = PlayerStats2;
             WorldState.managers.party = Party2;
             WorldState.managers.inventory = null;
@@ -114,13 +143,10 @@ const SaveSystem = {
             if (window.Maps && window.Maps.initWeek2) {
                 window.Maps.initWeek2();
             }
-            // Managers menu/shop/inn will be set by their respective systems or init?
-            // We need to set them here if we are loading directly from Title.
-            // But we don't have Menu2 yet.
-            // TODO: Import/Set Menu2
 
             // Restore Player Stats
             const p = data.player;
+            PlayerStats2.name = p.name || '勇者';
             PlayerStats2.hp = p.hp; PlayerStats2.maxHp = p.maxHp;
             PlayerStats2.mp = p.mp; PlayerStats2.maxMp = p.maxMp;
             PlayerStats2.atk = p.atk; PlayerStats2.def = p.def;
@@ -130,26 +156,35 @@ const SaveSystem = {
             PlayerStats2.status = p.status;
             PlayerStats2.spells = p.spells;
             PlayerStats2.magicBoost = p.magicBoost;
-            PlayerStats2.weapon = p.weapon; // Restore weapon object/data
+            PlayerStats2.weapon = p.weapon || null;
 
             // Restore Party
             Party2.members = [];
-            data.party.forEach(savedMember => {
-                // Re-add using base data to get skills/name etc, then override stats
-                Party2.add(savedMember.id);
-                const member = Party2.members.find(m => m.id === savedMember.id);
-                if (member) {
-                    member.hp = savedMember.hp; member.maxHp = savedMember.maxHp;
-                    member.mp = savedMember.mp; member.maxMp = savedMember.maxMp;
-                    member.atk = savedMember.atk; member.def = savedMember.def;
-                    member.matk = savedMember.matk; member.mdef = savedMember.mdef;
-                    member.hiddenExp = savedMember.hiddenExp;
-                }
-            });
+            if (data.party) {
+                data.party.forEach(savedMember => {
+                    // Re-add using base data to get skills/name etc, then override stats
+                    // We bypass add() checks to ensure restoration even if criteria changed?
+                    // But we need the base data.
+                    const baseData = window.PartyMemberData2 ? window.PartyMemberData2[savedMember.id] : null;
+                    if (baseData) {
+                        Party2.members.push({
+                            ...baseData,
+                            hp: savedMember.hp, maxHp: savedMember.maxHp,
+                            mp: savedMember.mp, maxMp: savedMember.maxMp,
+                            atk: savedMember.atk, def: savedMember.def,
+                            matk: savedMember.matk, mdef: savedMember.mdef,
+                            hiddenExp: savedMember.hiddenExp
+                        });
+                    }
+                });
+            }
 
             // Restore Quests
-            QuestSystem2.killCount = data.quest.killCount;
-            QuestSystem2.completed = data.quest.completed;
+            if (data.quest) {
+                QuestSystem2.killCount = data.quest.killCount || {};
+                QuestSystem2.completed = data.quest.completed || {};
+                QuestSystem2.departed = data.quest.departed || {};
+            }
 
             // Restore Map
             Maps.current = data.map.id;
@@ -172,8 +207,21 @@ const SaveSystem = {
         }
     },
 
+    loadLatest() {
+        const list = this.getSaveList();
+        const validSaves = list.filter(s => s.exists);
+        if (validSaves.length === 0) return false;
+
+        // Sort by timestamp descending
+        validSaves.sort((a, b) => b.timestamp - a.timestamp);
+        return this.load(validSaves[0].slot);
+    },
+
     clear() {
-        localStorage.removeItem(this.KEY);
+        // Clear all slots
+        for (let i = 0; i < 10; i++) {
+            localStorage.removeItem(this.KEY_BASE + i);
+        }
     }
 };
 

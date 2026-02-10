@@ -50,7 +50,7 @@
     <script src="js/loop1/systems/menu.js"></script>
     <script src="js/loop1/systems/shop.js"></script>
     <script src="js/loop1/systems/inn.js"></script> <!-- Inn System -->
-    <script src="js/loop1/systems/gameover.js"></script>
+    <script src="js/loop1/systems/gameover.js?v=7"></script>
 
     <!-- 4.4 マップ -->
     <script src="js/loop1/systems/maps/chests.js"></script>
@@ -82,42 +82,35 @@
     <!-- ========================================= -->
 
     <!-- 5.1 データ定義 -->
-    <script src="js/loop2/data/enemies.js"></script>
+    <!-- 削除: enemies.js -->
 
     <!-- 5.2 状態管理 -->
     <script src="js/loop2/world.js"></script>
     <script src="js/loop2/player.js"></script>
-    <script src="js/loop2/party.js"></script>
-    <script src="js/loop2/weapon.js"></script>
-    <script src="js/loop2/quest.js"></script>
+    <!-- 削除: companions.js -->
+    <script src="js/loop2/party.js?v=7"></script>
+    <!-- 削除: weapon.js -->
+    <script src="js/loop2/quest.js?v=7"></script>
 
     <!-- 5.3 バトル -->
     <!-- 5.3 バトル UI -->
-    <script src="js/loop2/systems/menu.js"></script>
+    <script src="js/loop2/systems/menu.js?v=7"></script>
     <script src="js/loop2/systems/battle/core.js"></script>
 
     <!-- 5.4 マップデータ -->
-    <script src="js/loop2/systems/maps/data/start.js"></script>
-    <script src="js/loop2/systems/maps/data/town1.js"></script>
-    <script src="js/loop2/systems/maps/data/town2.js"></script>
-    <script src="js/loop2/systems/maps/data/town3.js"></script>
-    <script src="js/loop2/systems/maps/data/village.js"></script>
-    <script src="js/loop2/systems/maps/data/east.js"></script>
-    <script src="js/loop2/systems/maps/data/west.js"></script>
-    <script src="js/loop2/systems/maps/data/north.js"></script>
-    <script src="js/loop2/systems/maps/data/south.js"></script>
-    <script src="js/loop2/systems/maps/data/demon.js"></script>
+    <script src="js/loop2/systems/maps/modern/start.js?v=7"></script>
+    <!-- 削除: 他マップ -->
     <script src="js/loop2/systems/maps/loader.js"></script>
 
     <!-- 6. メインゲーム -->
     <!-- 5.5 リファクタリング済みステート -->
-    <script src="js/core/save_system.js"></script>
+    <script src="js/core/save_system.js?v=7"></script>
     <script src="js/core/state_machine.js"></script>
     <script src="js/states/base_state.js"></script>
     <script src="js/systems/map_renderer.js"></script>
-    <script src="js/systems/player_controller.js"></script>
+    <script src="js/systems/player_controller.js?v=7"></script>
 
-    <script src="js/states/title_state.js"></script>
+    <script src="js/states/title_state.js?v=7"></script>
     <script src="js/states/playing_state.js"></script>
     <script src="js/states/menu_state.js"></script>
     <script src="js/states/dialog_state.js"></script>

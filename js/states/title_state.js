@@ -1,22 +1,27 @@
 // import { BaseState } from './base_state.js';
 
+// import { BaseState } from './base_state.js';
+
 class TitleState extends BaseState {
     constructor(game) {
         super(game);
         this.options = ['はじめから'];
         this.cur = 0;
-        this.canContinue = false;
+        this.mode = 'main'; // 'main', 'load'
+        this.saveList = [];
+        this.loadCur = 0;
     }
 
     enter() {
-        if (typeof SaveSystem !== 'undefined' && SaveSystem.hasSave()) {
-            this.canContinue = true;
+        this.mode = 'main';
+        this.cur = 0;
+
+        // Build Options
+        const hasAnySave = SaveSystem.hasSave ? SaveSystem.getSaveList().some(s => s.exists) : false;
+        if (hasAnySave) {
             this.options = ['つづきから', 'はじめから'];
-            this.cur = 0;
         } else {
-            this.canContinue = false;
             this.options = ['はじめから'];
-            this.cur = 0;
         }
 
         if (GameConfig.DEBUG_MODE) {
@@ -25,6 +30,36 @@ class TitleState extends BaseState {
     }
 
     update() {
+        // Load Mode
+        if (this.mode === 'load') {
+            if (Input.justPressed('ArrowUp')) this.loadCur = (this.loadCur - 1 + 10) % 10;
+            if (Input.justPressed('ArrowDown')) this.loadCur = (this.loadCur + 1) % 10;
+
+            if (Input.cancel()) {
+                this.mode = 'main';
+                Input.lock(150);
+                return;
+            }
+
+            if (Input.interact()) {
+                const slot = this.saveList[this.loadCur];
+                if (slot.exists) {
+                    if (SaveSystem.load(slot.slot)) {
+                        currentState = GameState.PLAYING;
+                        this.game.stateMachine.change('playing');
+                        FX.fadeIn();
+                    } else {
+                        // Load Failed
+                        console.error("Failed to load slot", slot.slot);
+                    }
+                } else {
+                    // Empty slot
+                }
+            }
+            return;
+        }
+
+        // Main Menu
         if (this.options.length > 1) {
             if (Input.justPressed('ArrowUp')) this.cur = (this.cur - 1 + this.options.length) % this.options.length;
             if (Input.justPressed('ArrowDown')) this.cur = (this.cur + 1) % this.options.length;
@@ -34,26 +69,15 @@ class TitleState extends BaseState {
             const selected = this.options[this.cur];
 
             if (selected === 'つづきから') {
-                if (SaveSystem.load()) {
-                    // Load successful, transition to Playing (SaveSystem sets state?)
-                    // SaveSystem.load() sets WorldState and Managers.
-                    // We just need to change state to 'playing'.
-                    currentState = GameState.PLAYING;
-                    this.game.stateMachine.change('playing');
-
-                    // Fade In Effect
-                    FX.fadeIn();
-                } else {
-                    // Load Failed
-                    // Maybe play error sound
-                }
+                this.saveList = SaveSystem.getSaveList();
+                this.mode = 'load';
+                this.loadCur = 0;
+                Input.lock(150);
             } else if (selected === 'DEBUG: Loop 2') {
-                // Debug Start directly to Loop 2
                 WorldState.reset();
-                SaveSystem.clear();
+                if (window.SaveSystem) window.SaveSystem.clear(); // Clear saves for fresh debug start?
+                // Or maybe keep them? User said "Debug Loop 2" clears.
 
-                // Initialize Week 2
-                // Create dummy stats for transition
                 const dummyStats = {
                     level: 50,
                     maxHp: 500, maxMp: 200,
@@ -62,39 +86,35 @@ class TitleState extends BaseState {
                 };
                 WorldState.startWeek2(dummyStats);
 
-                // Jump to Start Map
                 if (window.Maps && window.Maps.initWeek2) {
-                    window.Maps.initWeek2(); // Ensure Loop 2 maps are loaded
+                    // window.Maps.initWeek2(); 
                 }
 
-                if (Maps.data && Maps.data.start) {
-                    Maps.current = 'start';
+                if (window.Maps && window.Maps.data && window.Maps.data.start) {
+                    window.Maps.current = 'start';
                 } else {
-                    Maps.current = 'village';
+                    if (window.Maps) window.Maps.current = 'village';
                 }
 
-                // Initial Position in Start Map
-                const start = Maps.get().start;
+                const m = window.Maps.get();
+                const start = m.start;
                 this.game.player.x = start.x * GameConfig.TILE_SIZE;
                 this.game.player.y = start.y * GameConfig.TILE_SIZE;
                 this.game.player.dir = 0;
                 this.game.player.moving = false;
 
-                // Sync Camera
-                Camera.update(this.game.player.x, this.game.player.y, Maps.get().w, Maps.get().h);
+                Camera.update(this.game.player.x, this.game.player.y, m.w, m.h);
+                WorldState.resetEncounterSteps(m.encounterRate);
 
-                // Start Game
                 currentState = GameState.PLAYING;
                 this.game.stateMachine.change('playing');
                 FX.fadeIn();
+
             } else {
                 // New Game
-                // Reset everything strictly (WorldState.reset() does this)
                 WorldState.reset();
-                SaveSystem.clear(); // Clear existing save if starting over? Or keep it until overwrite?
-                // User said "Start from beginning = Full Reset".
-                // Usually means we just start fresh. Overwriting save happens later.
-                // But to be safe vs mixed state, we reset.
+                SaveSystem.clear(); // Clear all saves? Legacy behavior.
+                // Assuming "New Game" in Loop 1 context clears everything.
 
                 this.game.stateMachine.change('opening');
             }
@@ -103,19 +123,45 @@ class TitleState extends BaseState {
 
     draw(ctx) {
         const { VIEWPORT_WIDTH: VW, VIEWPORT_HEIGHT: VH } = GameConfig;
+
+        // Background
         Draw.rect(ctx, 0, 0, VW, VH, '#000');
 
-        // Title Logo
-        Draw.text(ctx, 'DOT WORLD', VW / 2, 70, '#fff', 24, 'center');
+        // Logo
+        Draw.text(ctx, 'DOT WORLD', VW / 2, 60, '#fff', 24, 'center');
 
-        // Menu
-        const startY = 130;
-        this.options.forEach((opt, i) => {
-            const color = (i === this.cur) ? '#fc0' : '#fff';
-            const prefix = (i === this.cur) ? '▶ ' : '  ';
-            Draw.text(ctx, prefix + opt, VW / 2, startY + i * 25, color, 14, 'center');
-        });
+        // Main Menu
+        if (this.mode === 'main') {
+            const startY = 130;
+            this.options.forEach((opt, i) => {
+                const color = (i === this.cur) ? '#fc0' : '#fff';
+                const prefix = (i === this.cur) ? '▶ ' : '  ';
+                Draw.text(ctx, prefix + opt, VW / 2, startY + i * 25, color, 14, 'center');
+            });
+            Draw.text(ctx, '© 2024 dot-world', VW / 2, VH - 20, '#666', 10, 'center');
+        }
+        // Load Menu
+        else if (this.mode === 'load') {
+            Draw.rect(ctx, 20, 40, VW - 40, VH - 50, 'rgba(0,0,50,0.9)');
+            Draw.stroke(ctx, 20, 40, VW - 40, VH - 50, '#fff', 2);
+            Draw.text(ctx, 'ロードするデータを選択', VW / 2, 60, '#fc0', 14, 'center');
 
-        Draw.text(ctx, '© 2024 dot-world', VW / 2, VH - 20, '#666', 10, 'center');
+            const listY = 80;
+            // Show all 10
+            this.saveList.slice(0, 10).forEach((slot, i) => {
+                const absIdx = i;
+                const y = listY + i * 20; // 20px spacing
+                const isSel = (absIdx === this.loadCur);
+                const color = isSel ? '#fc0' : '#ccc';
+                const prefix = isSel ? '▶ ' : '  ';
+
+                let text = `Slot ${absIdx + 1}: ----`;
+                if (slot.exists) {
+                    text = `Slot ${absIdx + 1}: ${slot.name} (W:${slot.week})`;
+                }
+
+                Draw.text(ctx, prefix + text, 40, y, color, 12);
+            });
+        }
     }
 }
