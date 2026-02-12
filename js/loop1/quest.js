@@ -1,7 +1,7 @@
 // ===========================================
 // クエストフラグ
 // ===========================================
-const QuestFlags = {
+export const QuestSystem = {
     // 旧フラグ（互換性維持）
     hasSword: false,
     gateOpen: false,
@@ -16,16 +16,16 @@ const QuestFlags = {
     phantomTruthRevealed: false,
 
     // ===== 新ストーリー進行フラグ =====
-    // 嘘ボス撃破状況
-    fakeBosses: { east: false, west: false, north: false, south: false },
+    // ボス撃破状況
+    bosses: { east: false, west: false, north: false, south: false },
 
     // 西ダンジョンスイッチ
     westSwitches: { stage1: false, stage2: false },
 
-    // 持続的なドアの状態 (South keys etc)
+    // 持続的なドアの状態
     doors: {},
 
-    // 北エリア中ボス (reset when returning to village)
+    // 北エリア中ボス
     northMinibosses: { stage1: false, stage2: false, stage3: false },
 
     resetNorthMinibosses() {
@@ -34,44 +34,30 @@ const QuestFlags = {
         this.northMinibosses.stage3 = false;
     },
 
-
-    // 嘘魔王と対面したか
-    metFakeDemonKing: false,
-
-    // 真ボス撃破状況
-    trueBosses: { east: false, west: false, north: false, south: false },
-
-    // 真魔王に挑戦可能か
-    canFaceTrueDemonKing: false,
-
-    // 全嘘ボス撃破済みか
-    allFakeBossesDefeated() {
-        return this.fakeBosses.east && this.fakeBosses.west &&
-            this.fakeBosses.north && this.fakeBosses.south;
+    // 全ボス撃破済みか
+    allBossesDefeated() {
+        return this.bosses.east && this.bosses.west &&
+            this.bosses.north && this.bosses.south;
     },
 
-    // 全真ボス撃破済みか
-    allTrueBossesDefeated() {
-        return this.trueBosses.east && this.trueBosses.west &&
-            this.trueBosses.north && this.trueBosses.south;
-    },
-
-    // 撃破済みの Loop 1 ボス数（嘘ボス）
+    // 撃破済みの Loop 1 ボス数
     countDefeatedBosses() {
-        return Object.values(this.fakeBosses).filter(b => b).length;
+        return Object.values(this.bosses).filter(b => b).length;
+    },
+
+    player: null,
+    init(player) {
+        this.player = player;
     },
 
     check() {
-        this.gateOpen = this.hasSword || PlayerStats.level >= 3;
-        this.westGateOpen = this.hasAmulet || PlayerStats.level >= 6;
-
-        // 真魔王挑戦条件チェック
-        if (this.allTrueBossesDefeated()) {
-            this.canFaceTrueDemonKing = true;
-        }
+        // Safe check if player is not initialized yet
+        const level = this.player ? this.player.level : 1;
+        this.gateOpen = this.hasSword || level >= 3;
+        this.westGateOpen = this.hasAmulet || level >= 6;
     },
 
-    // 2週目開始時のリセット
+    // 初期化
     reset() {
         this.hasSword = false;
         this.gateOpen = false;
@@ -84,12 +70,11 @@ const QuestFlags = {
         this.northGateOpen = false;
         this.southGateOpen = false;
         this.phantomTruthRevealed = false;
-        this.fakeBosses = { east: false, west: false, north: false, south: false };
+        this.bosses = { east: false, west: false, north: false, south: false };
         this.westSwitches = { stage1: false, stage2: false };
         this.doors = {};
-        this.metFakeDemonKing = true; // 2週目開始時は嘘魔王遭遇済み
-        this.trueBosses = { east: false, west: false, north: false, south: false };
         this.northMinibosses = { stage1: false, stage2: false, stage3: false };
-        this.canFaceTrueDemonKing = false;
     }
 };
+
+export const QuestFlags = QuestSystem;

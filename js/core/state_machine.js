@@ -1,4 +1,4 @@
-class StateMachine {
+export class StateMachine {
     constructor() {
         this.states = {};
         this.currentState = null;

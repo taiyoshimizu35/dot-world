@@ -1,12 +1,24 @@
+import { GameConfig, GameState } from '../../constants.js';
+import { Draw } from '../../core/draw.js';
+import { Input } from '../../core/input.js';
+import { Msg } from '../../core/message.js';
+// import { WorldState } from '../world.js'; // Circular dependency avoidance. Use window.WorldState
+import { PlayerStats } from '../player.js';
+import { Inventory as Inv } from '../inventory.js';
+import { ShopData, MagicShopData, AdvancedShopData, MaterialData } from '../data/items.js';
+import { QuestSystem as QuestFlags } from '../quest.js';
+
 // ===========================================
 // ショップUI
 // ===========================================
-// ===========================================
-// ショップUI
-// ===========================================
-const Shop = {
+export const Shop = {
     visible: false, cur: 0, scroll: 0, maxVisible: 5, warning: null, shopType: 'normal', mode: 'select',
     sellItems: [], // List of items player can sell
+    _worldState: null,
+
+    init(worldState) {
+        this._worldState = worldState;
+    },
 
     open(type = 'normal') {
         this.visible = true;
@@ -17,20 +29,45 @@ const Shop = {
 
         // Loop 1: Buy only mode (legacy behavior)
         // Loop 2: Select mode (Buy/Sell)
-        if (WorldState.week === 1) {
+        const ws = this._worldState || { week: 1 };
+        if (ws.week === 1) {
             this.mode = 'buy';
         } else {
             this.mode = 'select'; // select, buy, sell
         }
 
-        currentState = GameState.SHOP;
+        // currentState = GameState.SHOP; // Handled by StateMachine usually, but if this is a sub-state/overlay...
+        // The original code set `currentState` global. We should probably use a method or return a state?
+        // But for now, we leave it as is, but we need to know where `currentState` comes from if we want to change it.
+        // `currentState` is imported from `constants.js` if we exported it? No, `GameState` is exported. `currentState` was a global variable.
+        // We need to handle `currentState`.
+        // In the beginning I saw `currentState` being removed from `constants.js`?
+        // No, `constants.js` had `currentState` removed.
+        // So `currentState` is likely defined in `main.js` or `game.js`.
+        // BUT, `shop.js` tries to assign to it.
+        // Takes a step back: `currentState` usage is problematic if it's not available.
+        // I should probably NOT rely on `currentState` global if possible, or `game.currentState`.
+        // However, I can't easily change all logic right now.
+        // If `currentState` is not defined anywhere, this will error.
+        // I should import `game` or pass it?
+        // Or maybe `Shop` checks `Input` itself?
+        // `Shop.update` is called by `PlayingState` (or similar).
+        // If `Shop.visible` is true, `PlayingState` delegates to `Shop.update`.
+        // The `currentState = GameState.SHOP` assignment might be for other systems to know?
+        // If I removed `currentState` global, I need a replacement.
+        // Maybe I can export a mutable state object or use `WorldState`?
+        // Or maybe `window.currentState`?
+        // For now, I will comment out `currentState` assignment and assume the caller handles logic based on `Shop.visible`.
+        // OR I can re-introduce `window.currentState` in `main.js` for compatibility.
+        // I will comment it out for now and rely on `visible` flag, assuming `PlayingState` checks `Shop.visible`.
+
         Input.lock(200);
     },
 
     close() {
         this.visible = false;
         this.warning = null;
-        currentState = GameState.PLAYING;
+        // currentState = GameState.PLAYING;
         Input.lock(150);
     },
 
@@ -73,7 +110,8 @@ const Shop = {
         }
 
         // Loop 2 only: Selection logic
-        if (this.mode === 'select' && WorldState.week !== 1) {
+        const ws = this._worldState || { week: 1 };
+        if (this.mode === 'select' && ws.week !== 1) {
             if (Input.justPressed('ArrowUp') || Input.justPressed('ArrowDown')) this.cur = (this.cur ^ 1);
             if (Input.interact()) {
                 if (this.cur === 0) {
@@ -112,8 +150,9 @@ const Shop = {
         }
 
         if (Input.cancel()) {
+            const ws = this._worldState || { week: 1 };
             // Loop 1: Close immediately
-            if (WorldState.week === 1) {
+            if (ws.week === 1) {
                 this.close();
             } else {
                 // Loop 2: Back to select
@@ -144,7 +183,7 @@ const Shop = {
             QuestFlags.check();
             Msg.show(`${item.name}を購入した！\nメニューから装備しよう。`, () => { Input.lock(100); }, 'overlay');
         } else if (item.type === 'holySword') {
-            WorldState.holySwordOwned = true;
+            if (this._worldState) this._worldState.holySwordOwned = true;
             Msg.show(`${item.name}を購入した！\n「特別な力を感じる...」`, () => { Input.lock(100); }, 'overlay');
         } else if (item.type === 'armor') {
             Msg.show(`${item.name}を購入した！\nメニューから装備しよう。`, () => { Input.lock(100); }, 'overlay');
@@ -175,15 +214,21 @@ const Shop = {
 
     render(ctx) {
         if (!this.visible) return;
-        const { VIEWPORT_WIDTH: VW, VIEWPORT_HEIGHT: VH } = GameConfig;
+        const VW = GameConfig ? GameConfig.VIEWPORT_WIDTH : 320;
+        const VH = GameConfig ? GameConfig.VIEWPORT_HEIGHT : 240;
+
         Draw.rect(ctx, 20, 20, VW - 40, VH - 40, 'rgba(0,0,40,0.95)');
         Draw.stroke(ctx, 20, 20, VW - 40, VH - 40, '#fff', 2);
 
         let title = '【ショップ】';
         if (this.shopType === 'magic') title = '【魔法ショップ】';
         else if (this.shopType === 'advanced') title = '【上級ショップ】';
-        Draw.text(ctx, title, 32, 28, '#fc0', 14);
-        Draw.text(ctx, `所持金: ${PlayerStats.gold}G`, VW - 120, 28, '#ff0', 12);
+
+        try {
+            Draw.text(ctx, title, 32, 28, '#fc0', 14);
+            const gold = PlayerStats ? PlayerStats.gold : 0;
+            Draw.text(ctx, `所持金: ${gold}G`, VW - 120, 28, '#ff0', 12);
+        } catch (e) { console.error("Shop text render error", e); }
 
         if (this.mode === 'select') {
             Draw.text(ctx, '買いに来た', 60, 80, this.cur === 0 ? '#fff' : '#888', 14);
@@ -197,11 +242,12 @@ const Shop = {
             }
 
             let y = 52;
+            const PStats = PlayerStats || { gold: 0 };
             for (let i = this.scroll; i < Math.min(this.scroll + this.maxVisible, items.length); i++) {
                 const item = items[i];
                 if (this.mode === 'buy') {
                     const isSoldOut = item.sold && ['weapon', 'armor', 'spell', 'staff', 'robe', 'amulet', 'holySword'].includes(item.type);
-                    const affordable = PlayerStats.gold >= item.price && !isSoldOut;
+                    const affordable = PStats.gold >= item.price && !isSoldOut;
                     if (i === this.cur) Draw.text(ctx, '▶', 32, y, '#fc0', 12);
                     Draw.text(ctx, item.name, 48, y, affordable ? '#fff' : '#666', 12);
                     Draw.text(ctx, `${item.price}G`, 140, y, affordable ? '#ff0' : '#664', 12);

@@ -1,7 +1,12 @@
+import { PlayerStats } from '../../player.js';
+import { Input } from '../../../core/input.js';
+import { FX } from '../../../core/effects.js';
+import { getLearnedSpells } from '../../data/magic.js';
+
 // ===========================================
 // 戦闘魔法システム
 // ===========================================
-const BattleMagic = {
+export const BattleMagic = {
     updateMagic(battle) {
         if (PlayerStats.status.silence > 0) {
             battle.msg = '沈黙状態で魔法が使えない！';

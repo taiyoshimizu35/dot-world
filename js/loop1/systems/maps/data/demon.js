@@ -1,7 +1,9 @@
+import { MapHelper } from './helper.js';
+
 // ===========================================
 // 魔王城マップデータ
 // ===========================================
-function initDemonCastleMaps(Maps, T) {
+export function initDemonCastleMaps(Maps, T) {
     const { createDungeonTiles } = MapHelper;
 
     // 魔王城 - 入口

@@ -1,7 +1,11 @@
+import { Input } from '../../../core/input.js';
+import { PlayerStats } from '../../player.js';
+import { Inventory as Inv } from '../../inventory.js';
+
 // ===========================================
 // 戦闘アイテムシステム
 // ===========================================
-const BattleItems = {
+export const BattleItems = {
     updateItem(battle) {
         const items = Inv.list();
         if (items.length === 0) {

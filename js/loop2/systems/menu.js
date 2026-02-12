@@ -1,7 +1,16 @@
+import { GameConfig, GameState } from '../../constants.js';
+import { Input } from '../../core/input.js';
+import { Msg } from '../../core/message.js';
+import { Draw } from '../../core/draw.js';
+import { SaveSystem } from '../../core/save_system.js';
+import { PlayerStats2 } from '../player.js';
+import { Party2 } from '../party.js';
+import { WorldState } from '../../loop1/world.js'; // Context
+
 // ===========================================
 // Loop 2 Menu System
 // ===========================================
-const Menu2 = {
+export const Menu2 = {
     visible: false,
     cur: 0,
     sub: null, // 'status', 'companions', 'items'
@@ -19,14 +28,14 @@ const Menu2 = {
         this.subCur = 0;
         this.actionWindow = false;
         this.targetMember = null;
-        currentState = GameState.MENU;
+        if (window.game && window.game.stateMachine) window.game.stateMachine.change('menu'); // currentState = GameState.MENU;
         Input.lock(200);
     },
 
     close() {
         this.visible = false;
         this.sub = null;
-        currentState = GameState.PLAYING;
+        if (window.game && window.game.stateMachine) window.game.stateMachine.change('playing'); // currentState = GameState.PLAYING;
         Input.lock(150);
     },
 
@@ -270,7 +279,10 @@ const Menu2 = {
 // ===========================================
 // Save Menu (For Save Points)
 // ===========================================
-const SaveMenu = {
+// ===========================================
+// Save Menu (For Save Points)
+// ===========================================
+export const SaveMenu = {
     visible: false,
     cur: 0,
     saveList: [],
@@ -280,13 +292,13 @@ const SaveMenu = {
         this.cur = 0;
         this.saveList = SaveSystem.getSaveList();
         Input.lock(200);
-        currentState = GameState.MENU; // Pause game
+        if (window.game && window.game.stateMachine) window.game.stateMachine.change('menu'); // currentState = GameState.MENU;
     },
 
     close() {
         this.visible = false;
         Input.lock(150);
-        currentState = GameState.PLAYING;
+        if (window.game && window.game.stateMachine) window.game.stateMachine.change('playing'); // currentState = GameState.PLAYING;
     },
 
     update() {
@@ -321,9 +333,8 @@ const SaveMenu = {
         Draw.text(ctx, 'セーブする場所を選択', VW / 2, 40, '#fc0', 14, 'center');
 
         const listY = 60;
-        const showCount = 10;
-        let startIdx = 0;
-        // if (this.cur >= showCount) ... (No need if showCount >= total)
+        // const showCount = 10;
+        // let startIdx = 0;
 
         this.saveList.slice(0, 10).forEach((slot, i) => {
             const absIdx = i;
@@ -345,7 +356,7 @@ const SaveMenu = {
 // ===========================================
 // Load Menu
 // ===========================================
-const LoadMenu = {
+export const LoadMenu = {
     visible: false,
     cur: 0,
     saveList: [],
@@ -355,13 +366,13 @@ const LoadMenu = {
         this.cur = 0;
         this.saveList = SaveSystem.getSaveList();
         Input.lock(200);
-        currentState = GameState.MENU;
+        if (WorldState) WorldState.changeState('menu'); // currentState = GameState.MENU;
     },
 
     close() {
         this.visible = false;
         Input.lock(150);
-        currentState = GameState.PLAYING;
+        if (WorldState) WorldState.changeState('playing'); // currentState = GameState.PLAYING;
     },
 
     update() {
@@ -380,8 +391,9 @@ const LoadMenu = {
             if (slot.exists) {
                 if (SaveSystem.load(slot.slot)) {
                     this.close();
-                    currentState = GameState.PLAYING;
-                    FX.fadeIn();
+                    if (WorldState) WorldState.changeState('playing'); // currentState = GameState.PLAYING;
+                    // Reset or logic?
+                    // SaveSystem.load handles restoration
                 } else {
                     Msg.show('ロードに失敗しました。');
                 }
@@ -418,7 +430,3 @@ const LoadMenu = {
         });
     }
 };
-
-window.Menu2 = Menu2;
-window.SaveMenu = SaveMenu;
-window.LoadMenu = LoadMenu;

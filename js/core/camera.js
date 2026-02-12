@@ -1,7 +1,9 @@
 // ===========================================
 // カメラ
 // ===========================================
-const Camera = {
+import { GameConfig } from '../constants.js';
+
+export const Camera = {
     x: 0, y: 0,
 
     update(tx, ty, mw, mh) {

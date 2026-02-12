@@ -1,7 +1,11 @@
+import { PlayerStats } from './player.js';
+import { Inventory as Inv } from './inventory.js'; // Assuming Inventory export
+import { Maps } from './systems/maps/manager.js';
+
 // ===========================================
 // チェックポイント
 // ===========================================
-const Checkpoint = {
+export const Checkpoint = {
     saved: false,
     data: null,
 

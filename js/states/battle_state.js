@@ -1,19 +1,14 @@
-// import { BaseState } from './base_state.js';
+import { BaseState } from './base_state.js';
+import { WorldState } from '../loop1/world.js';
 
-class BattleState extends BaseState {
+export class BattleState extends BaseState {
     update() {
+        // Battle system should be active in WorldState.managers
         const battle = WorldState.managers.battle;
         if (battle) {
             battle.update();
-            // Battle system handles return to PLAYING or GAMEOVER internally usually by setting currentState
-            // We need to detect this.
-            // If WorldState.managers.battle.active is false? 
-            // Or check `currentState` changed?
-
-            if (currentState !== GameState.BATTLE) {
-                if (currentState === GameState.PLAYING) this.game.stateMachine.change('playing');
-                else if (currentState === GameState.GAMEOVER) this.game.stateMachine.change('gameover');
-            }
+            // State transitions are now handled within the Battle system itself
+            // relying on window.game.stateMachine.change()
         }
     }
 

@@ -1,7 +1,9 @@
+import { WorldState } from '../world.js';
+
 // ===========================================
 // 敵データ
 // ===========================================
-const EnemyData = {
+export const Enemies = {
     // ===== 村エリア =====
     slime: { name: 'グリーンスライム', hp: 10, atk: 7, def: 4, exp: 10, gold: 10, img: 'enemy_slime' },
     goblin: { name: 'ゴブリン', hp: 1, atk: 9, def: 1, exp: 10000, gold: 20000, img: 'enemy_goblin' },
@@ -57,7 +59,7 @@ const EnemyData = {
 };
 
 // マップごとの敵リストを取得
-function getEnemiesForMap(mapData, mapId) {
+export function getEnemiesForMap(mapData, mapId) {
     let enemies = [];
 
     // 1/20 Chance (5%) to encounter a Fairy
@@ -65,7 +67,27 @@ function getEnemiesForMap(mapData, mapId) {
         return Math.random() < 0.5 ? ['exp_fairy'] : ['gold_fairy'];
     }
 
-    if (gameLoop.week === 1) {
+    if (WorldState.week === 1) { // window.gameLoop might be WorldState.week?
+        // WorldState should be used but checking if gameLoop is global or need replacement?
+        // WorldState is loop1/world.js. I should use WorldState.week if exported.
+        // But this file `enemies.js` is data file. It shouldn't depend on WorldState ideally?
+        // Or it should accept week as argument?
+        // `getEnemiesForMap` calls `gameLoop.week`.
+        // I should probably pass `week` or import `WorldState`.
+        // Importing `WorldState` -> circular dependency not likely for data file?
+        // `world.js` imports `Shop`, `Inn`, `Menu`. Data files are safe.
+        // BUT `getEnemiesForMap` is called by `Battle.start`. `Battle` has access to `WorldState`.
+        // I will import `WorldState` here or use `WorldState` if I can.
+        // Wait, `enemies.js` is in `loop1/data/`. `world.js` is in `loop1/`.
+        // Import: `import { WorldState } from '../world.js';`
+        // But `world.js` might import `enemies.js`? No.
+        // Let's import `WorldState` in `enemies.js` just to be safe or change logic to use parameter.
+        // Changing signature might break other calls? Only `Battle.start` calls it.
+        // I'll stick to `gameLoop` check replacement with `WorldState` if imported.
+        // Actually, `gameLoop` is the global object from `main.js`.
+        // I'll leave `gameLoop` reference for now but maybe I should import `WorldState`.
+        // Let's import `WorldState`.
+
         if (mapData.area === 'east') enemies = ['hobgoblin', 'devilbat', 'poison_slime'];
         else if (mapData.area === 'west') enemies = ['skeleton', 'imp', 'killerbee'];
         else if (mapData.area === 'south') enemies = ['skeleton_knight', 'ghost', 'zombie'];
@@ -88,9 +110,9 @@ function getEnemiesForMap(mapData, mapId) {
 }
 
 // エリアに対応するボスを取得
-function getBossForArea(area, isFake) {
+export function getBossForArea(area, isFake) {
     const prefix = isFake ? 'fake' : 'true';
     const key = `${prefix}_${area}_boss`;
-    return EnemyData[key] || null;
+    return Enemies[key] || null;
 }
 

@@ -3,7 +3,10 @@
 // ===========================================
 // ※ gameLoop, truthFlagsはworld.jsで定義
 
-const PlayerStats = {
+import { ShopData, MagicShopData, AdvancedShopData, MaterialData, MapItems } from './data/items.js';
+import { QuestSystem as QuestFlags } from './quest.js';
+
+export const PlayerStats = {
     name: '勇者',
     level: 1,
     // Base stats (without equipment)
@@ -30,7 +33,10 @@ const PlayerStats = {
         accessory: null
     },
 
-    init() {
+    _worldState: null,
+
+    init(worldState) {
+        this._worldState = worldState;
         this.recalcStats();
     },
 
@@ -192,7 +198,7 @@ const PlayerStats = {
 
     addExp(amount) {
         // 2週目はレベルアップなし
-        if (gameLoop.week === 2) {
+        if (this._worldState && this._worldState.week === 2) {
             this.gold += Math.floor(amount / 10);
             return false;
         }
@@ -235,7 +241,7 @@ const PlayerStats = {
 
         // Holy Sword Growth Rule: +3 ATK per level if possessed
         // Check inventory via WorldState manager (Inv is usually attached there or global Inv object)
-        const inv = WorldState.managers.inventory;
+        const inv = this._worldState ? this._worldState.managers.inventory : null;
         if (inv && (inv.has('聖剣') || this.equipment.weapon === '聖剣')) {
             this.holySwordBonus += 3;
         }
@@ -282,7 +288,7 @@ const PlayerStats = {
 
     // 2週目開始時のリセット
     resetForWeek2() {
-        WorldState.startWeek2(this);
+        if (this._worldState) this._worldState.startWeek2(this);
 
         this.level = 1;
         this.baseMaxHp = 30; this.maxHp = 30; this.hp = 30;
@@ -302,4 +308,4 @@ const PlayerStats = {
         this.magicBoost = 1.0;
     }
 };
-window.PlayerStats = PlayerStats;
+// window.PlayerStats = PlayerStats;

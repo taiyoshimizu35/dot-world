@@ -1,12 +1,15 @@
-const Party2 = {
+import { Msg } from '../core/message.js';
+import { PlayerStats2 } from './player.js';
+import { QuestSystem2 } from './quest.js';
+import { PartyMemberData2 } from './data/companions.js';
+
+export const Party2 = {
     members: [],  // 現在のパーティメンバー
 
     // 仲間追加
     add(memberId) {
         // データ取得
-        // Note: PartyMemberData2 is defined in data/companions.js (which has been reset/deleted).
-        // User must create data/companions.js to use this.
-        const data = window.PartyMemberData2 ? window.PartyMemberData2[memberId] : null;
+        const data = PartyMemberData2[memberId];
         if (!data) return false;
 
         // すでに仲間にいる

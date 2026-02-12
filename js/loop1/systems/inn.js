@@ -1,7 +1,13 @@
+import { GameConfig } from '../../constants.js';
+import { Draw } from '../../core/draw.js';
+import { Input } from '../../core/input.js';
+import { Msg } from '../../core/message.js';
+import { PlayerStats } from '../player.js';
+
 // ===========================================
 // 教会システム (旧宿屋)
 // ===========================================
-const Inn = {
+export const Inn = {
     visible: false,
     cost: 0,
 
@@ -12,13 +18,13 @@ const Inn = {
         this.visible = true;
         this.cost = cost;
         this.step = 0; // 0: Prompt, 1: Result
-        currentState = GameState.INN;
+        // currentState = GameState.INN;
         Input.lock(200);
     },
 
     close() {
         this.visible = false;
-        currentState = GameState.PLAYING;
+        // currentState = GameState.PLAYING;
         Input.lock(150);
     },
 

@@ -2,7 +2,7 @@
 // 2週目プレイヤー（内部exp成長システム）
 // ===========================================
 
-const PlayerStats2 = {
+export const PlayerStats2 = {
     name: '勇者',
     hp: 30, maxHp: 30,
     mp: 10, maxMp: 10,

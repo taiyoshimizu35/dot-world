@@ -1,7 +1,12 @@
+import { GameConfig } from '../../constants.js';
+import { Input } from '../../core/input.js';
+import { Draw } from '../../core/draw.js';
+import { FX } from '../../core/effects.js';
+
 // ===========================================
 // オープニングムービー（1行ずつ進む版）
 // ===========================================
-const Opening = {
+export const Opening = {
     active: false,
     timer: 0,
     phase: 0, // 0:FadeIn, 1:Wait, 2:FadeOut, 3:Next
@@ -11,12 +16,12 @@ const Opening = {
 
     // ムービーテキスト
     lines: [
-        "目をさまさなくては...",
-        "力を取り戻さくては...",
-        "やつを、魔王を滅ぼさなくては..."
+        "ここはどこだ...",
     ],
 
-    init() {
+    game: null,
+    init(game) {
+        this.game = game;
         this.active = true;
         this.timer = 0;
         this.phase = 0;
@@ -35,10 +40,10 @@ const Opening = {
 
         if (Input.interact() && !this.waitForKey) {
             this.waitForKey = true; // ロックをかける
-            
+
             // 次の行へ強制移行
             this.currentLine++;
-            
+
             if (this.currentLine >= this.lines.length) {
                 this.end(); // 全行終われば終了
             } else {
@@ -62,7 +67,7 @@ const Opening = {
             }
         } else if (this.phase === 1) { // Wait
             this.timer++;
-            if (this.timer > 120) { // 2秒待機
+            if (this.timer > 60) { // 2秒待機
                 this.phase = 2;
             }
         } else if (this.phase === 2) { // Fade Out
@@ -103,7 +108,9 @@ const Opening = {
 
     end() {
         this.active = false;
-        currentState = GameState.PLAYING;
+        if (this.game && this.game.stateMachine) {
+            this.game.stateMachine.change('playing');
+        }
         FX.fadeIn();
     }
 };

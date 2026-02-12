@@ -1,8 +1,14 @@
-// import { BaseState } from './base_state.js';
+import { BaseState } from './base_state.js';
+import { GameConfig, GameState } from '../constants.js';
+import { Input } from '../core/input.js';
+import { Draw } from '../core/draw.js';
+import { FX } from '../core/effects.js';
+import { Camera } from '../core/camera.js';
+import { WorldState } from '../loop1/world.js';
+import { SaveSystem } from '../core/save_system.js';
+import { Maps } from '../loop1/systems/maps/manager.js'; // For window.Maps if needed, or just Maps
 
-// import { BaseState } from './base_state.js';
-
-class TitleState extends BaseState {
+export class TitleState extends BaseState {
     constructor(game) {
         super(game);
         this.options = ['はじめから'];
@@ -45,7 +51,7 @@ class TitleState extends BaseState {
                 const slot = this.saveList[this.loadCur];
                 if (slot.exists) {
                     if (SaveSystem.load(slot.slot)) {
-                        currentState = GameState.PLAYING;
+                        if (window.currentState !== undefined) window.currentState = GameState.PLAYING;
                         this.game.stateMachine.change('playing');
                         FX.fadeIn();
                     } else {
@@ -75,7 +81,7 @@ class TitleState extends BaseState {
                 Input.lock(150);
             } else if (selected === 'DEBUG: Loop 2') {
                 WorldState.reset();
-                if (window.SaveSystem) window.SaveSystem.clear(); // Clear saves for fresh debug start?
+                SaveSystem.clear(); // Clear saves for fresh debug start?
                 // Or maybe keep them? User said "Debug Loop 2" clears.
 
                 const dummyStats = {
@@ -86,17 +92,17 @@ class TitleState extends BaseState {
                 };
                 WorldState.startWeek2(dummyStats);
 
-                if (window.Maps && window.Maps.initWeek2) {
-                    // window.Maps.initWeek2(); 
+                if (Maps.initWeek2) {
+                    Maps.initWeek2();
                 }
 
-                if (window.Maps && window.Maps.data && window.Maps.data.start) {
-                    window.Maps.current = 'start';
+                if (Maps.data && Maps.data.start) {
+                    Maps.current = 'start';
                 } else {
-                    if (window.Maps) window.Maps.current = 'village';
+                    Maps.current = 'village';
                 }
 
-                const m = window.Maps.get();
+                const m = Maps.get();
                 const start = m.start;
                 this.game.player.x = start.x * GameConfig.TILE_SIZE;
                 this.game.player.y = start.y * GameConfig.TILE_SIZE;
@@ -106,13 +112,15 @@ class TitleState extends BaseState {
                 Camera.update(this.game.player.x, this.game.player.y, m.w, m.h);
                 WorldState.resetEncounterSteps(m.encounterRate);
 
-                currentState = GameState.PLAYING;
+                if (window.currentState !== undefined) window.currentState = GameState.PLAYING;
                 this.game.stateMachine.change('playing');
                 FX.fadeIn();
 
             } else {
-                // New Game
-                WorldState.reset();
+                // New Game / Reset
+                // Properly reset WorldState and QuestSystem here
+                if (WorldState.reset) WorldState.reset();
+
                 SaveSystem.clear(); // Clear all saves? Legacy behavior.
                 // Assuming "New Game" in Loop 1 context clears everything.
 

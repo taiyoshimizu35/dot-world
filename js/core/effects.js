@@ -1,15 +1,24 @@
 // ===========================================
 // エフェクト (フェード・フラッシュ・シェイク)
 // ===========================================
-const FX = {
+import { GameConfig, GameState } from '../constants.js';
+import { Draw } from './draw.js';
+import { Input } from './input.js';
+
+export const FX = {
     fadeAlpha: 0, fadeActive: false, fadeDir: 0, fadeCb: null,
     flashAlpha: 0, flashColor: 'white',
     shakeX: 0, shakeY: 0, shakeActive: false,
+    game: null,
+
+    init(game) {
+        this.game = game;
+    },
 
     fadeOut(cb) {
         this.fadeAlpha = 0; this.fadeDir = 1;
         this.fadeActive = true; this.fadeCb = cb;
-        currentState = GameState.FADE;
+        Input.lock(500); // Block input during fade
     },
 
     fadeIn(cb) {
@@ -39,12 +48,12 @@ const FX = {
                 this.fadeAlpha = this.fadeDir > 0 ? 1 : 0;
                 this.fadeActive = false;
                 if (this.fadeCb) this.fadeCb();
-                if (this.fadeDir < 0) {
-                    if (currentState === GameState.FADE) {
-                        currentState = GameState.PLAYING;
-                        Input.lock(100);
-                    }
-                }
+                // if (this.fadeDir < 0) {
+                //    if (currentState === GameState.FADE) {
+                //        currentState = GameState.PLAYING;
+                //        Input.lock(100);
+                //    }
+                // }
             }
         }
         if (this.shakeActive) {

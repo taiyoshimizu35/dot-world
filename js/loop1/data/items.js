@@ -1,7 +1,7 @@
 // ===========================================
 // ショップデータ
 // ===========================================
-const ShopData = {
+export const ShopData = {
     items: [
         { name: '薬草', price: 10, type: 'item', desc: 'HP+15回復', sold: false },
         { name: 'ポーション', price: 30, type: 'item', desc: 'HP+30回復', sold: false },
@@ -28,7 +28,7 @@ const ShopData = {
 // ===========================================
 // マップアイテムデータ（非売品）
 // ===========================================
-const MapItems = {
+export const MapItems = {
     items: [
         { name: 'ドラゴンスレイヤー', price: 0, type: 'weapon', atk: 5, desc: '東の敵に特効', sold: false },
         { name: '炎の盾', price: 0, type: 'armor', def: 5, desc: 'ブレスダメージ半減', sold: false }
@@ -39,7 +39,7 @@ const MapItems = {
 // ===========================================
 // 魔法ショップデータ
 // ===========================================
-const MagicShopData = {
+export const MagicShopData = {
     items: [
         { name: '魔力の小瓶', price: 25, type: 'item', desc: 'MP+10回復', sold: false },
         { name: 'ハイ・エーテル', price: 80, type: 'item', desc: 'MP+30回復', sold: false },
@@ -61,7 +61,7 @@ const MagicShopData = {
 // ===========================================
 // 上級ショップデータ
 // ===========================================
-const AdvancedShopData = {
+export const AdvancedShopData = {
     items: [
         { name: 'エリクサー', price: 100, type: 'item', desc: 'HP+200回復', sold: false },
         { name: '伝説の剣', price: 4000, type: 'weapon', atk: 25, desc: '攻撃力+30', sold: false },
@@ -79,7 +79,7 @@ const AdvancedShopData = {
 // 素材・換金アイテムデータ
 // ===========================================
 // 敵からドロップする非売品（売却専用）
-const MaterialData = {
+export const MaterialData = {
     items: [
         { name: 'スライムの粘液', price: 10, type: 'material', desc: 'スライムの体液' },
         { name: 'ボロボロの布', price: 15, type: 'material', desc: 'ゴブリンの服の切れ端' },
@@ -101,7 +101,7 @@ const MaterialData = {
 // ===========================================
 // アイテム効果定義
 // ===========================================
-const ItemEffects = {
+export const ItemEffects = {
     '薬草': { type: 'heal', amount: 15 },
     'ポーション': { type: 'heal', amount: 30 },
     '上薬草': { type: 'heal', amount: 60 },

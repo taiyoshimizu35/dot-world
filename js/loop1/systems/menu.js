@@ -1,12 +1,26 @@
+import { GameConfig } from '../../constants.js';
+import { Draw } from '../../core/draw.js';
+import { Input } from '../../core/input.js';
+import { FX } from '../../core/effects.js';
+import { PlayerStats } from '../player.js';
+import { Inventory as Inv } from '../inventory.js';
+// import { WorldState } from '../world.js'; // Dependency Injected
+import { Maps } from './maps/manager.js';
+
 // ===========================================
 // メニュー
 // ===========================================
-const Menu = {
+export const Menu = {
     visible: false, cur: 0, sub: null, itemCur: 0,
     categoryCur: 0,
     categories: ['道具', '武器', '防具', '装飾品'],
     message: null,
     opts: ['アイテム', 'ステータス', '閉じる'],
+    _worldState: null,
+
+    init(worldState) {
+        this._worldState = worldState;
+    },
 
     open() {
         this.visible = true;
@@ -15,7 +29,7 @@ const Menu = {
         this.itemCur = 0;
         this.categoryCur = 0;
         this.message = null;
-        currentState = GameState.MENU;
+        // currentState = GameState.MENU;
         Input.lock(200);
     },
 
@@ -23,7 +37,7 @@ const Menu = {
         this.visible = false;
         this.sub = null;
         this.message = null;
-        currentState = GameState.PLAYING;
+        // currentState = GameState.PLAYING;
         Input.lock(150);
     },
 
@@ -214,17 +228,19 @@ const Menu = {
                 PlayerStats.status.defDownVal = 0; Inv.remove('守りの霧'); this.message = '防御力が戻った！';
             } else { this.message = '防御力は下がっていない！'; }
         } else if (itemName === '魔除け薬') {
-            WorldState.useCharm(); Inv.remove('魔除け薬'); this.message = '魔除けの効果が現れた！';
+            if (this._worldState) this._worldState.useCharm();
+            Inv.remove('魔除け薬'); this.message = '魔除けの効果が現れた！';
         } else if (itemName === '天使のはね') {
             Inv.remove('天使のはね');
             this.message = '天使のはねを使った！';
             FX.fadeOut(() => {
                 Maps.current = 'village';
-                if (window.game && window.game.player) {
+                const game = this._worldState ? this._worldState.game : null;
+                if (game && game.player) {
                     const TS = GameConfig.TILE_SIZE;
-                    window.game.player.x = 12 * TS;
-                    window.game.player.y = 11 * TS;
-                    WorldState.resetEncounterSteps(Maps.get().encounterRate);
+                    game.player.x = 12 * TS;
+                    game.player.y = 11 * TS;
+                    if (this._worldState) this._worldState.resetEncounterSteps(Maps.get().encounterRate);
                 }
                 FX.fadeIn();
                 this.close();

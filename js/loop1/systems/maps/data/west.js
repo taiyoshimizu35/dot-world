@@ -1,3 +1,5 @@
+import { MapHelper } from './helper.js';
+
 // ===========================================
 // 西エリアマップデータ
 // ===========================================
@@ -6,7 +8,7 @@
 // 1週目：探索エリア2層 + ボス部屋
 // 1週目：スイッチ攻略型ダンジョン
 // 1週目：探索エリア2層 + ボス部屋
-function initWestWeek1(Maps, T) {
+export function initWestWeek1(Maps, T) {
     const { createDungeonTiles } = MapHelper;
 
     // ヘルパー: パス掘削

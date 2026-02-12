@@ -1,8 +1,23 @@
+import { WorldState } from '../loop1/world.js';
+import { WorldState2 } from '../loop2/world.js';
+import { PlayerStats2 } from '../loop2/player.js';
+import { Party2 } from '../loop2/party.js';
+import { QuestSystem2 } from '../loop2/quest.js';
+import { Battle2 } from '../loop2/systems/battle/core.js';
+import { Maps } from '../loop1/systems/maps/manager.js';
+import { Camera } from './camera.js';
+import { PartyMemberData2 } from '../loop2/data/companions.js';
+
 // ===========================================
 // セーブシステム (Loop 2以降専用・10スロット)
 // ===========================================
-const SaveSystem = {
+export const SaveSystem = {
     KEY_BASE: 'dot_world_save_',
+    game: null,
+
+    init(game) {
+        this.game = game;
+    },
 
     // 特定のスロットにセーブデータがあるか
     hasSave(slot = 0) {
@@ -99,9 +114,9 @@ const SaveSystem = {
             // Map Location
             map: {
                 id: Maps.current,
-                x: window.game.player.x,
-                y: window.game.player.y,
-                dir: window.game.player.dir
+                x: this.game.player.x,
+                y: this.game.player.y,
+                dir: this.game.player.dir
             }
         };
 
@@ -165,7 +180,7 @@ const SaveSystem = {
                     // Re-add using base data to get skills/name etc, then override stats
                     // We bypass add() checks to ensure restoration even if criteria changed?
                     // But we need the base data.
-                    const baseData = window.PartyMemberData2 ? window.PartyMemberData2[savedMember.id] : null;
+                    const baseData = PartyMemberData2[savedMember.id];
                     if (baseData) {
                         Party2.members.push({
                             ...baseData,
@@ -188,15 +203,15 @@ const SaveSystem = {
 
             // Restore Map
             Maps.current = data.map.id;
-            if (window.game) {
-                window.game.player.x = data.map.x;
-                window.game.player.y = data.map.y;
-                window.game.player.dir = data.map.dir;
+            if (this.game) {
+                this.game.player.x = data.map.x;
+                this.game.player.y = data.map.y;
+                this.game.player.dir = data.map.dir;
 
                 // Update Camera
                 const m = Maps.get();
                 if (m) {
-                    Camera.update(window.game.player.x, window.game.player.y, m.w, m.h);
+                    Camera.update(this.game.player.x, this.game.player.y, m.w, m.h);
                 }
             }
 
@@ -225,4 +240,4 @@ const SaveSystem = {
     }
 };
 
-window.SaveSystem = SaveSystem;
+

@@ -1,9 +1,23 @@
+import { GameConfig } from '../../constants.js';
+import { Input } from '../../core/input.js';
+import { Draw } from '../../core/draw.js';
+import { FX } from '../../core/effects.js';
+import { SaveSystem } from '../../core/save_system.js';
+import { WorldState } from '../world.js';
+import { Checkpoint } from '../checkpoint.js';
+
 // ===========================================
 // ゲームオーバーメニュー
 // ===========================================
-const GameOverMenu = {
+export const GameOverMenu = {
+    game: null,
     cur: 0,
     opts: ['▶ 続きからやり直す', '　 はじめからやり直す'],
+
+    init(game) {
+        this.game = game;
+        this.cur = 0;
+    },
 
     update() {
         if (Input.justPressed('ArrowUp') || Input.justPressed('ArrowDown')) {
@@ -15,28 +29,26 @@ const GameOverMenu = {
                 if (WorldState.week === 2) {
                     // Loop 2: Load latest save
                     if (SaveSystem.loadLatest()) {
-                        currentState = GameState.PLAYING;
+                        if (this.game && this.game.stateMachine) this.game.stateMachine.change('playing');
                         FX.fadeIn();
                     } else {
-                        // Creating a notification or just reloading/Title?
-                        // If load fails (no save), maybe go to Title
-                        location.reload();
+                        window.location.reload();
                     }
                 } else {
                     // Loop 1: Checkpoint
                     if (Checkpoint.saved) {
                         FX.fadeOut(() => {
-                            Checkpoint.restore(game.player);
-                            currentState = GameState.PLAYING;
+                            if (this.game && this.game.player) Checkpoint.restore(this.game.player);
+                            if (this.game && this.game.stateMachine) this.game.stateMachine.change('playing');
                             FX.fadeIn();
                         });
                     } else {
-                        location.reload();
+                        window.location.reload();
                     }
                 }
             } else {
                 // Restart (Title)
-                location.reload();
+                window.location.reload();
             }
         }
     },

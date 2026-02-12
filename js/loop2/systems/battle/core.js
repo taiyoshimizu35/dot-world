@@ -1,26 +1,39 @@
+import { GameConfig, GameState } from '../../../constants.js';
+import { Input } from '../../../core/input.js';
+import { FX } from '../../../core/effects.js';
+// import { Maps } from '../maps/loader.js'; // Removed duplicate
+import { Maps } from '../../../loop1/systems/maps/manager.js';
+import { PlayerStats2 } from '../../player.js';
+import { Party2 } from '../../party.js';
+import { BattleRender2 } from './render.js';
+import { EnemyData2, getEnemiesForMap2 } from '../../data/enemies.js';
+import { WorldState2 } from '../../world.js';
+import { WorldState } from '../../../loop1/world.js'; // Context
+// import { Inv } from '../../loop1/systems/inventory.js'; // If Inv is used (line 212)
+
 // ===========================================
 // 2週目バトルコアシステム
 // ===========================================
-const Battle2 = {
+export const Battle2 = {
     active: false, enemy: null, enemyHp: 0, phase: 'command', cur: 0, msg: '', msgTimer: 0,
     commands: ['こうげき', 'スキル', 'アイテム', 'にげる'], itemCur: 0, magicCur: 0,
     isBoss: false, enemyAttackCount: 0, playerRef: null, waitForInput: false, nextPhase: null,
     currentArea: null, isTrueBoss: false, isDemonKing: false,
 
     start(mapId) {
-        if (typeof EnemyData2 === 'undefined') {
-            console.warn('EnemyData2 not found. Battle cannot start.');
-            return;
-        }
+        // EnemyData2 is imported
         const m = Maps.get();
         const enemies = getEnemiesForMap2(m, mapId);
+        if (!enemies || enemies.length === 0) {
+            console.warn('No enemies found for map', mapId);
+            return;
+        }
         const id = enemies[Math.floor(Math.random() * enemies.length)];
         this.enemy = { ...EnemyData2[id], type: id };
         this.startCommon();
     },
 
     startTrueBoss(area) {
-        if (typeof EnemyData2 === 'undefined') return;
         const key = `true_${area}_boss`;
         this.enemy = { ...EnemyData2[key], type: key };
         this.currentArea = area;
@@ -29,7 +42,6 @@ const Battle2 = {
     },
 
     startTrueDemonKing() {
-        if (typeof EnemyData2 === 'undefined') return;
         this.enemy = { ...EnemyData2.true_demon_king, type: 'true_demon_king' };
         this.currentArea = 'demon';
         this.isTrueBoss = true;
@@ -43,7 +55,8 @@ const Battle2 = {
         this.msg = `ボス：${this.enemy.name}が現れた！`;
         this.msgTimer = 0;
         this.isBoss = true; this.enemyAttackCount = 0;
-        this.active = true; currentState = GameState.BATTLE;
+        this.active = true;
+        if (WorldState) WorldState.changeState('battle'); // currentState = GameState.BATTLE;
         this.waitForInput = true;
         FX.flash(200);
         Input.lock(300);
@@ -58,7 +71,8 @@ const Battle2 = {
         this.currentArea = null;
         this.isTrueBoss = false;
         this.isDemonKing = false;
-        this.active = true; currentState = GameState.BATTLE;
+        this.active = true;
+        if (WorldState) WorldState.changeState('battle'); // currentState = GameState.BATTLE;
         this.waitForInput = true;
         FX.flash(100);
         Input.lock(200);
@@ -93,7 +107,7 @@ const Battle2 = {
         } else if (this.phase === 'defeat') {
             if (Input.interact()) {
                 this.active = false;
-                currentState = GameState.GAMEOVER;
+                if (WorldState) WorldState.changeState('gameover'); // currentState = GameState.GAMEOVER;
             }
         }
         this.msgTimer++;
@@ -209,7 +223,8 @@ const Battle2 = {
         if (this.enemy.drop) {
             if (Math.random() < this.enemy.drop.rate) {
                 const itemName = this.enemy.drop.item;
-                if (window.Inv) Inv.add(itemName);
+                // if (window.Inv) Inv.add(itemName); // Inv is Loop 1 Inventory. Loop 2 has no inventory yet?
+                // For now, ignore drops or add to Loop 2 Inventory if exists
                 this.msg += `\n${itemName}を手に入れた！`;
             }
         }
@@ -228,7 +243,7 @@ const Battle2 = {
 
     end() {
         this.active = false;
-        currentState = GameState.PLAYING;
+        if (window.game && window.game.stateMachine) window.game.stateMachine.change('playing'); // currentState = GameState.PLAYING;
         this.phase = 'command';
         this.isDemonKing = false;
         this.isTrueBoss = false;
@@ -237,6 +252,6 @@ const Battle2 = {
     },
 
     render(ctx) {
-        BattleRender.render(ctx, this);
+        BattleRender2.render(ctx, this);
     }
 };

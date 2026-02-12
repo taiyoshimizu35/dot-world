@@ -1,9 +1,18 @@
 // ===========================================
 // メッセージ
 // ===========================================
-const Msg = {
+import { GameConfig, GameState } from '../constants.js';
+import { Draw } from './draw.js';
+import { Input } from './input.js';
+
+export const Msg = {
     visible: false, text: '', disp: '', idx: 0, lt: 0, callback: null,
     choices: null, choiceIdx: 0,
+    game: null,
+
+    init(game) {
+        this.game = game;
+    },
 
     show(t, cb = null, mode = 'normal') {
         this.visible = true;
@@ -14,7 +23,7 @@ const Msg = {
         this.callback = cb;
         this.choices = null; // Reset choices
         if (mode !== 'overlay') {
-            currentState = GameState.DIALOG;
+            if (this.game && this.game.stateMachine) this.game.stateMachine.change('dialog');
         }
     },
 
@@ -38,7 +47,7 @@ const Msg = {
             this.callback = null;
             cb();
         } else if (!this.choices) {
-            currentState = GameState.PLAYING;
+            if (this.game && this.game.stateMachine) this.game.stateMachine.change('playing');
         }
     },
 
@@ -62,7 +71,7 @@ const Msg = {
                 const cb = this.callback;
                 this.visible = false; // Close immediately or let caller handle?
                 this.choices = null;
-                currentState = GameState.PLAYING; // Default reset
+                if (this.game && this.game.stateMachine) this.game.stateMachine.change('playing'); // Default reset
                 Input.lock(150);
                 if (cb) cb(selected);
             }

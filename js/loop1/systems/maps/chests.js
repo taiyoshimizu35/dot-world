@@ -1,7 +1,11 @@
+import { GameConfig } from '../../../constants.js';
+import { Camera } from '../../../core/camera.js';
+import { AssetLoader } from '../../../core/assets.js';
+
 // ===========================================
 // 宝箱
 // ===========================================
-const Chests = {
+export const Chests = {
     list: [],
     opened: new Set(),
 

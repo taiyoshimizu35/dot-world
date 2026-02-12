@@ -1,9 +1,11 @@
+import { MapHelper } from './helper.js';
+
 // ===========================================
 // 北エリアマップデータ
 // ===========================================
 
 // 1週目：ボス直行マップ（4層構造）
-function initNorthWeek1(Maps, T) {
+export function initNorthWeek1(Maps, T) {
     const { createFieldTiles } = MapHelper;
 
     // Helper to create basic 15x15 room

@@ -1,16 +1,16 @@
-// import { BaseState } from './base_state.js';
+import { BaseState } from './base_state.js';
+import { Loop1Ending } from '../loop1/systems/loop1_ending.js';
 
-class Loop1EndingState extends BaseState {
+export class Loop1EndingState extends BaseState {
+    enter() {
+        Loop1Ending.init(this.game);
+    }
+
     update() {
-        if (typeof Loop1Ending !== 'undefined') {
-            Loop1Ending.update();
-            // Check transition?
-        }
+        Loop1Ending.update();
     }
 
     draw(ctx) {
-        if (typeof Loop1Ending !== 'undefined') {
-            Loop1Ending.render(ctx);
-        }
+        Loop1Ending.render(ctx);
     }
 }

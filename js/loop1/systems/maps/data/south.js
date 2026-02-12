@@ -1,9 +1,11 @@
+import { MapHelper } from './helper.js';
+
 // ===========================================
 // 南エリアマップデータ
 // ===========================================
 
 // 1週目：視界制限・鍵探しダンジョン
-function initSouthWeek1(Maps, T) {
+export function initSouthWeek1(Maps, T) {
     const { createDungeonTiles } = MapHelper;
 
     const fillSouthMaze = (tiles, w, h) => {

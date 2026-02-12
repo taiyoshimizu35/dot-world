@@ -1,7 +1,21 @@
+import { GameConfig, GameState } from '../../constants.js';
+import { Draw } from '../../core/draw.js';
+import { Input } from '../../core/input.js';
+import { Msg } from '../../core/message.js';
+import { FX } from '../../core/effects.js';
+import { WorldState } from '../world.js';
+import { PlayerStats } from '../player.js';
+import { ShopData, MagicShopData } from '../data/items.js';
+import { QuestSystem as QuestFlags } from '../quest.js';
+import { Maps } from './maps/manager.js';
+import { Camera } from '../../core/camera.js';
+import { SaveSystem } from '../../core/save_system.js'; // Assuming SaveSystem will be here
+import { Menu2 } from '../../loop2/systems/menu.js';
+
 // ===========================================
 // 1週目エンディングムービー（魔王戦後）
 // ===========================================
-const Loop1Ending = {
+export const Loop1Ending = {
     active: false,
     timer: 0,
     phase: 0, // 0:FadeIn, 1:Wait, 2:FadeOut, 3:Next
@@ -25,7 +39,9 @@ const Loop1Ending = {
         "【第一部 終】"
     ],
 
-    init() {
+    game: null,
+    init(game) {
+        this.game = game;
         this.active = true;
         this.timer = 0;
         this.phase = 0;
@@ -138,9 +154,8 @@ const Loop1Ending = {
 
     startWeek2() {
         // Init Loop 2 Systems (Capture stats before reset)
-        if (typeof WorldState !== 'undefined') {
-            WorldState.startWeek2(PlayerStats);
-        }
+        WorldState.startWeek2(PlayerStats);
+        WorldState.managers.menu = Menu2; // Set Menu2 explicitly to avoid circular dependencies in WorldState
 
         // ステータスリセット (Legacy Loop 1 resets)
         PlayerStats.resetForWeek2();
@@ -149,8 +164,8 @@ const Loop1Ending = {
         QuestFlags.reset();
 
         // 聖剣フラグ処理
-        if (typeof gameLoop !== 'undefined' && gameLoop.holySwordOwned) {
-            gameLoop.holySwordStolen = true;
+        if (WorldState.holySwordOwned) {
+            WorldState.holySwordStolen = true;
         }
 
         // 村に戻る
@@ -163,15 +178,16 @@ const Loop1Ending = {
         }
 
         const start = Maps.get().start;
-        if (window.game) {
-            window.game.player.x = start.x * GameConfig.TILE_SIZE;
-            window.game.player.y = start.y * GameConfig.TILE_SIZE;
-            window.game.player.dir = 0;
-            window.game.player.moving = false;
+        // window.game usage - replace with direct game object if possible, but window.game is common pattern here
+        if (this.game) {
+            this.game.player.x = start.x * GameConfig.TILE_SIZE;
+            this.game.player.y = start.y * GameConfig.TILE_SIZE;
+            this.game.player.dir = 0;
+            this.game.player.moving = false;
 
             // Immediately update camera so we don't show wrong location for 1 frame
             if (Maps.get()) {
-                Camera.update(window.game.player.x, window.game.player.y, Maps.get().w, Maps.get().h);
+                Camera.update(this.game.player.x, this.game.player.y, Maps.get().w, Maps.get().h);
             }
         }
 
@@ -180,7 +196,12 @@ const Loop1Ending = {
         FX.fadeVal = 1;
 
         // 2. Switch State immediately so PlayingState starts drawing the village
-        currentState = GameState.PLAYING;
+        // currentState = GameState.PLAYING;
+        // Should use StateMachine if possible. assuming global StateMachine access or window.game.stateMachine
+        if (this.game && this.game.stateMachine) {
+            this.game.stateMachine.change('playing');
+            if (window.currentState !== undefined) window.currentState = GameState.PLAYING;
+        }
 
         // 3. Start Fade In (Black -> Transparent)
         FX.fadeIn(() => {
@@ -188,6 +209,7 @@ const Loop1Ending = {
             // 2週目開始メッセージ
             Msg.show('……目が覚めた。\n何もかもが…違って見える…\n\n【2週目開始】', () => {
                 // Auto-Save after message closed
+                // Assuming SaveSystem is imported
                 if (typeof SaveSystem !== 'undefined') {
                     SaveSystem.save();
                     Msg.show('セーブしました。');

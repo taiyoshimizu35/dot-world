@@ -1,4 +1,10 @@
-class MapRenderer {
+import { GameConfig } from '../constants.js';
+import { Draw } from '../core/draw.js';
+import { AssetLoader } from '../core/assets.js';
+import { Maps } from '../loop1/systems/maps/manager.js';
+import { Chests } from '../loop1/systems/maps/chests.js';
+
+export class MapRenderer {
     constructor() {
     }
 
@@ -18,24 +24,25 @@ class MapRenderer {
             for (let x = startCol; x <= endCol; x++) {
                 if (y >= 0 && y < map.h && x >= 0 && x < map.w) {
                     const t = map.tiles[y][x];
+                    const T = GameConfig.TILE_TYPES;
                     let imgName = 'grass';
-                    if (t === 1) imgName = 'rock';
-                    else if (t === 2) imgName = 'path';
-                    else if (t === 3) imgName = 'water';
-                    else if (t === 4) imgName = 'house';
-                    else if (t === 5) imgName = 'door';
-                    else if (t === 6) imgName = 'floor';
-                    else if (t === 7) imgName = 'desk';
-                    else if (t === 8) imgName = 'bed';
-                    else if (t === 9) imgName = 'path';
-                    else if (t === 10) imgName = 'counter';
-                    else if (t === 11) imgName = 'tree';
-                    else if (t === 12) imgName = 'stairs';
-                    else if (t === 13) imgName = 'stone_switch';
-                    else if (t === 14) imgName = 'stone';
-                    else if (t === 15) imgName = 'statue';
-                    else if (t === 16) imgName = 'gray_grass';
-                    else if (t === 17) imgName = 'gray_door';
+                    if (t === T.ROCK) imgName = 'rock';
+                    else if (t === T.PATH) imgName = 'path';
+                    else if (t === T.WATER) imgName = 'water';
+                    else if (t === T.HOUSE) imgName = 'house';
+                    else if (t === T.DOOR) imgName = 'door';
+                    else if (t === T.FLOOR) imgName = 'floor';
+                    else if (t === T.DESK) imgName = 'desk';
+                    else if (t === T.BED) imgName = 'bed';
+                    else if (t === T.CHEST_BG) imgName = 'path'; // 9 was path
+                    else if (t === T.COUNTER) imgName = 'counter';
+                    else if (t === T.TREE) imgName = 'tree';
+                    else if (t === T.STAIRS) imgName = 'stairs';
+                    else if (t === T.SWITCH) imgName = 'stone_switch';
+                    else if (t === T.STONE) imgName = 'stone';
+                    else if (t === T.STATUE) imgName = 'statue';
+                    else if (t === T.GRAY_GRASS) imgName = 'gray_grass';
+                    else if (t === T.GRAY_DOOR) imgName = 'gray_door';
 
                     const sp = camera.toScreen(x * TS, y * TS);
                     const img = AssetLoader.get(imgName);

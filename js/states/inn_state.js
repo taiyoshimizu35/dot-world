@@ -1,6 +1,7 @@
-// import { BaseState } from './base_state.js';
+import { BaseState } from './base_state.js';
+import { WorldState } from '../loop1/world.js';
 
-class InnState extends BaseState {
+export class InnState extends BaseState {
     update() {
         const inn = WorldState.managers.inn;
         if (!inn) {

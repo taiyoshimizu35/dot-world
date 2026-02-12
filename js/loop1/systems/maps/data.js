@@ -1,7 +1,15 @@
+import { GameConfig } from '../../../constants.js';
+import { initVillageMap, initShopMaps } from './data/village.js';
+import { initEastWeek1 } from './data/east.js';
+import { initWestWeek1 } from './data/west.js';
+import { initNorthWeek1 } from './data/north.js';
+import { initSouthWeek1 } from './data/south.js';
+import { initDemonCastleMaps } from './data/demon.js';
+
 // ===========================================
 // マップデータローダー
 // ===========================================
-function initMapData(Maps) {
+export function initMapData(Maps) {
     const T = GameConfig.TILE_TYPES;
 
     // 各エリアを初期化

@@ -1,8 +1,11 @@
-// import { BaseState } from './base_state.js';
+import { BaseState } from './base_state.js';
+import { Input } from '../core/input.js';
+import { Draw } from '../core/draw.js';
+import { GameConfig } from '../constants.js';
 
-class EndingState extends BaseState {
+export class EndingState extends BaseState {
     update() {
-        if (Input.interact()) location.reload();
+        if (Input.interact()) window.location.reload();
     }
 
     draw(ctx) {

@@ -1,7 +1,7 @@
 // ===========================================
 // 描画ユーティリティ
 // ===========================================
-const Draw = {
+export const Draw = {
     text(ctx, t, x, y, c = '#fff', s = 12, align = 'left') {
         ctx.fillStyle = c; ctx.font = `${s}px monospace`; ctx.textBaseline = 'middle'; ctx.textAlign = align;
         ctx.fillText(t, Math.floor(x), Math.floor(y));

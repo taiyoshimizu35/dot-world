@@ -1,4 +1,4 @@
-class BaseState {
+export class BaseState {
     constructor(game) {
         this.game = game;
     }

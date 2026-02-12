@@ -2,13 +2,16 @@
 // 2週目クエストシステム（討伐クエスト）
 // ===========================================
 
+import { PlayerStats2 } from './player.js';
+import { Msg } from '../core/message.js';
+
 const QuestData2 = {
     // クエストデータをここに記述
     // example:
     // slime_hunt: { id: 'slime_hunt', name: 'スライム退治', ... }
 };
 
-const QuestSystem2 = {
+export const QuestSystem2 = {
     // 討伐カウント
     killCount: {
         slime: 0,

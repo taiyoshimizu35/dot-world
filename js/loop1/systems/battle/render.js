@@ -1,7 +1,15 @@
+import { GameConfig } from '../../../constants.js';
+import { Draw } from '../../../core/draw.js';
+import { FX } from '../../../core/effects.js';
+import { AssetLoader } from '../../../core/assets.js';
+import { PlayerStats } from '../../player.js';
+import { Inventory as Inv } from '../../inventory.js';
+import { getLearnedSpells } from '../../data/magic.js';
+
 // ===========================================
 // 戦闘描画
 // ===========================================
-const BattleRender = {
+export const BattleRender = {
     render(ctx, battle) {
         if (!battle.active) return;
         const { VIEWPORT_WIDTH: VW, VIEWPORT_HEIGHT: VH } = GameConfig;

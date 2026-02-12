@@ -1,7 +1,7 @@
 // ===========================================
 // アセットローダー
 // ===========================================
-const AssetLoader = {
+export const AssetLoader = {
     images: {},
 
     async loadImage(n, s) {
@@ -38,7 +38,6 @@ const AssetLoader = {
             ['chest_closed', 'assets/objects/chest_closed.png'],
             ['chest_open', 'assets/objects/chest_open.png'],
             ['counter', 'assets/objects/counter.png'],
-            ['counter', 'assets/objects/counter.png'],
             ['shop_sign', 'assets/objects/shop_sign.png'],
             ['stairs', 'assets/objects/stairs.png'],
             ['stone_switch', 'assets/objects/stone_switch.png'],
@@ -68,8 +67,8 @@ const AssetLoader = {
             ['ice_golem_map', 'assets/enemies/enemy_ice_golem.png'],
             ['phantom_knight_map', 'assets/enemies/enemy_phantom_knight.png'],
             ['dragon_map', 'assets/enemies/enemy_dragon_map.png'],
-            ['great_mage_map', 'assets/enemies/enemy_great_mage_map.png'],
-            ['enemy_great_mage_map', 'assets/enemies/enemy_great_mage_map.png'],
+            ['great_mage_map', 'assets/enemies/enemy_mage.png'],
+            ['enemy_great_mage_map', 'assets/enemies/enemy_mage.png'],
         ];
         await Promise.all(assets.map(([n, s]) => this.loadImage(n, s)));
         console.log('Assets loaded');

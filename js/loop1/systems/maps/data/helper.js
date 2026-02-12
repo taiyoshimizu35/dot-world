@@ -1,7 +1,7 @@
 // ===========================================
 // マップヘルパー関数
 // ===========================================
-const MapHelper = {
+export const MapHelper = {
     // 標準サイズ
     S: 15,  // 縦
     M: 7,   // 中心Y
@@ -32,4 +32,3 @@ const MapHelper = {
         return tiles;
     }
 };
-window.MapHelper = MapHelper;

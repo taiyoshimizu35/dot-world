@@ -1,6 +1,9 @@
-// import { BaseState } from './base_state.js';
+import { BaseState } from './base_state.js';
+import { WorldState } from '../loop1/world.js';
+import { Msg } from '../core/message.js';
+import { Input } from '../core/input.js';
 
-class ShopState extends BaseState {
+export class ShopState extends BaseState {
     update() {
         if (Msg.visible) {
             Msg.update();
@@ -28,6 +31,5 @@ class ShopState extends BaseState {
         }
         const shop = WorldState.managers.shop;
         if (shop) shop.render(ctx);
-        // Msg.render(ctx); // Handled globally in main.js to sort with FX
     }
 }

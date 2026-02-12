@@ -1,7 +1,13 @@
+import { GameConfig } from '../../../constants.js';
+import { WorldState } from '../../world.js';
+import { QuestSystem as QuestFlags } from '../../quest.js';
+import { Msg } from '../../../core/message.js';
+import { initMapData } from './data.js';
+
 // ===========================================
 // マップマネージャー
 // ===========================================
-const Maps = {
+export const Maps = {
     data: {},
     current: 'village',
 
@@ -13,6 +19,10 @@ const Maps = {
     get() { return this.data[this.current]; },
 
     getTile(x, y) {
+        if (Number.isNaN(x) || Number.isNaN(y)) {
+            console.error("Maps.getTile received NaN:", x, y);
+            return GameConfig.TILE_TYPES ? GameConfig.TILE_TYPES.HOUSE : 2;
+        }
         const m = this.get();
         if (x < 0 || x >= m.w || y < 0 || y >= m.h) return GameConfig.TILE_TYPES.HOUSE;
         return m.tiles[y][x];
@@ -31,8 +41,9 @@ const Maps = {
             if (!npc.blocking) continue;
 
             // 週限定NPCのチェック
-            if (npc.week1Only && gameLoop.week !== 1) continue;
-            if (npc.week2Only && gameLoop.week !== 2) continue;
+            // WorldState use
+            if (npc.week1Only && WorldState.week !== 1) continue;
+            if (npc.week2Only && WorldState.week !== 2) continue;
 
             // 仲間加入NPCのチェック
             if (npc.partyJoin) {
@@ -49,8 +60,7 @@ const Maps = {
 
             // エリアボスのチェック
             if (npc.areaBoss) {
-                if (!npc.trueAreaBoss && QuestFlags.fakeBosses[npc.areaBoss]) continue;
-                if (npc.trueAreaBoss && QuestFlags.trueBosses[npc.areaBoss]) continue;
+                if (QuestFlags.bosses[npc.areaBoss]) continue;
                 return true;
             }
 
@@ -74,8 +84,8 @@ const Maps = {
         const npcs = this.get().npcs || [];
         return npcs.filter(npc => {
             // 週限定NPCのチェック
-            if (npc.week1Only && gameLoop.week !== 1) return false;
-            if (npc.week2Only && gameLoop.week !== 2) return false;
+            if (npc.week1Only && WorldState.week !== 1) return false;
+            if (npc.week2Only && WorldState.week !== 2) return false;
 
             // 仲間加入NPCのチェック
             if (npc.partyJoin) {
@@ -90,8 +100,9 @@ const Maps = {
 
             // エリアボスのチェック
             if (npc.areaBoss) {
-                if (!npc.trueAreaBoss && QuestFlags.fakeBosses[npc.areaBoss]) return false;
-                if (npc.trueAreaBoss && QuestFlags.trueBosses[npc.areaBoss]) return false;
+                if (QuestFlags.bosses[npc.areaBoss]) {
+                    return false;
+                }
             }
 
             // 北エリア中ボス (defeated -> hidden)
@@ -118,14 +129,19 @@ const Maps = {
         for (const w of this.get().warps) {
             if (w.x === tx && w.y === ty) {
                 // MAP_DECEPTION: 週ごとのワープ制限
-                if (w.week1Only && gameLoop.week !== 1) continue;
-                if (w.week2Only && gameLoop.week !== 2) continue;
+                if (w.week1Only && WorldState.week !== 1) continue;
+                if (w.week2Only && WorldState.week !== 2) continue;
 
+                // Initialize boss flags if needed (usually handled in QuestSystem)
+                // Check dynamic updates
+                if (QuestFlags.bosses.east) {
+                    // Example dynamic map change if any
+                }
                 // Key Requirement Check (Moved to PlayerController)
                 // if (w.requiresKey) { ... }
 
                 // ボス撃破条件チェック
-                if (w.requiresBoss && !QuestFlags.trueBosses[w.requiresBoss]) {
+                if (w.requiresBoss && !QuestFlags.bosses[w.requiresBoss]) {
                     Msg.show(`この先に進むには${w.requiresBoss}エリアのボスを\n倒す必要がある。`);
                     return null;
                 }
@@ -142,11 +158,11 @@ const Maps = {
                 }
 
                 // 奥エリアへのアクセス制限チェック
-                if (w.requiresDeepAccess && !QuestFlags.metFakeDemonKing) {
+                if (w.requiresDeepAccess && !QuestFlags.allBossesDefeated()) {
                     return null;
                 }
                 // 魔王城へのアクセス制限チェック
-                if (w.requiresDemonCastle && !QuestFlags.allFakeBossesDefeated()) {
+                if (w.requiresDemonCastle && !QuestFlags.allBossesDefeated()) {
                     return null;
                 }
                 return w;
@@ -155,14 +171,14 @@ const Maps = {
         return null;
     },
 
-    // 魔王城へワープ（全嘘ボス撃破後に使用）
+    // 魔王城へワープ
     canAccessDemonCastle() {
-        return QuestFlags.allFakeBossesDefeated();
+        return QuestFlags.allBossesDefeated();
     },
 
+    /*
     canFaceTrueDemonKing() {
         return QuestFlags.canFaceTrueDemonKing;
     }
+    */
 };
-
-window.Maps = Maps;

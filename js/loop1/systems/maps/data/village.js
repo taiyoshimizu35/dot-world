@@ -1,7 +1,9 @@
+import { MapHelper } from './helper.js';
+
 // ===========================================
 // 村マップデータ
 // ===========================================
-function initVillageMap(Maps, T) {
+export function initVillageMap(Maps, T) {
     const { S, M, createFieldTiles } = MapHelper;
     const vw = 25, vh = 19;
 
@@ -70,7 +72,7 @@ function initVillageMap(Maps, T) {
 }
 
 // ショップマップ
-function initShopMaps(Maps, T) {
+export function initShopMaps(Maps, T) {
     // 魔法ショップ
     const hw = 9, hh = 8, ht = [];
     for (let y = 0; y < hh; y++) {

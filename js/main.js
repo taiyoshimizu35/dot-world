@@ -1,9 +1,28 @@
-// Imports removed for global script compatibility
-// State classes are now loaded via index.html globals
+import { GameConfig, GameState } from './constants.js';
+import { AssetLoader } from './core/assets.js';
+import { Input } from './core/input.js';
+import { StateMachine } from './core/state_machine.js';
+import { FX } from './core/effects.js';
+import { Msg } from './core/message.js';
+import { WorldState } from './loop1/world.js';
+import { Maps } from './loop1/systems/maps/manager.js';
+import { Chests } from './loop1/systems/maps/chests.js';
+// SaveSystem import moved to bottom or needed here? 
+// It's used at bottom. ES modules hoist imports, so top is better.
+import { SaveSystem } from './core/save_system.js';
 
-// ===========================================
-// メインゲームクラス
-// ===========================================
+// States
+import { TitleState } from './states/title_state.js';
+import { PlayingState } from './states/playing_state.js';
+import { MenuState } from './states/menu_state.js';
+import { DialogState } from './states/dialog_state.js';
+import { BattleState } from './states/battle_state.js';
+import { ShopState } from './states/shop_state.js';
+import { InnState } from './states/inn_state.js';
+import { GameOverState } from './states/gameover_state.js';
+import { OpeningState } from './states/opening_state.js';
+import { EndingState } from './states/ending_state.js';
+import { Loop1EndingState } from './states/loop1_ending_state.js';
 
 class Game {
     constructor() {
@@ -70,7 +89,15 @@ class Game {
     }
 
     async init() {
-        await AssetLoader.loadAll();
+        console.log("Game Init Started");
+        try {
+            console.log("Loading Assets...");
+            await AssetLoader.loadAll();
+            console.log("Assets Loaded");
+        } catch (e) {
+            console.error("Asset Load Failed", e);
+        }
+
         Input.init();
         Maps.init();
         Chests.init();
@@ -79,13 +106,20 @@ class Game {
         if (!WorldState.managers.player) WorldState.reset();
 
         const start = Maps.get().start;
+        console.log("Start Log:", start, "TileSize:", GameConfig.TILE_SIZE);
+        if (!start) console.error("Start position missing!");
+
         this.player.x = start.x * GameConfig.TILE_SIZE;
         this.player.y = start.y * GameConfig.TILE_SIZE;
+        console.log("Player Initialized at:", this.player);
+
         this.player.dir = 0;
 
         // ウィンドウリサイズ時の処理
         window.addEventListener('resize', () => this.resize());
 
+        console.log("Starting Loop");
+        // Start Loop
         requestAnimationFrame(t => this.loop(t));
     }
 
@@ -95,15 +129,9 @@ class Game {
 
         this.update();
         this.draw();
-
-        FX.update();
     }
 
     update() {
-        // Global Systems checks (can be moved to states later)
-        // Check for Global State changes triggered by non-state systems
-        this.checkGlobalStateTransitions();
-
         this.stateMachine.update();
         FX.update();
     }
@@ -113,63 +141,13 @@ class Game {
         FX.render(this.ctx); // FX overlay
         Msg.render(this.ctx); // Global Msg overlay (must be on top of FX)
     }
-
-    checkGlobalStateTransitions() {
-        // Compatibility: Check if `currentState` changed externally (e.g. by legacy systems)
-        // and sync StateMachine. 
-        // NOTE: This is a temporary bridge. ideally systems should call game.stateMachine.change
-
-        // Map legacy GameStates to StateMachine keys
-        const map = {
-            [GameState.TITLE]: 'title',
-            [GameState.PLAYING]: 'playing',
-            [GameState.MENU]: 'menu',
-            [GameState.DIALOG]: 'dialog',
-            [GameState.BATTLE]: 'battle',
-            [GameState.SHOP]: 'shop',
-            [GameState.INN]: 'inn',
-            [GameState.GAMEOVER]: 'gameover',
-            [GameState.OPENING]: 'opening',
-            [GameState.ENDING]: 'ending',
-            [GameState.LOOP1_ENDING]: 'loop1_ending'
-        };
-
-        const targetState = map[currentState];
-        if (targetState && targetState !== this.stateMachine.currentName) {
-            // External change detected (e.g. from Msg.show, Menu.open)
-            console.log(`Syncing state: ${this.stateMachine.currentName} -> ${targetState}`);
-            // We use 'change' but we might need to be careful if 'enter' logic repeats?
-            // Most 'enter' logic is safe or empty.
-            this.stateMachine.change(targetState);
-        }
-
-        // If we want to support legacy systems setting `currentState`, 
-        // we need to detect mismatch.
-        // But `this.stateMachine.currentState` is an object.
-        // We can't easily check 'name' unless we store it.
-        // However, we can trust the StateMachine if we assume we are migrating fully.
-
-        // For now, let's reverse it: allow StateMachine to be the source of truth,
-        // and if legacy systems rely on `currentState` variable, keep it updated?
-        // OR, if legacy systems SET `currentState`, we must detect it.
-
-        // Let's rely on the wrapper states (MenuState etc) checking the systems.
-        // e.g. MenuState checks if Menu.visible is false.
-
-        // One critical thing: Msg.show() sets currentState = DIALOG?
-        // Let's check Msg.show()
-    }
 }
 
 const game = new Game();
-window.game = game;
+// window.game = game; // REFACTORED: Removed global access
+WorldState.registerGame(game);
+Msg.init(game);
+FX.init(game);
+SaveSystem.init(game);
+
 window.onload = () => game.init();
-
-// Bridging: We might need to listen to global `currentState` changes if we can't refactor everything.
-// But we can try to intercept Msg.show or similar.
-// For now, let's inject a listener or poll.
-// But since we want "Optimization", polling is bad.
-// Ideally, we modify Msg.show to call game.stateMachine.change via a global helper?
-
-// Let's monkey-patch Msg.show if necessary, or just rely on PlayingState to check Msg.
-// In PlayingState, we can check logic.

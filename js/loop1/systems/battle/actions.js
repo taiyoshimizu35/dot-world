@@ -1,7 +1,13 @@
+import { WorldState } from '../../world.js';
+import { PlayerStats } from '../../player.js';
+import { FX } from '../../../core/effects.js';
+import { Maps } from '../maps/manager.js';
+import { QuestSystem as QuestFlags } from '../../quest.js';
+
 // ===========================================
 // 戦闘アクション
 // ===========================================
-const BattleActions = {
+export const BattleActions = {
     doPlayerAtk(battle) {
         // 1週目の魔王戦のみ発生する自傷ギミック
         if (WorldState.week === 1 && battle.isDemonKing) {
@@ -53,10 +59,10 @@ const BattleActions = {
         }
         // ブレス攻撃（古代のドラゴン等）
         else if (battle.enemy.useBreath && Math.random() < 0.15) {
-            if (battle.enemy.name === '古代のドラゴン'){
+            if (battle.enemy.name === '古代のドラゴン') {
                 dmg = 20;
             }
-            if (battle.enemy.name === 'クリスタル・ゴーレム'){
+            if (battle.enemy.name === 'クリスタル・ゴーレム') {
                 dmg = 30;
             }
             // Apply MDEF reduction to Breath (Magic Resistance)

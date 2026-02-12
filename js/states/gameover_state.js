@@ -1,17 +1,16 @@
-// import { BaseState } from './base_state.js';
+import { BaseState } from './base_state.js';
+import { GameOverMenu } from '../loop1/systems/gameover.js';
 
-class GameOverState extends BaseState {
+export class GameOverState extends BaseState {
+    enter() {
+        GameOverMenu.init(this.game);
+    }
+
     update() {
-        if (typeof GameOverMenu !== 'undefined') {
-            GameOverMenu.update(); // Assumes GameOverMenu is global
-            // Need to handle restart or transition?
-            // GameOverMenu usually reloads page or resets state.
-        }
+        GameOverMenu.update();
     }
 
     draw(ctx) {
-        if (typeof GameOverMenu !== 'undefined') {
-            GameOverMenu.render(ctx);
-        }
+        GameOverMenu.render(ctx);
     }
 }

@@ -1,10 +1,12 @@
+import { MapHelper } from './helper.js';
+
 // ===========================================
 // 東エリアマップデータ
 // ===========================================
 
 // 1週目：ボス直行マップ
 // 1週目：探索エリア1層 + ボス部屋
-function initEastWeek1(Maps, T) {
+export function initEastWeek1(Maps, T) {
     const { createDungeonTiles } = MapHelper;
 
     // ステージ1 (41x41)
@@ -28,6 +30,7 @@ function initEastWeek1(Maps, T) {
     // This means chests are likely in a separate file or I missed it.
     // Re-reading `east.js` showed NO `chests` property.
     // Checking `chests.js` is necessary.
+    // (Chests are defined in Chests.js, verified)
 
     for (let y = 0; y < 41; y++) {
         for (let x = 0; x < 41; x++) {
@@ -58,13 +61,6 @@ function initEastWeek1(Maps, T) {
     e1t[20][40] = T.PATH; // End point
 
     // 宝箱への小道（行き止まり）
-    // 右下 (38, 38)
-    //for (let y = 20; y <= 38; y++) e1t[y][30] = T.PATH; // 既存のパスから分岐
-    //for (let x = 30; x <= 38; x++) e1t[38][x] = T.PATH;
-    //
-    //// 右上 (38, 2)
-    //for (let y = 20; y >= 2; y--) e1t[y][30] = T.PATH; // 既存のパスから分岐
-    //for (let x = 30; x <= 38; x++) e1t[2][x] = T.PATH;
 
     e1t[20][39] = T.EXIT;
 

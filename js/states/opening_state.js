@@ -1,25 +1,17 @@
-// import { BaseState } from './base_state.js';
+import { BaseState } from './base_state.js';
+import { Opening } from '../loop1/systems/opening.js';
 
-class OpeningState extends BaseState {
+export class OpeningState extends BaseState {
     enter() {
-        if (typeof Opening !== 'undefined') Opening.init();
+        Opening.init(this.game);
     }
 
     update() {
-        if (typeof Opening !== 'undefined') {
-            Opening.update();
-            // Opening transitions to PLAYING usually.
-            // We need to know when it finishes.
-            // Opening.js might set currentState?
-            if (currentState === GameState.PLAYING) {
-                this.game.stateMachine.change('playing');
-            }
-        }
+        Opening.update();
+        // State transition handled in Opening.js
     }
 
     draw(ctx) {
-        if (typeof Opening !== 'undefined') {
-            Opening.render(ctx);
-        }
+        Opening.render(ctx);
     }
 }

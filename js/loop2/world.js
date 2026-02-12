@@ -2,7 +2,11 @@
 // 2週目ワールド状態
 // ===========================================
 
-const WorldState2 = {
+import { PlayerStats2 } from './player.js';
+import { Party2 } from './party.js';
+import { QuestSystem2 } from './quest.js';
+
+export const WorldState2 = {
     // 真ボス撃破状況
     trueBosses: { east: false, west: false, north: false, south: false },
 
