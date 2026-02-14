@@ -53,7 +53,9 @@ export const AssetLoader = {
             ['shop_sign', 'assets/objects/shop_sign.png'],
             ['stairs', 'assets/objects/stairs.png'],
             ['stone_switch', 'assets/objects/stone_switch.png'],
+            ['stone_switch', 'assets/objects/stone_switch.png'],
             ['statue', 'assets/objects/statue.png'],
+            ['goddes', 'assets/objects/goddes.png'],
             // 敵キャラクター
             ['enemy_slime', 'assets/enemies/enemy_slime.png'],
             ['enemy_goblin', 'assets/enemies/enemy_goblin.png'],

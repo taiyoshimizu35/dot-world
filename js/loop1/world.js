@@ -54,7 +54,7 @@ export const WorldState = {
 
     // エンカウント歩数のリセット
     resetEncounterSteps(rate) {
-        if (rate <= 0) {
+        if (rate === undefined || rate <= 0) {
             this.stepsUntilEncounter = Infinity;
             return;
         }
@@ -83,6 +83,7 @@ export const WorldState = {
         this.managers.controllerClass = PlayerController;
         this.managers.interaction = new InteractionSystem(this);
 
+        this.managers.quest = QuestSystem;
         QuestSystem.init(PlayerStats);
         QuestSystem.reset();
 

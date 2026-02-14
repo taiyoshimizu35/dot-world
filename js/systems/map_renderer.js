@@ -69,7 +69,15 @@ export class MapRenderer {
             }
 
             const sp = camera.toScreen(npc.x * TS, npc.y * TS);
-            const img = AssetLoader.get(npc.img || (npc.type === 'villager' ? 'villager' : (npc.type === 'guard' ? 'guard' : (npc.type === 'signpost' ? 'signpost' : 'enemy_slime'))));
+            let spriteName = npc.img;
+            if (!spriteName) {
+                if (['villager', 'guard', 'signpost', 'goddes'].includes(npc.type)) {
+                    spriteName = npc.type;
+                } else {
+                    spriteName = 'enemy_slime';
+                }
+            }
+            const img = AssetLoader.get(spriteName);
             if (img) ctx.drawImage(img, sp.x, sp.y, TS, TS);
         }
 

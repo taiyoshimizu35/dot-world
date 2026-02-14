@@ -75,6 +75,9 @@ export const Maps = {
 
             // 旧システム互換
             if (npc.boss || npc.westBoss || npc.northBoss || npc.southBoss) return true;
+
+            // 一般的なブロッキングNPC (上記条件を通過してここに到達したらブロック)
+            return true;
         }
         return false;
     },

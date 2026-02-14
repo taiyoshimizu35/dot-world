@@ -48,9 +48,9 @@ export function initVillageMap(Maps, T) {
     Maps.data.village = {
         w: vw, h: vh, tiles: vt, encounterRate: 0.5,
         npcs: [
-            { id: 'npc1', type: 'villager', x: 8, y: 9, msg: '草原を歩くとモンスターに会うぞ。\n勇者！魔王様を倒してくれよな！', blocking: true },
-            { id: 'sign1', type: 'signpost', x: 12, y: 7, msg: '四天王を倒せ。\nさすれば道は開かれん', blocking: true },
-            { id: 'demon_guide', type: 'villager', x: 14, y: 11, msg: null, demonGuide: true, blocking: true }
+            { id: 'npc1', type: 'villager', x: 8, y: 9, msg: '草原を歩くとモンスターに会うぞ。\n勇者！魔王様を倒してくれよな！', blocking: false },
+            { id: 'sign1', type: 'signpost', x: 11, y: 7, msg: '四天王を倒せ。\nさすれば道は開かれん', blocking: true },
+            { id: 'demon_guide', type: 'villager', x: 13, y: 11, msg: null, demonGuide: true, blocking: true }
         ],
         warps: [
             { x: 4, y: 5, to: 'magic_shop', tx: 4, ty: 6 },
@@ -128,7 +128,10 @@ export function initShopMaps(Maps, T) {
 
     Maps.data.inn = {
         w: iw, h: ih, tiles: it,
-        npcs: [{ id: 'innkeeper', type: 'villager', x: 4, y: 1, msg: null, inn: true, blocking: true }],
+        npcs: [
+            { id: 'innkeeper', type: 'villager', x: 4, y: 1, msg: null, inn: true, blocking: true },
+            { id: 'save_point', type: 'goddes', x: 2, y: 2, savePoint: true, blocking: true }
+        ],
         warps: [{ x: 4, y: 7, to: 'village', tx: 19, ty: 16 }],
         start: { x: 4, y: 5 }
     };

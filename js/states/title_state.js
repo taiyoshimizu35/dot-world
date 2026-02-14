@@ -16,6 +16,8 @@ export class TitleState extends BaseState {
         this.mode = 'main'; // 'main', 'load'
         this.saveList = [];
         this.loadCur = 0;
+        this.scroll = 0;
+        this.maxVisible = 6;
     }
 
     enter() {
@@ -23,7 +25,9 @@ export class TitleState extends BaseState {
         this.cur = 0;
 
         // Build Options
-        const hasAnySave = SaveSystem.hasSave ? SaveSystem.getSaveList().some(s => s.exists) : false;
+        const saves = SaveSystem.getSaveList();
+        console.log("TitleState: Save List:", saves);
+        const hasAnySave = saves.some(s => s.exists);
         if (hasAnySave) {
             this.options = ['つづきから', 'はじめから'];
         } else {
@@ -38,8 +42,24 @@ export class TitleState extends BaseState {
     update() {
         // Load Mode
         if (this.mode === 'load') {
-            if (Input.justPressed('ArrowUp')) this.loadCur = (this.loadCur - 1 + 10) % 10;
-            if (Input.justPressed('ArrowDown')) this.loadCur = (this.loadCur + 1) % 10;
+            if (Input.justPressed('ArrowUp')) {
+                this.loadCur--;
+                if (this.loadCur < 0) {
+                    this.loadCur = this.saveList.length - 1;
+                    this.scroll = Math.max(0, this.saveList.length - this.maxVisible);
+                } else if (this.loadCur < this.scroll) {
+                    this.scroll = this.loadCur;
+                }
+            }
+            if (Input.justPressed('ArrowDown')) {
+                this.loadCur++;
+                if (this.loadCur >= this.saveList.length) {
+                    this.loadCur = 0;
+                    this.scroll = 0;
+                } else if (this.loadCur >= this.scroll + this.maxVisible) {
+                    this.scroll = this.loadCur - this.maxVisible + 1;
+                }
+            }
 
             if (Input.cancel()) {
                 this.mode = 'main';
@@ -78,6 +98,7 @@ export class TitleState extends BaseState {
                 this.saveList = SaveSystem.getSaveList();
                 this.mode = 'load';
                 this.loadCur = 0;
+                this.scroll = 0;
                 Input.lock(150);
             } else if (selected === 'DEBUG: Loop 2') {
                 WorldState.reset();
@@ -150,26 +171,36 @@ export class TitleState extends BaseState {
         }
         // Load Menu
         else if (this.mode === 'load') {
-            Draw.rect(ctx, 20, 40, VW - 40, VH - 50, 'rgba(0,0,50,0.9)');
-            Draw.stroke(ctx, 20, 40, VW - 40, VH - 50, '#fff', 2);
-            Draw.text(ctx, 'ロードするデータを選択', VW / 2, 60, '#fc0', 14, 'center');
+            Draw.rect(ctx, 40, 30, VW - 80, VH - 60, 'rgba(0,0,50,0.95)');
+            Draw.stroke(ctx, 40, 30, VW - 80, VH - 60, '#fff', 2);
+            Draw.text(ctx, 'ロードするデータを選択', VW / 2, 50, '#fc0', 14, 'center');
 
-            const listY = 80;
-            // Show all 10
-            this.saveList.slice(0, 10).forEach((slot, i) => {
-                const absIdx = i;
-                const y = listY + i * 20; // 20px spacing
-                const isSel = (absIdx === this.loadCur);
+            const listY = 75;
+            const itemH = 20;
+
+            for (let i = 0; i < this.maxVisible; i++) {
+                const idx = this.scroll + i;
+                if (idx >= this.saveList.length) break;
+
+                const slot = this.saveList[idx];
+                const y = listY + i * itemH;
+                const isSel = (idx === this.loadCur);
                 const color = isSel ? '#fc0' : '#ccc';
                 const prefix = isSel ? '▶ ' : '  ';
 
-                let text = `Slot ${absIdx + 1}: ----`;
+                let text = `Slot ${idx + 1}: ----`;
                 if (slot.exists) {
-                    text = `Slot ${absIdx + 1}: ${slot.name} (W:${slot.week})`;
+                    text = `Slot ${idx + 1}: ${slot.name} (W:${slot.week} HP:${slot.hp}/${slot.maxHp})`;
                 }
 
-                Draw.text(ctx, prefix + text, 40, y, color, 12);
-            });
+                Draw.text(ctx, prefix + text, 60, y, color, 12);
+            }
+
+            // Scroll Indicators
+            if (this.scroll > 0) Draw.text(ctx, '▲', VW / 2, 65, '#888', 10, 'center');
+            if (this.scroll + this.maxVisible < this.saveList.length) Draw.text(ctx, '▼', VW / 2, listY + this.maxVisible * itemH + 5, '#888', 10, 'center');
+
+            Draw.text(ctx, 'Z: 決定  X: キャンセル', VW - 50, VH - 35, '#888', 10, 'right');
         }
     }
 }

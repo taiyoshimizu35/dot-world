@@ -47,18 +47,28 @@ export class PlayerController {
     }
 
     checkCollisionAndMove(nx, ny, dx, dy, TS) {
-        const margin = 5;
+        // Hitbox adjustments (Feet collision)
+        // Shift collision box to lower half relative to sprite
+        // Sprite is 16x16. We want collision to be approx 10px wide, 8px high at bottom.
+        const marginX = 5; // 16 - 2*4 = 8px width
+        const marginY_Top = 12; // Start checking from middle
+        const marginY_Bottom = 2; // Bottom offset
 
-        const c1 = Maps.getTile(Math.floor((nx + margin) / TS), Math.floor((ny + margin) / TS));
-        const c2 = Maps.getTile(Math.floor((nx + TS - margin) / TS), Math.floor((ny + margin) / TS));
-        const c3 = Maps.getTile(Math.floor((nx + margin) / TS), Math.floor((ny + TS - margin) / TS));
-        const c4 = Maps.getTile(Math.floor((nx + TS - margin) / TS), Math.floor((ny + TS - margin) / TS));
+        const x1 = Math.floor((nx + marginX) / TS);
+        const x2 = Math.floor((nx + TS - marginX) / TS);
+        const y1 = Math.floor((ny + marginY_Top) / TS);
+        const y2 = Math.floor((ny + TS - marginY_Bottom) / TS);
+
+        const c1 = Maps.getTile(x1, y1);
+        const c2 = Maps.getTile(x2, y1);
+        const c3 = Maps.getTile(x1, y2);
+        const c4 = Maps.getTile(x2, y2);
 
         const tileBlocked = Maps.isBlocking(c1) || Maps.isBlocking(c2) || Maps.isBlocking(c3) || Maps.isBlocking(c4);
-        const npcBlocked = Maps.isNpcAt(Math.floor((nx + margin) / TS), Math.floor((ny + margin) / TS)) ||
-            Maps.isNpcAt(Math.floor((nx + TS - margin) / TS), Math.floor((ny + margin) / TS)) ||
-            Maps.isNpcAt(Math.floor((nx + margin) / TS), Math.floor((ny + TS - margin) / TS)) ||
-            Maps.isNpcAt(Math.floor((nx + TS - margin) / TS), Math.floor((ny + TS - margin) / TS));
+
+        // Check NPC collision for same points
+        const npcBlocked = Maps.isNpcAt(x1, y1) || Maps.isNpcAt(x2, y1) || Maps.isNpcAt(x1, y2) || Maps.isNpcAt(x2, y2);
+
 
         if (tileBlocked || npcBlocked) {
             this.player.moving = false;
@@ -166,7 +176,7 @@ export class PlayerController {
     checkEncounter() {
         const TS = GameConfig.TILE_SIZE;
         const m = Maps.get();
-        const currentTile = Maps.getTile(Math.floor((this.player.x + TS / 2) / TS), Math.floor((this.player.y + TS / 2) / TS));
+        const currentTile = Maps.getTile(Math.floor((this.player.x + TS / 2) / TS), Math.floor((this.player.y + 14) / TS));
 
         if (currentTile === GameConfig.TILE_TYPES.PATH || currentTile === GameConfig.TILE_TYPES.DOOR) return;
 

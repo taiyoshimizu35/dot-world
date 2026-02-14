@@ -15,6 +15,7 @@ export const Msg = {
     },
 
     show(t, cb = null, mode = 'normal') {
+        console.log("Msg.show called:", t);
         this.visible = true;
         this.text = t;
         this.disp = '';
@@ -29,9 +30,11 @@ export const Msg = {
 
     // Show text with choices
     choice(t, options, cb) {
+        console.log("Msg.choice called with options:", options);
         this.show(t, cb); // Use show to init text
         this.choices = options;
         this.choiceIdx = 0;
+        console.log("Msg.choices set to:", this.choices);
     },
 
     hide() {
@@ -69,7 +72,7 @@ export const Msg = {
             if (Input.interact()) {
                 const selected = this.choiceIdx;
                 const cb = this.callback;
-                this.visible = false; // Close immediately or let caller handle?
+                this.visible = false;
                 this.choices = null;
                 if (this.game && this.game.stateMachine) this.game.stateMachine.change('playing'); // Default reset
                 Input.lock(150);

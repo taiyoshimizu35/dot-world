@@ -2,6 +2,7 @@
 import { Msg } from '../../core/message.js';
 import { PlayerStats } from '../player.js';
 import { QuestSystem as QuestFlags } from '../quest.js';
+import { SaveSystem } from '../../core/save_system.js';
 
 export class InteractionSystem {
     constructor(worldState) {
@@ -9,12 +10,22 @@ export class InteractionSystem {
     }
 
     handle(npc, player) {
+        console.log('Interaction handle:', npc);
         // Week restriction check
         if (npc.week1Only && this.worldState.week !== 1) return;
         if (npc.week2Only && this.worldState.week !== 2) return;
 
         if (npc.partyJoin) {
             if (npc.msg) Msg.show(npc.msg);
+            return;
+        }
+
+        if (npc.savePoint) {
+            Msg.choice('女神像がある。\n記録しますか？', ['はい', 'いいえ'], (idx) => {
+                if (idx === 0) {
+                    this.worldState.changeState('save');
+                }
+            });
             return;
         }
 

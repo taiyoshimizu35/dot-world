@@ -8,6 +8,12 @@ import { Inn } from '../loop1/systems/inn.js';
 
 export class DialogState extends BaseState {
     update() {
+        // If choices are available and text is done, let Msg handle input entirely
+        if (Msg.choices && Msg.done()) {
+            Msg.update();
+            return;
+        }
+
         if (Input.interact()) {
             if (Msg.done()) {
                 console.log("DialogState: Msg done, hiding and changing to playing.");
