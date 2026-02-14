@@ -222,88 +222,21 @@ export class PlayerController {
             }
         }
 
-        if (npc) this.handleNpcInteraction(npc);
+        if (npc) {
+            const interaction = this.worldState.managers.interaction;
+            if (interaction) interaction.handle(npc, this.player);
+        }
 
         const chest = Chests.nearby(Maps.current, tx * TS, ty * TS);
         if (chest && !Chests.isOpen(chest.id)) {
             Chests.open(chest.id);
             const inv = this.worldState ? this.worldState.managers.inventory : null;
             if (inv) {
-                if (chest.item === '薬草') inv.add('薬草', chest.count);
-                else if (chest.item === 'ポーション') inv.add('ポーション', chest.count);
-                else if (chest.item === '魔法の聖水') inv.add('魔法の聖水', chest.count);
-                else if (chest.item === '銀の鍵') inv.add('銀の鍵', chest.count);
+                inv.add(chest.item, chest.count);
                 Msg.show(`${chest.item}を手に入れた!` + (chest.count > 1 ? ` x${chest.count}` : ''));
             } else {
                 Msg.show(`${chest.item}を見つけたが、今は持ち運べない。`);
             }
         }
-    }
-
-    handleNpcInteraction(npc) {
-        if (npc.week1Only && this.worldState && this.worldState.week !== 1) return;
-        if (npc.week2Only && this.worldState && this.worldState.week !== 2) return;
-
-        if (npc.partyJoin) {
-            // Loop 1 has no party, but keeping if user decides to add later or if code relies on it safely
-            // But User said "Simple game". Let's ignore for now or keep standard.
-            if (npc.msg) Msg.show(npc.msg);
-            return;
-        }
-
-        if (npc.areaBoss) {
-            // Simplified boss check
-            if (QuestFlags.bosses[npc.areaBoss]) {
-                // Already defeated
-            } else {
-                const battle = this.worldState ? this.worldState.managers.battle : null;
-                if (battle) {
-                    battle.playerRef = { x: this.player.x, y: this.player.y };
-                    battle.startAreaBoss(npc.areaBoss);
-                }
-            }
-            return;
-        }
-
-        if (npc.demonGuide) {
-            if (QuestFlags.allBossesDefeated()) {
-                Msg.show('「四天王を倒したのか！？\n魔王様を倒しに行けるな！」');
-            } else {
-                Msg.show(`魔王様はずっと北にいるらしい。\n四天王を倒してから行ってみたらどうだい？`);
-            }
-            return;
-        }
-
-        if (npc.demonKing) {
-            const battle = this.worldState ? this.worldState.managers.battle : null;
-            if (battle && battle.startDemonKing) battle.startDemonKing();
-            return;
-        }
-
-        // Standard Shops/Inns
-        const shop = this.worldState.managers.shop;
-        const magicShop = this.worldState.managers.shop; // Assuming same manager handles logic or different?
-        // Actually WorldState.managers.shop is capable of different types?
-        // Shop.open(type) supports it.
-        const inn = this.worldState.managers.inn;
-        const battle = this.worldState.managers.battle;
-
-        if (npc.shop && shop) shop.open('normal');
-        else if (npc.magicShop && shop) shop.open('magic');
-        else if (npc.advancedShop && shop) shop.open('advanced');
-        else if (npc.inn && inn) {
-            const cost = Math.max(1, Math.floor(PlayerStats.gold * 0.05));
-            inn.open(cost);
-        }
-        else if (npc.boss && battle) battle.startBoss();
-        else if (npc.westBoss && battle) battle.startWestBoss();
-        else if (npc.northBoss && battle) battle.startNorthBoss();
-        else if (npc.southBoss && battle) battle.startSouthBoss();
-        else if (npc.northMiniboss && battle) {
-            if (QuestFlags.northMinibosses && QuestFlags.northMinibosses[npc.northMiniboss]) return;
-            battle.startNorthMiniboss(npc.id, npc.northMiniboss);
-        }
-
-        else if (npc.msg) Msg.show(npc.msg);
     }
 }

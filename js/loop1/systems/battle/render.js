@@ -23,12 +23,13 @@ export const BattleRender = {
             const shakeY = FX.shakeActive ? FX.shakeY : 0;
             const img = AssetLoader.get(battle.enemy.img || 'enemy_slime');
             if (img) {
-                const es = battle.isBoss ? 64 : 32;
+                // Enemy Size: Bosses are larger
+                const es = battle.isBoss ? 96 : 40;
                 const ex = (VW - es) / 2 + shakeX;
                 const ey = (VH / 2 - es / 2) - 20 + shakeY;
                 ctx.drawImage(img, Math.floor(ex), Math.floor(ey), es, es);
             }
-            Draw.text(ctx, battle.enemy.name, VW / 2 - (battle.enemy.name.length * 6), VH / 2 - 60, '#fff', 12);
+            Draw.text(ctx, battle.enemy.name, VW / 2 - (battle.enemy.name.length * 6), VH / 2 - 80 + shakeY, '#fff', 12);
         }
 
         // コマンドUI

@@ -250,17 +250,26 @@ export const Shop = {
                     const affordable = PStats.gold >= item.price && !isSoldOut;
                     if (i === this.cur) Draw.text(ctx, '▶', 32, y, '#fc0', 12);
                     Draw.text(ctx, item.name, 48, y, affordable ? '#fff' : '#666', 12);
-                    Draw.text(ctx, `${item.price}G`, 140, y, affordable ? '#ff0' : '#664', 12);
+                    Draw.text(ctx, `${item.price}G`, VW - 50, y, affordable ? '#ff0' : '#664', 12, 'right');
                     Draw.text(ctx, item.desc, 48, y + 14, isSoldOut ? '#333' : '#aaa', 10);
                 } else {
                     // Sell mode
                     if (i === this.cur) Draw.text(ctx, '▶', 32, y, '#fc0', 12);
                     Draw.text(ctx, item.name, 48, y, '#fff', 12);
-                    Draw.text(ctx, `x${item.count}`, 160, y, '#fff', 12);
-                    Draw.text(ctx, `${item.price}G`, 190, y, '#ff0', 12);
+                    Draw.text(ctx, `x${item.count}`, VW - 100, y, '#fff', 12, 'right');
+                    Draw.text(ctx, `${item.price}G`, VW - 50, y, '#ff0', 12, 'right');
                     Draw.text(ctx, item.desc, 48, y + 14, '#aaa', 10);
                 }
                 y += 32;
+            }
+
+            // Scroll Indicators
+            const centerX = 20 + (VW - 40) / 2; // Box starts at 20, width VW-40
+            if (this.scroll > 0) {
+                Draw.text(ctx, '▲', centerX, 44, '#fc0', 12, 'center');
+            }
+            if (this.scroll + this.maxVisible < items.length) {
+                Draw.text(ctx, '▼', centerX, 210, '#fc0', 12, 'center');
             }
         }
 

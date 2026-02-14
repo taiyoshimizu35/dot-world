@@ -317,7 +317,11 @@ export const Menu = {
                 let prefix = '';
                 if (item.equipped) prefix = '[E]';
 
-                Draw.text(ctx, `${prefix}${item.name} x${item.count}`, 38, y, '#fff', 12);
+                let displayText = `${prefix}${item.name}`;
+                if (item.data && !['weapon', 'armor', 'holySword', 'staff', 'robe', 'amulet'].includes(item.data.type)) {
+                    displayText += ` x${item.count}`;
+                }
+                Draw.text(ctx, displayText, 38, y, '#fff', 12);
 
                 // Show stats if equipable
                 if (item.data) {
@@ -328,7 +332,7 @@ export const Menu = {
                         stat += `攻:${val} `;
                     }
                     if (item.data.def) stat += `防:${item.data.def} `;
-                    if (stat) Draw.text(ctx, stat, 140, y, '#ccc', 10);
+                    if (stat) Draw.text(ctx, stat, 208, y, '#ccc', 10, 'right');
                 }
 
                 y += 20;

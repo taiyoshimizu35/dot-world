@@ -20,6 +20,8 @@ import { WorldState2 } from '../loop2/world.js';
 import { PlayerController } from '../systems/player_controller.js';
 import { PlayerController2 } from '../loop2/systems/player_controller.js';
 import { Maps } from './systems/maps/manager.js';
+import { InteractionSystem } from './systems/interaction.js';
+import { InteractionSystem2 } from '../loop2/systems/interaction.js';
 
 // ===========================================
 // ワールドステート
@@ -79,6 +81,7 @@ export const WorldState = {
         Shop.init(this);
         this.managers.inn = Inn;
         this.managers.controllerClass = PlayerController;
+        this.managers.interaction = new InteractionSystem(this);
 
         QuestSystem.init(PlayerStats);
         QuestSystem.reset();
@@ -104,6 +107,7 @@ export const WorldState = {
         this.managers.party = Party2;
         this.managers.battle = Battle2;
         this.managers.controllerClass = PlayerController2;
+        this.managers.interaction = new InteractionSystem2(this);
         // Menu is swapped in Loop1Ending.js, but good to be safe implies relying on caller or doing it here.
         // Loop1Ending does: WorldState.managers.menu = Menu2;
 

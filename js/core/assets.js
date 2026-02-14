@@ -17,6 +17,18 @@ export const AssetLoader = {
         const assets = [
             // キャラクター
             ['player', 'assets/characters/player.png'],
+            ['player_down_1', 'assets/characters/player_down_1.png'],
+            ['player_down_2', 'assets/characters/player_down_2.png'],
+            ['player_down_stop', 'assets/characters/player_down_stop.png'],
+            ['player_left_1', 'assets/characters/player_left_1.png'],
+            ['player_left_2', 'assets/characters/player_left_2.png'],
+            ['player_left_stop', 'assets/characters/player_left_stop.png'],
+            ['player_right_1', 'assets/characters/player_right_1.png'],
+            ['player_right_2', 'assets/characters/player_right_2.png'],
+            ['player_right_stop', 'assets/characters/player_right_stop.png'],
+            ['player_up_1', 'assets/characters/player_up_1.png'],
+            ['player_up_2', 'assets/characters/player_up_2.png'],
+            ['player_up_stop', 'assets/characters/player_up_stop.png'],
             ['villager', 'assets/characters/villager.png'],
             ['guard', 'assets/characters/guard.png'],
             // タイル

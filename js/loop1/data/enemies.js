@@ -91,7 +91,7 @@ export function getEnemiesForMap(mapData, mapId) {
         if (mapData.area === 'east') enemies = ['hobgoblin', 'devilbat', 'poison_slime'];
         else if (mapData.area === 'west') enemies = ['skeleton', 'imp', 'killerbee'];
         else if (mapData.area === 'south') enemies = ['skeleton_knight', 'ghost', 'zombie'];
-        else enemies = ['goblin'];
+        else enemies = ['goblin', 'slime', 'bat'];
     } else {
         // 2週目は通常のエリア別敵
         if (mapData.isDungeon) {

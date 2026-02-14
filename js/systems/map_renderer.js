@@ -75,7 +75,18 @@ export class MapRenderer {
 
         // Player
         const pSp = camera.toScreen(player.x, player.y);
-        const pImg = AssetLoader.get('player');
+        // Player Animation
+        const dirs = ['down', 'left', 'right', 'up'];
+        const dirStr = dirs[player.dir] || 'down';
+        let suffix = 'stop';
+
+        if (player.moving) {
+            const frame = Math.floor(Date.now() / 200) % 2 + 1; // 1 or 2
+            suffix = `${frame}`;
+        }
+
+        const pImgName = `player_${dirStr}_${suffix}`;
+        const pImg = AssetLoader.get(pImgName) || AssetLoader.get('player');
         if (pImg) ctx.drawImage(pImg, pSp.x, pSp.y, TS, TS);
 
         // South Area Darkness Effect
