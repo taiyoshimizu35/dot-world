@@ -17,24 +17,34 @@ export function initVillageMap(Maps, T) {
 
     // 道（端まで）
     for (let x = 0; x < vw; x++) vt[9][x] = T.PATH;
+    for (let x = 0; x < vw; x++) vt[10][x] = T.PATH;
+    for (let y = 0; y < vh; y++) vt[y][13] = T.PATH;
     for (let y = 0; y < vh; y++) vt[y][12] = T.PATH;
     for (let y = 6; y <= 8; y++) for (let x = 4; x <= 5; x++) vt[y][x] = T.PATH
     for (let y = 6; y <= 8; y++) for (let x = 19; x <= 20; x++) vt[y][x] = T.PATH
-    for (let x = 13; x <= 20; x++) vt[16][x] = T.PATH
-    for (let x = 4; x <= 11; x++) vt[16][x] = T.PATH
+    for (let x = 14; x <= 21; x++) vt[16][x] = T.PATH
+    for (let x = 14; x <= 21; x++) vt[17][x] = T.PATH
+    for (let x = 3; x <= 11; x++) vt[16][x] = T.PATH
+    for (let x = 3; x <= 11; x++) vt[17][x] = T.PATH
 
 
     // 建物
-    for (let y = 2; y <= 5; y++) for (let x = 3; x <= 6; x++) vt[y][x] = T.HOUSE_WOOD;
+    for (let y = 3; y <= 5; y++) for (let x = 3; x <= 6; x++) vt[y][x] = T.HOUSE_WOOD;
     vt[5][4] = T.DOOR_LEFT;
     vt[5][5] = T.DOOR_RIGHT;
-    for (let y = 2; y <= 5; y++) for (let x = 17; x <= 22; x++) vt[y][x] = T.HOUSE_WOOD;
+    vt[4][4] = T.MAGIC_SHOP_SIGN_LEFT;
+    vt[4][5] = T.MAGIC_SHOP_SIGN_RIGHT;
+    for (let y = 3; y <= 5; y++) for (let x = 18; x <= 21; x++) vt[y][x] = T.HOUSE_WOOD;
     vt[5][19] = T.DOOR_LEFT;
     vt[5][20] = T.DOOR_RIGHT;
-    for (let y = 12; y <= 15; y++) for (let x = 17; x <= 22; x++) vt[y][x] = T.HOUSE_WOOD;
+    vt[4][19] = T.WEAPON_SHOP_SIGN_LEFT;
+    vt[4][20] = T.WEAPON_SHOP_SIGN_RIGHT;
+    for (let y = 13; y <= 15; y++) for (let x = 18; x <= 21; x++) vt[y][x] = T.HOUSE_WOOD;
     vt[15][19] = T.DOOR_LEFT;
     vt[15][20] = T.DOOR_RIGHT;
-    for (let y = 12; y <= 15; y++) for (let x = 3; x <= 6; x++) vt[y][x] = T.HOUSE_WOOD;
+    vt[14][19] = T.INN_SIGN_LEFT;
+    vt[14][20] = T.INN_SIGN_RIGHT;
+    for (let y = 13; y <= 15; y++) for (let x = 3; x <= 6; x++) vt[y][x] = T.HOUSE_WOOD;
     vt[15][4] = T.DOOR_LEFT;
     vt[15][5] = T.DOOR_RIGHT;
 
@@ -49,9 +59,10 @@ export function initVillageMap(Maps, T) {
         w: vw, h: vh, tiles: vt, encounterRate: 0.5,
         baseTile: T.GRASS,
         npcs: [
-            { id: 'npc1', type: 'villager', x: 8, y: 9, msg: '草原を歩くとモンスターに会うぞ。\n勇者！魔王様を倒してくれよな！', blocking: false },
+            { id: 'npc1', type: 'villager', x: 8, y: 8, msg: '草原を歩くとモンスターに会うぞ。\n勇者！魔王様を倒してくれよな！', blocking: true },
+            { id: 'npc2', type: 'villager', x: 10, y: 15, msg: '女神像は記憶を保持してくれるらしい', blocking: true },
             { id: 'sign1', type: 'signpost', x: 11, y: 7, msg: '四天王を倒せ。\nさすれば道は開かれん', blocking: true },
-            { id: 'demon_guide', type: 'villager', x: 13, y: 11, msg: null, demonGuide: true, blocking: true }
+            { id: 'demon_guide', type: 'villager', x: 14, y: 11, msg: null, demonGuide: true, blocking: true }
         ],
         warps: [
             { x: 4, y: 5, to: 'magic_shop', tx: 4, ty: 6 },
@@ -59,9 +70,13 @@ export function initVillageMap(Maps, T) {
             { x: 19, y: 5, to: 'shop_interior', tx: 4, ty: 6 },
             { x: 20, y: 5, to: 'shop_interior', tx: 4, ty: 6 },
             { x: 24, y: 9, to: 'east_stage1', tx: 2, ty: 20 },
+            { x: 24, y: 10, to: 'east_stage1', tx: 2, ty: 20 },
             { x: 0, y: 9, to: 'west_stage1', tx: 37, ty: 20 },
+            { x: 0, y: 10, to: 'west_stage1', tx: 37, ty: 20 },
             { x: 12, y: 0, to: 'north_stage1', tx: 7, ty: 12 },
+            { x: 13, y: 0, to: 'north_stage1', tx: 7, ty: 12 },
             { x: 12, y: 18, to: 'south_stage1', tx: 20, ty: 2 },
+            { x: 13, y: 18, to: 'south_stage1', tx: 20, ty: 2 },
             // { x: 14, y: 12, to: 'demon_castle', tx: 10, ty: 15, requiresDemonCastle: true },
             { x: 4, y: 15, to: 'advanced_shop', tx: 4, ty: 6, requiresBossCount: 1 },
             { x: 5, y: 15, to: 'advanced_shop', tx: 4, ty: 6, requiresBossCount: 1 },

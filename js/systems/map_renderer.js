@@ -47,12 +47,23 @@ export class MapRenderer {
                     else if (t === T.HOUSE_WOOD) imgName = 'house_wood';
                     else if (t === T.DOOR_LEFT) imgName = 'door_left';
                     else if (t === T.DOOR_RIGHT) imgName = 'door_right';
+                    else if (t === T.MAGIC_SHOP_SIGN_LEFT) imgName = 'magic_shop_sign_left';
+                    else if (t === T.MAGIC_SHOP_SIGN_RIGHT) imgName = 'magic_shop_sign_right';
+                    else if (t === T.WEAPON_SHOP_SIGN_LEFT) imgName = 'weapon_shop_sign_left';
+                    else if (t === T.WEAPON_SHOP_SIGN_RIGHT) imgName = 'weapon_shop_sign_right';
+                    else if (t === T.INN_SIGN_LEFT) imgName = 'inn_sign_left';
+                    else if (t === T.INN_SIGN_RIGHT) imgName = 'inn_sign_right';
 
                     const sp = camera.toScreen(x * TS, y * TS);
 
                     // Overlay Check (Base Tile Rendering)
                     let baseTile = map.baseTile;
-                    if (t === T.DOOR_LEFT || t === T.DOOR_RIGHT) baseTile = T.HOUSE_WOOD;
+                    if (t === T.DOOR_LEFT || t === T.DOOR_RIGHT ||
+                        t === T.MAGIC_SHOP_SIGN_LEFT || t === T.MAGIC_SHOP_SIGN_RIGHT ||
+                        t === T.WEAPON_SHOP_SIGN_LEFT || t === T.WEAPON_SHOP_SIGN_RIGHT ||
+                        t === T.INN_SIGN_LEFT || t === T.INN_SIGN_RIGHT) {
+                        baseTile = T.HOUSE_WOOD;
+                    }
 
                     if (GameConfig.OVERLAY_TILES.has(t) && baseTile !== undefined) {
                         let baseName = 'grass';

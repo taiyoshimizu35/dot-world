@@ -39,7 +39,13 @@ export const GameConfig = {
         GRAY_DOOR: 17,
         HOUSE_WOOD: 18,
         DOOR_LEFT: 19,
-        DOOR_RIGHT: 20
+        DOOR_RIGHT: 20,
+        MAGIC_SHOP_SIGN_LEFT: 21,
+        MAGIC_SHOP_SIGN_RIGHT: 22,
+        WEAPON_SHOP_SIGN_LEFT: 23,
+        WEAPON_SHOP_SIGN_RIGHT: 24,
+        INN_SIGN_LEFT: 25,
+        INN_SIGN_RIGHT: 26
     },
     // Tiles that should be drawn over a base tile (e.g. grass/floor)
     OVERLAY_TILES: new Set([
@@ -56,7 +62,13 @@ export const GameConfig = {
         17, // GRAY_DOOR
         18, // HOUSE_WOOD
         19, // DOOR_LEFT
-        20  // DOOR_RIGHT
+        20, // DOOR_RIGHT
+        21, // MAGIC_SHOP_SIGN_LEFT
+        22, // MAGIC_SHOP_SIGN_RIGHT
+        23, // WEAPON_SHOP_SIGN_LEFT
+        24, // WEAPON_SHOP_SIGN_RIGHT
+        25, // INN_SIGN_LEFT
+        26  // INN_SIGN_RIGHT
     ])
 };
 
