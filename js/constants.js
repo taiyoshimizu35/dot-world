@@ -23,7 +23,7 @@ export const GameConfig = {
         ROCK: 1,
         PATH: 2,
         WATER: 3,
-        HOUSE: 4,
+        HOUSE_STONE: 4,
         DOOR: 5,
         FLOOR: 6,
         DESK: 7,
@@ -36,7 +36,8 @@ export const GameConfig = {
         STONE: 14,
         STATUE: 15,
         GRAY_GRASS: 16,
-        GRAY_DOOR: 17
+        GRAY_DOOR: 17,
+        HOUSE_WOOD: 18
     }
 };
 

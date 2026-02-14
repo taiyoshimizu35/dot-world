@@ -21,16 +21,16 @@ export const Maps = {
     getTile(x, y) {
         if (Number.isNaN(x) || Number.isNaN(y)) {
             console.error("Maps.getTile received NaN:", x, y);
-            return GameConfig.TILE_TYPES ? GameConfig.TILE_TYPES.HOUSE : 2;
+            return GameConfig.TILE_TYPES ? GameConfig.TILE_TYPES.HOUSE_WOOD : 2;
         }
         const m = this.get();
-        if (x < 0 || x >= m.w || y < 0 || y >= m.h) return GameConfig.TILE_TYPES.HOUSE;
+        if (x < 0 || x >= m.w || y < 0 || y >= m.h) return GameConfig.TILE_TYPES.HOUSE_WOOD;
         return m.tiles[y][x];
     },
 
     isBlocking(t) {
         const T = GameConfig.TILE_TYPES;
-        return t === T.ROCK || t === T.WATER || t === T.HOUSE || t === T.DESK || t === T.BED || t === T.COUNTER || t === T.TREE || t === T.STATUE;
+        return t === T.ROCK || t === T.WATER || t === T.HOUSE_WOOD || t === T.HOUSE_STONE || t === T.DESK || t === T.BED || t === T.COUNTER || t === T.TREE || t === T.STATUE;
     },
 
     // NPCがブロッキングかチェック（仲間加入済み、ボス撃破済みは除外）

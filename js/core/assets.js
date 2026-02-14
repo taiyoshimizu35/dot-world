@@ -41,7 +41,8 @@ export const AssetLoader = {
             ['stone', 'assets/tiles/stone.png'],
             ['gray_grass', 'assets/tiles/gray_glass.png'],
             // オブジェクト
-            ['house', 'assets/objects/house.png'],
+            ['house_stone', 'assets/objects/house_stone.png'],
+            ['house_wood', 'assets/objects/house_wood.png'],
             ['signpost', 'assets/objects/signpost.png'],
             ['desk', 'assets/objects/desk.png'],
             ['bed', 'assets/objects/bed.png'],

@@ -25,16 +25,16 @@ export function initVillageMap(Maps, T) {
 
 
     // 建物
-    for (let y = 2; y <= 5; y++) for (let x = 3; x <= 6; x++) vt[y][x] = T.HOUSE;
+    for (let y = 2; y <= 5; y++) for (let x = 3; x <= 6; x++) vt[y][x] = T.HOUSE_WOOD;
     vt[5][4] = T.DOOR;
     vt[5][5] = T.DOOR;
-    for (let y = 2; y <= 5; y++) for (let x = 17; x <= 22; x++) vt[y][x] = T.HOUSE;
+    for (let y = 2; y <= 5; y++) for (let x = 17; x <= 22; x++) vt[y][x] = T.HOUSE_WOOD;
     vt[5][19] = T.DOOR;
     vt[5][20] = T.DOOR;
-    for (let y = 12; y <= 15; y++) for (let x = 17; x <= 22; x++) vt[y][x] = T.HOUSE;
+    for (let y = 12; y <= 15; y++) for (let x = 17; x <= 22; x++) vt[y][x] = T.HOUSE_WOOD;
     vt[15][19] = T.DOOR;
     vt[15][20] = T.DOOR;
-    for (let y = 12; y <= 15; y++) for (let x = 3; x <= 6; x++) vt[y][x] = T.HOUSE;
+    for (let y = 12; y <= 15; y++) for (let x = 3; x <= 6; x++) vt[y][x] = T.HOUSE_WOOD;
     vt[15][4] = T.DOOR;
     vt[15][5] = T.DOOR;
 
@@ -77,7 +77,7 @@ export function initShopMaps(Maps, T) {
     const hw = 9, hh = 8, ht = [];
     for (let y = 0; y < hh; y++) {
         const r = [];
-        for (let x = 0; x < hw; x++) r.push(y === 0 || y === hh - 1 || x === 0 || x === hw - 1 ? T.HOUSE : T.FLOOR);
+        for (let x = 0; x < hw; x++) r.push(y === 0 || y === hh - 1 || x === 0 || x === hw - 1 ? T.HOUSE_WOOD : T.FLOOR);
         ht.push(r);
     }
     ht[2][3] = T.COUNTER; ht[2][4] = T.COUNTER; ht[2][5] = T.COUNTER;
@@ -93,7 +93,7 @@ export function initShopMaps(Maps, T) {
     const sw = 9, sh = 8, st = [];
     for (let y = 0; y < sh; y++) {
         const r = [];
-        for (let x = 0; x < sw; x++) r.push(y === 0 || y === sh - 1 || x === 0 || x === sw - 1 ? T.HOUSE : T.FLOOR);
+        for (let x = 0; x < sw; x++) r.push(y === 0 || y === sh - 1 || x === 0 || x === sw - 1 ? T.HOUSE_WOOD : T.FLOOR);
         st.push(r);
     }
     st[2][3] = T.COUNTER; st[2][4] = T.COUNTER; st[2][5] = T.COUNTER;
@@ -119,7 +119,7 @@ export function initShopMaps(Maps, T) {
     const iw = 9, ih = 8, it = [];
     for (let y = 0; y < ih; y++) {
         const r = [];
-        for (let x = 0; x < iw; x++) r.push(y === 0 || y === ih - 1 || x === 0 || x === iw - 1 ? T.HOUSE : T.FLOOR);
+        for (let x = 0; x < iw; x++) r.push(y === 0 || y === ih - 1 || x === 0 || x === iw - 1 ? T.HOUSE_WOOD : T.FLOOR);
         it.push(r);
     }
     it[2][4] = T.COUNTER; // カウンター1つ

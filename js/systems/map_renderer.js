@@ -29,7 +29,7 @@ export class MapRenderer {
                     if (t === T.ROCK) imgName = 'rock';
                     else if (t === T.PATH) imgName = 'path';
                     else if (t === T.WATER) imgName = 'water';
-                    else if (t === T.HOUSE) imgName = 'house';
+                    else if (t === T.HOUSE_STONE) imgName = 'house_stone';
                     else if (t === T.DOOR) imgName = 'door';
                     else if (t === T.FLOOR) imgName = 'floor';
                     else if (t === T.DESK) imgName = 'desk';
@@ -43,6 +43,7 @@ export class MapRenderer {
                     else if (t === T.STATUE) imgName = 'statue';
                     else if (t === T.GRAY_GRASS) imgName = 'gray_grass';
                     else if (t === T.GRAY_DOOR) imgName = 'gray_door';
+                    else if (t === T.HOUSE_WOOD) imgName = 'house_wood';
 
                     const sp = camera.toScreen(x * TS, y * TS);
                     const img = AssetLoader.get(imgName);
