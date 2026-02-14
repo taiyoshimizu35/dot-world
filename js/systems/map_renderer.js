@@ -53,6 +53,7 @@ export class MapRenderer {
                     else if (t === T.WEAPON_SHOP_SIGN_RIGHT) imgName = 'weapon_shop_sign_right';
                     else if (t === T.INN_SIGN_LEFT) imgName = 'inn_sign_left';
                     else if (t === T.INN_SIGN_RIGHT) imgName = 'inn_sign_right';
+                    else if (t === T.PULPIT) imgName = 'pulpit';
 
                     const sp = camera.toScreen(x * TS, y * TS);
 

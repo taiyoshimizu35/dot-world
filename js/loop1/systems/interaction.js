@@ -47,7 +47,7 @@ export class InteractionSystem {
             if (QuestFlags.allBossesDefeated()) {
                 Msg.show('「四天王を倒したのか！？\n魔王様を倒しに行けるな！」');
             } else {
-                Msg.show(`魔王様はずっと北にいるらしい。\n四天王を倒してから行ってみたらどうだい？`);
+                Msg.show(`魔王様はずっと北にいるらしい。\n四天王を倒してから行ってみたらどうだい？  \n聖剣を忘れるなよ！`);
             }
             return;
         }

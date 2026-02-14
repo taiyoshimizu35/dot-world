@@ -30,7 +30,7 @@ export const Maps = {
 
     isBlocking(t) {
         const T = GameConfig.TILE_TYPES;
-        return t === T.ROCK || t === T.WATER || t === T.HOUSE_WOOD || t === T.HOUSE_STONE || t === T.DESK || t === T.BED || t === T.COUNTER || t === T.TREE || t === T.STATUE || t === T.DOOR_LEFT || t === T.DOOR_RIGHT;
+        return t === T.ROCK || t === T.WATER || t === T.HOUSE_WOOD || t === T.HOUSE_STONE || t === T.DESK || t === T.BED || t === T.COUNTER || t === T.TREE || t === T.STATUE || t === T.DOOR_LEFT || t === T.DOOR_RIGHT || t === T.PULPIT;
     },
 
     // NPCがブロッキングかチェック（仲間加入済み、ボス撃破済みは除外）

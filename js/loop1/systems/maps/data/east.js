@@ -67,7 +67,7 @@ export function initEastWeek1(Maps, T) {
     Maps.data.east_stage1 = {
         w: 41, h: 41, tiles: e1t, isDungeon: true, encounterRate: 0.0, area: 'east', week1Map: true,
         baseTile: T.GRASS,
-        npcs: [{ id: 'e1_sign', type: 'signpost', x: 5, y: 20, msg: '【深緑の迷宮】\n木々の隙間を進め', blocking: false }],
+        npcs: [{ id: 'e1_sign', type: 'signpost', x: 5, y: 19, msg: '【深緑の迷宮】', blocking: true }],
         warps: [
             { x: 0, y: 20, to: 'village', tx: 23, ty: 9 },
             { x: 40, y: 20, to: 'east_boss_room', tx: 2, ty: 7 }

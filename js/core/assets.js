@@ -30,6 +30,7 @@ export const AssetLoader = {
             ['player_up_2', 'assets/characters/player_up_2.png'],
             ['player_up_stop', 'assets/characters/player_up_stop.png'],
             ['villager', 'assets/characters/villager.png'],
+            ['priest', 'assets/characters/priest.png'],
             ['guard', 'assets/characters/guard.png'],
             // タイル
             ['grass', 'assets/tiles/grass.png'],
@@ -65,6 +66,7 @@ export const AssetLoader = {
             ['stone_switch', 'assets/objects/stone_switch.png'],
             ['statue', 'assets/objects/statue.png'],
             ['goddes', 'assets/objects/goddes.png'],
+            ['pulpit', 'assets/objects/pulpit.png'],
             // 敵キャラクター
             ['enemy_slime', 'assets/enemies/enemy_slime.png'],
             ['enemy_goblin', 'assets/enemies/enemy_goblin.png'],

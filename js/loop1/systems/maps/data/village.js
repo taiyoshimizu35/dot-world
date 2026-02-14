@@ -141,7 +141,7 @@ export function initShopMaps(Maps, T) {
         for (let x = 0; x < iw; x++) r.push(y === 0 || y === ih - 1 || x === 0 || x === iw - 1 ? T.HOUSE_WOOD : T.FLOOR);
         it.push(r);
     }
-    it[2][4] = T.COUNTER; // カウンター1つ
+    it[2][4] = T.PULPIT; // カウンター1つ
     it[ih - 1][4] = T.EXIT;
     it[2][6] = T.BED; it[2][7] = T.BED; // ベッド装飾
 
@@ -149,7 +149,7 @@ export function initShopMaps(Maps, T) {
         w: iw, h: ih, tiles: it,
         baseTile: T.FLOOR,
         npcs: [
-            { id: 'innkeeper', type: 'villager', x: 4, y: 1, msg: null, inn: true, blocking: true },
+            { id: 'innkeeper', type: 'villager', img: 'priest', x: 4, y: 1, msg: null, inn: true, blocking: true },
             { id: 'save_point', type: 'goddes', x: 1, y: 1, savePoint: true, blocking: true }
         ],
         warps: [{ x: 4, y: 7, to: 'village', tx: 19, ty: 16 }],
