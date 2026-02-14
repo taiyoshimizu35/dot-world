@@ -59,6 +59,7 @@ export function initSouthWeek1(Maps, T) {
 
     Maps.data.south_stage1 = {
         w: 41, h: 41, tiles: s1t, encounterRate: 0.0, area: 'south', week1Map: true,
+        baseTile: T.GRAY_GRASS,
         bgm: 'dungeon',
         npcs: [
             { id: 's1_sign', type: 'signpost', x: 23, y: 5, msg: '【忘却の墓地】\n闇に潜む鍵を探せ', blocking: true }
@@ -95,6 +96,7 @@ export function initSouthWeek1(Maps, T) {
 
     Maps.data.south_stage2 = {
         w: 41, h: 41, tiles: s2t, encounterRate: 0.0, area: 'south', week1Map: true,
+        baseTile: T.GRAY_GRASS,
         bgm: 'dungeon',
         npcs: [],
         warps: [
@@ -116,6 +118,7 @@ export function initSouthWeek1(Maps, T) {
 
     Maps.data.south_boss_room = {
         w: 15, h: 15, tiles: sbt, encounterRate: 0.0, area: 'south', week1Map: true,
+        baseTile: T.GRAY_GRASS,
         bgm: 'boss',
         npcs: [
             { id: 'southBoss', type: 'enemy_skeleton', img: 'phantom_knight_map', x: 7, y: 10, msg: null, areaBoss: 'south', blocking: true, name: '幻影の騎士', atk: 22, def: 8, hp: 100, exp: 60 }

@@ -43,9 +43,31 @@ export class MapRenderer {
                     else if (t === T.STATUE) imgName = 'statue';
                     else if (t === T.GRAY_GRASS) imgName = 'gray_grass';
                     else if (t === T.GRAY_DOOR) imgName = 'gray_door';
+                    else if (t === T.GRAY_DOOR) imgName = 'gray_door';
                     else if (t === T.HOUSE_WOOD) imgName = 'house_wood';
+                    else if (t === T.DOOR_LEFT) imgName = 'door_left';
+                    else if (t === T.DOOR_RIGHT) imgName = 'door_right';
 
                     const sp = camera.toScreen(x * TS, y * TS);
+
+                    // Overlay Check (Base Tile Rendering)
+                    let baseTile = map.baseTile;
+                    if (t === T.DOOR_LEFT || t === T.DOOR_RIGHT) baseTile = T.HOUSE_WOOD;
+
+                    if (GameConfig.OVERLAY_TILES.has(t) && baseTile !== undefined) {
+                        let baseName = 'grass';
+                        if (baseTile === T.FLOOR) baseName = 'floor';
+                        else if (baseTile === T.GRAY_GRASS) baseName = 'gray_grass';
+                        else if (baseTile === T.STONE) baseName = 'stone';
+                        else if (baseTile === T.PATH) baseName = 'path';
+                        else if (baseTile === T.HOUSE_WOOD) baseName = 'house_wood';
+
+                        // Add more base tiles as needed
+
+                        const bImg = AssetLoader.get(baseName);
+                        if (bImg) ctx.drawImage(bImg, sp.x, sp.y, TS, TS);
+                    }
+
                     const img = AssetLoader.get(imgName);
                     if (img) ctx.drawImage(img, sp.x, sp.y, TS, TS);
                 }

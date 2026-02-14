@@ -20,6 +20,7 @@ export function initDemonCastleMaps(Maps, T) {
 
     Maps.data.demon_castle = {
         w: 20, h: 18, tiles: dc1t, isDungeon: true, encounterRate: 0.12, area: 'demon',
+        baseTile: T.GRAY_GRASS,
         npcs: [{ id: 'dc_sign', type: 'signpost', x: 10, y: 12, msg: '【魔王城】\nここが最後の戦いの場所…', blocking: true }],
         warps: [
             { x: 10, y: 17, to: 'village', tx: 14, ty: 13 },
@@ -28,6 +29,8 @@ export function initDemonCastleMaps(Maps, T) {
         start: { x: 10, y: 15 }
     };
 
+
+
     // 魔王城 - 玉座の間
     const dc2t = createDungeonTiles(16, 14, T);
     for (let y = 1; y <= 11; y++) dc2t[y][8] = T.PATH;
@@ -35,8 +38,11 @@ export function initDemonCastleMaps(Maps, T) {
 
     Maps.data.demon_throne = {
         w: 16, h: 14, tiles: dc2t, isDungeon: true, encounterRate: 0, area: 'demon',
+        baseTile: T.GRAY_GRASS,
         npcs: [{ id: 'demonKing', type: 'enemy_demon_king', img: 'enemy_demon_king', x: 8, y: 4, msg: null, demonKing: true, blocking: true }],
         warps: [{ x: 8, y: 12, to: 'demon_castle', tx: 10, ty: 3 }],
         start: { x: 8, y: 11 }
     };
+
+
 }

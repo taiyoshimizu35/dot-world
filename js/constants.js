@@ -37,8 +37,27 @@ export const GameConfig = {
         STATUE: 15,
         GRAY_GRASS: 16,
         GRAY_DOOR: 17,
-        HOUSE_WOOD: 18
-    }
+        HOUSE_WOOD: 18,
+        DOOR_LEFT: 19,
+        DOOR_RIGHT: 20
+    },
+    // Tiles that should be drawn over a base tile (e.g. grass/floor)
+    OVERLAY_TILES: new Set([
+        1,  // ROCK
+        4,  // HOUSE_STONE
+        5,  // DOOR
+        7,  // DESK
+        8,  // BED
+        10, // COUNTER
+        11, // TREE
+        12, // STAIRS
+        13, // SWITCH
+        15, // STATUE
+        17, // GRAY_DOOR
+        18, // HOUSE_WOOD
+        19, // DOOR_LEFT
+        20  // DOOR_RIGHT
+    ])
 };
 
 export const GameState = {

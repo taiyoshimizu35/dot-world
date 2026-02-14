@@ -26,17 +26,17 @@ export function initVillageMap(Maps, T) {
 
     // 建物
     for (let y = 2; y <= 5; y++) for (let x = 3; x <= 6; x++) vt[y][x] = T.HOUSE_WOOD;
-    vt[5][4] = T.DOOR;
-    vt[5][5] = T.DOOR;
+    vt[5][4] = T.DOOR_LEFT;
+    vt[5][5] = T.DOOR_RIGHT;
     for (let y = 2; y <= 5; y++) for (let x = 17; x <= 22; x++) vt[y][x] = T.HOUSE_WOOD;
-    vt[5][19] = T.DOOR;
-    vt[5][20] = T.DOOR;
+    vt[5][19] = T.DOOR_LEFT;
+    vt[5][20] = T.DOOR_RIGHT;
     for (let y = 12; y <= 15; y++) for (let x = 17; x <= 22; x++) vt[y][x] = T.HOUSE_WOOD;
-    vt[15][19] = T.DOOR;
-    vt[15][20] = T.DOOR;
+    vt[15][19] = T.DOOR_LEFT;
+    vt[15][20] = T.DOOR_RIGHT;
     for (let y = 12; y <= 15; y++) for (let x = 3; x <= 6; x++) vt[y][x] = T.HOUSE_WOOD;
-    vt[15][4] = T.DOOR;
-    vt[15][5] = T.DOOR;
+    vt[15][4] = T.DOOR_LEFT;
+    vt[15][5] = T.DOOR_RIGHT;
 
 
 
@@ -47,6 +47,7 @@ export function initVillageMap(Maps, T) {
 
     Maps.data.village = {
         w: vw, h: vh, tiles: vt, encounterRate: 0.5,
+        baseTile: T.GRASS,
         npcs: [
             { id: 'npc1', type: 'villager', x: 8, y: 9, msg: '草原を歩くとモンスターに会うぞ。\n勇者！魔王様を倒してくれよな！', blocking: false },
             { id: 'sign1', type: 'signpost', x: 11, y: 7, msg: '四天王を倒せ。\nさすれば道は開かれん', blocking: true },
@@ -84,6 +85,7 @@ export function initShopMaps(Maps, T) {
     ht[hh - 1][4] = T.EXIT;
     Maps.data.magic_shop = {
         w: hw, h: hh, tiles: ht,
+        baseTile: T.FLOOR,
         npcs: [{ id: 'mage_shopkeeper', type: 'villager', x: 4, y: 1, msg: null, magicShop: true, blocking: true }],
         warps: [{ x: 4, y: 7, to: 'village', tx: 4, ty: 6 }],
         start: { x: 4, y: 5 }
@@ -100,6 +102,7 @@ export function initShopMaps(Maps, T) {
     st[sh - 1][4] = T.EXIT;
     Maps.data.shop_interior = {
         w: sw, h: sh, tiles: st,
+        baseTile: T.FLOOR,
         npcs: [{ id: 'shopkeeper', type: 'villager', x: 4, y: 1, msg: null, shop: true, blocking: true }],
         warps: [{ x: 4, y: 7, to: 'village', tx: 19, ty: 6 }],
         start: { x: 4, y: 5 }
@@ -110,6 +113,7 @@ export function initShopMaps(Maps, T) {
     // タイルは通常ショップと同じものを使用
     Maps.data.advanced_shop = {
         w: aw, h: ah, tiles: st,
+        baseTile: T.FLOOR,
         npcs: [{ id: 'adv_shopkeeper', type: 'villager', x: 4, y: 1, msg: null, advancedShop: true, blocking: true }],
         warps: [{ x: 4, y: 7, to: 'village', tx: 4, ty: 16 }],
         start: { x: 4, y: 5 }
@@ -128,9 +132,10 @@ export function initShopMaps(Maps, T) {
 
     Maps.data.inn = {
         w: iw, h: ih, tiles: it,
+        baseTile: T.FLOOR,
         npcs: [
             { id: 'innkeeper', type: 'villager', x: 4, y: 1, msg: null, inn: true, blocking: true },
-            { id: 'save_point', type: 'goddes', x: 2, y: 2, savePoint: true, blocking: true }
+            { id: 'save_point', type: 'goddes', x: 1, y: 1, savePoint: true, blocking: true }
         ],
         warps: [{ x: 4, y: 7, to: 'village', tx: 19, ty: 16 }],
         start: { x: 4, y: 5 }

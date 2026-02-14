@@ -108,6 +108,13 @@ export class PlayerController {
                 // Usually Demon King requires something. Let's keep it simple: just bosses.
             }
 
+            if (warp.requiresNorthMiniboss) {
+                if (!QuestFlags.northMinibosses[warp.requiresNorthMiniboss]) {
+                    Msg.show(`強大な気配を感じる…\nこのエリアの主を倒さねば進めないようだ。`);
+                    return;
+                }
+            }
+
             if (warp.requiresSwitch) {
                 if (!QuestFlags.westSwitches[warp.requiresSwitch]) {
                     Msg.show('扉は閉ざされている…\nどこかにあるスイッチを押さなければならないようだ。');

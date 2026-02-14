@@ -23,12 +23,13 @@ export function initNorthWeek1(Maps, T) {
 
     Maps.data.north_stage1 = {
         w: 15, h: 15, tiles: n1t, encounterRate: 0.0, area: 'north', week1Map: true,
+        baseTile: T.GRASS,
         npcs: [
             { id: 'ice_dragon', type: 'enemy_ice_dragon', img: 'enemy_ice_dragon', x: 7, y: 1, msg: null, northMiniboss: 'stage1', blocking: true }
         ],
         warps: [
             { x: 7, y: 13, to: 'village', tx: 12, ty: 2 },
-            { x: 7, y: 1, to: 'north_stage2', tx: 7, ty: 12 }
+            { x: 7, y: 1, to: 'north_stage2', tx: 7, ty: 12, requiresNorthMiniboss: 'stage1' }
         ],
         start: { x: 7, y: 12 }
     };
@@ -40,12 +41,13 @@ export function initNorthWeek1(Maps, T) {
 
     Maps.data.north_stage2 = {
         w: 15, h: 15, tiles: n2t, encounterRate: 0.0, area: 'north', week1Map: true,
+        baseTile: T.GRASS,
         npcs: [
             { id: 'ice_magician', type: 'enemy_ice_magician', img: 'enemy_ice_magician', x: 7, y: 1, msg: null, northMiniboss: 'stage2', blocking: true }
         ],
         warps: [
             { x: 7, y: 13, to: 'north_stage1', tx: 7, ty: 2 }, // Back to Stage 1 (after dragon)
-            { x: 7, y: 1, to: 'north_stage3', tx: 7, ty: 12 }
+            { x: 7, y: 1, to: 'north_stage3', tx: 7, ty: 12, requiresNorthMiniboss: 'stage2' }
         ],
         start: { x: 7, y: 12 }
     };
@@ -57,12 +59,13 @@ export function initNorthWeek1(Maps, T) {
 
     Maps.data.north_stage3 = {
         w: 15, h: 15, tiles: n3t, encounterRate: 0.0, area: 'north', week1Map: true,
+        baseTile: T.GRASS,
         npcs: [
             { id: 'ice_knight', type: 'enemy_ice_knight', img: 'enemy_ice_knight', x: 7, y: 1, msg: null, northMiniboss: 'stage3', blocking: true }
         ],
         warps: [
             { x: 7, y: 13, to: 'north_stage2', tx: 7, ty: 2 },
-            { x: 7, y: 1, to: 'north_boss_room', tx: 7, ty: 12 }
+            { x: 7, y: 1, to: 'north_boss_room', tx: 7, ty: 12, requiresNorthMiniboss: 'stage3' }
         ],
         start: { x: 7, y: 12 }
     };
@@ -74,6 +77,7 @@ export function initNorthWeek1(Maps, T) {
 
     Maps.data.north_boss_room = {
         w: 15, h: 15, tiles: nbt, encounterRate: 0.0, area: 'north', week1Map: true,
+        baseTile: T.FLOOR,
         npcs: [
             { id: 'northBoss', type: 'enemy_ice_golem', img: 'ice_golem_map', x: 7, y: 1, msg: null, areaBoss: 'north', blocking: true }
         ],
