@@ -227,14 +227,23 @@ export class PlayerController {
         }
 
         const npcs = Maps.get().npcs || [];
-        let npc = npcs.find(n => n.x === tx && n.y === ty);
+        let npc = npcs.find(n => {
+            const w = n.width || 1;
+            const h = n.height || 1;
+            return tx >= n.x && tx < n.x + w && ty >= n.y && ty < n.y + h;
+        });
+
         if (!npc) {
             const adjacents = [
                 { x: playerTx, y: playerTy + 1 }, { x: playerTx, y: playerTy - 1 },
                 { x: playerTx + 1, y: playerTy }, { x: playerTx - 1, y: playerTy }
             ];
             for (const adj of adjacents) {
-                const adjNpc = npcs.find(n => n.x === adj.x && n.y === adj.y);
+                const adjNpc = npcs.find(n => {
+                    const w = n.width || 1;
+                    const h = n.height || 1;
+                    return adj.x >= n.x && adj.x < n.x + w && adj.y >= n.y && adj.y < n.y + h;
+                });
                 if (adjNpc) { npc = adjNpc; break; }
             }
         }

@@ -25,7 +25,7 @@ export function initNorthWeek1(Maps, T) {
         w: 15, h: 15, tiles: n1t, encounterRate: 0.0, area: 'north', week1Map: true,
         baseTile: T.GRASS,
         npcs: [
-            { id: 'ice_dragon', type: 'enemy_ice_dragon', img: 'enemy_ice_dragon', x: 7, y: 1, msg: null, northMiniboss: 'stage1', blocking: true }
+            { id: 'ice_dragon', type: 'enemy_ice_dragon', img: 'enemy_ice_dragon', x: 6, y: 0.2, width: 3, height: 3, msg: null, northMiniboss: 'stage1', blocking: true }
         ],
         warps: [
             { x: 7, y: 13, to: 'village', tx: 12, ty: 2 },
@@ -43,7 +43,7 @@ export function initNorthWeek1(Maps, T) {
         w: 15, h: 15, tiles: n2t, encounterRate: 0.0, area: 'north', week1Map: true,
         baseTile: T.GRASS,
         npcs: [
-            { id: 'ice_magician', type: 'enemy_ice_magician', img: 'enemy_ice_magician', x: 7, y: 1, msg: null, northMiniboss: 'stage2', blocking: true }
+            { id: 'ice_magician', type: 'enemy_ice_magician', img: 'enemy_ice_magician', x: 6.4, y: 0.2, width: 2.2, height: 3, msg: null, northMiniboss: 'stage2', blocking: true }
         ],
         warps: [
             { x: 7, y: 13, to: 'north_stage1', tx: 7, ty: 2 }, // Back to Stage 1 (after dragon)
@@ -61,7 +61,7 @@ export function initNorthWeek1(Maps, T) {
         w: 15, h: 15, tiles: n3t, encounterRate: 0.0, area: 'north', week1Map: true,
         baseTile: T.GRASS,
         npcs: [
-            { id: 'ice_knight', type: 'enemy_ice_knight', img: 'enemy_ice_knight', x: 7, y: 1, msg: null, northMiniboss: 'stage3', blocking: true }
+            { id: 'ice_knight', type: 'enemy_ice_knight', img: 'enemy_ice_knight', x: 5.9, y: 0.2, width: 2.6, height: 3, msg: null, northMiniboss: 'stage3', blocking: true }
         ],
         warps: [
             { x: 7, y: 13, to: 'north_stage2', tx: 7, ty: 2 },
@@ -79,7 +79,7 @@ export function initNorthWeek1(Maps, T) {
         w: 15, h: 15, tiles: nbt, encounterRate: 0.0, area: 'north', week1Map: true,
         baseTile: T.FLOOR,
         npcs: [
-            { id: 'northBoss', type: 'enemy_ice_golem', img: 'ice_golem_map', x: 7, y: 1, msg: null, areaBoss: 'north', blocking: true }
+            { id: 'northBoss', type: 'enemy_ice_golem', img: 'ice_golem_map', x: 6, y: 0.2, width: 3, height: 3, msg: null, areaBoss: 'north', blocking: true }
         ],
         warps: [
             { x: 7, y: 13, to: 'north_stage3', tx: 7, ty: 2 },

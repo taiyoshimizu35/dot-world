@@ -113,7 +113,9 @@ export class MapRenderer {
                 }
             }
             const img = AssetLoader.get(spriteName);
-            if (img) ctx.drawImage(img, sp.x, sp.y, TS, TS);
+            const w = npc.width || 1;
+            const h = npc.height || 1;
+            if (img) ctx.drawImage(img, sp.x, sp.y, TS * w, TS * h);
         }
 
         // Player

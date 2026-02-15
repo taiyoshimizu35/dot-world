@@ -90,10 +90,9 @@ export const AssetLoader = {
             ['enemy_gold_fairy', 'assets/enemies/enemy_gold_fairy.png'],
             // ボスマップスプライト
             ['ice_golem_map', 'assets/enemies/enemy_ice_golem.png'],
-            ['phantom_knight_map', 'assets/enemies/enemy_phantom_knight.png'],
+            ['phantom_knight_map', 'assets/enemies/enemy_phantom_knight-map.png'],
             ['dragon_map', 'assets/enemies/enemy_dragon_map.png'],
-            ['great_mage_map', 'assets/enemies/enemy_mage.png'],
-            ['enemy_great_mage_map', 'assets/enemies/enemy_mage.png'],
+            ['great_mage_map', 'assets/enemies/enemy_mage_map.png'],
         ];
         await Promise.all(assets.map(([n, s]) => this.loadImage(n, s)));
         console.log('Assets loaded');

@@ -83,7 +83,7 @@ export function initEastWeek1(Maps, T) {
     Maps.data.east_boss_room = {
         w: 15, h: 15, tiles: ebt, isDungeon: true, encounterRate: 0.0, area: 'east', week1Map: true,
         baseTile: T.FLOOR,
-        npcs: [{ id: 'eastBoss', type: 'enemy_slime', img: 'enemy_dragon', x: 10, y: 7, msg: null, areaBoss: 'east', blocking: true }],
+        npcs: [{ id: 'eastBoss', type: 'enemy_slime', img: 'dragon_map', x: 11, y: 5, width: 3, height: 3, msg: null, areaBoss: 'east', blocking: true }],
         warps: [{ x: 1, y: 7, to: 'east_stage1', tx: 38, ty: 20 }],
         start: { x: 2, y: 7 }
     };

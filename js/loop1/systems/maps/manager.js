@@ -37,7 +37,10 @@ export const Maps = {
     isNpcAt(tx, ty) {
         const npcs = this.get().npcs || [];
         for (const npc of npcs) {
-            if (npc.x !== tx || npc.y !== ty) continue;
+            const w = npc.width || 1;
+            const h = npc.height || 1;
+
+            if (tx < npc.x || tx >= npc.x + w || ty < npc.y || ty >= npc.y + h) continue;
             if (!npc.blocking) continue;
 
             // 週限定NPCのチェック

@@ -121,7 +121,7 @@ export function initSouthWeek1(Maps, T) {
         baseTile: T.GRAY_GRASS,
         bgm: 'boss',
         npcs: [
-            { id: 'southBoss', type: 'enemy_skeleton', img: 'phantom_knight_map', x: 7, y: 10, msg: null, areaBoss: 'south', blocking: true, name: '幻影の騎士', atk: 22, def: 8, hp: 100, exp: 60 }
+            { id: 'southBoss', type: 'enemy_skeleton', img: 'phantom_knight_map', x: 6.5, y: 10, width: 2.4, height: 3, msg: null, areaBoss: 'south', blocking: true }
         ],
         warps: [{ x: 7, y: 1, to: 'south_stage2', tx: 20, ty: 38 }],
         start: { x: 7, y: 2 }

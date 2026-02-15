@@ -143,7 +143,7 @@ export function initWestWeek1(Maps, T) {
         baseTile: T.STONE,
         bgm: 'boss',
         npcs: [
-            { id: 'westBoss', type: 'enemy_monster', img: 'enemy_mage', x: 4, y: 7, msg: null, areaBoss: 'west', blocking: true, name: '大魔道士', atk: 18, def: 5, hp: 80, exp: 50 }
+            { id: 'westBoss', type: 'enemy_monster', img: 'great_mage_map', x: 2, y: 4.8, width: 2.2, height: 3, msg: null, areaBoss: 'west', blocking: true }
         ],
         warps: [
             { x: 14, y: 7, to: 'west_stage2', tx: 2, ty: 20 }
