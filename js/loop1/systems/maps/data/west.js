@@ -73,7 +73,8 @@ export function initWestWeek1(Maps, T) {
 
     // ゴール
     w1t[20][1] = T.STAIRS;
-    w1t[20][40] = T.EXIT; // To Village
+    // w1t[20][40] = T.EXIT; // To Village
+    w1t[20][40] = T.ROCK
 
     Maps.data.west_stage1 = {
         w: 41, h: 41, tiles: w1t, isDungeon: true, encounterRate: 0.0, area: 'west', week1Map: true,
@@ -83,10 +84,10 @@ export function initWestWeek1(Maps, T) {
             { id: 'w1_sign', type: 'signpost', x: 38, y: 19, msg: '【西の塔 1階】\n石像の迷宮', blocking: true }
         ],
         warps: [
-            { x: 40, y: 20, to: 'village', tx: 1, ty: 9 },
+            { x: 39, y: 20, to: 'village', tx: 1, ty: 9 },
             { x: 1, y: 20, to: 'west_stage2', tx: 39, ty: 20, requiresSwitch: 'stage1' } // ty修正
         ],
-        start: { x: 39, y: 20 }
+        start: { x: 38, y: 20 }
     };
 
     // ----------------------------------------------------------------
@@ -143,7 +144,7 @@ export function initWestWeek1(Maps, T) {
         baseTile: T.STONE,
         bgm: 'boss',
         npcs: [
-            { id: 'westBoss', type: 'enemy_monster', img: 'great_mage_map', x: 2, y: 4.8, width: 2.2, height: 3, msg: null, areaBoss: 'west', blocking: true }
+            { id: 'westBoss', type: 'enemy_monster', img: 'great_mage_map', x: 2, y: 5.8, width: 1.5, height: 2, msg: null, areaBoss: 'west', blocking: true }
         ],
         warps: [
             { x: 14, y: 7, to: 'west_stage2', tx: 2, ty: 20 }

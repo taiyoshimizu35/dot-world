@@ -62,7 +62,7 @@ export function initEastWeek1(Maps, T) {
 
     // 宝箱への小道（行き止まり）
 
-    e1t[20][39] = T.EXIT;
+    // e1t[20][39] = T.EXIT;
 
     Maps.data.east_stage1 = {
         w: 41, h: 41, tiles: e1t, isDungeon: true, encounterRate: 0.0, area: 'east', week1Map: true,
@@ -77,8 +77,8 @@ export function initEastWeek1(Maps, T) {
 
     // ボス部屋 (15x15)
     const ebt = createDungeonTiles(15, 15, T);
-    for (let x = 2; x <= 12; x++) ebt[7][x] = T.PATH;
-    ebt[7][1] = T.EXIT;
+    for (let x = 1; x <= 12; x++) ebt[7][x] = T.PATH;
+    // ebt[7][1] = T.EXIT;
 
     Maps.data.east_boss_room = {
         w: 15, h: 15, tiles: ebt, isDungeon: true, encounterRate: 0.0, area: 'east', week1Map: true,

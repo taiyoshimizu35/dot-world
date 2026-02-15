@@ -12,13 +12,13 @@ export function initNorthWeek1(Maps, T) {
     const createRoom = () => {
         const tiles = createFieldTiles(15, 15, T);
         // Basic path (center vertical)
-        for (let y = 2; y <= 12; y++) tiles[y][7] = T.PATH;
+        for (let y = 2; y <= 13; y++) tiles[y][7] = T.PATH;
         return tiles;
     };
 
     // Stage 1: Ice Dragon
     const n1t = createRoom();
-    n1t[13][7] = T.EXIT; // To Village
+    // n1t[13][7] = T.EXIT; // To Village
     n1t[1][7] = T.PATH;  // Warp point behind boss
 
     Maps.data.north_stage1 = {
@@ -36,7 +36,7 @@ export function initNorthWeek1(Maps, T) {
 
     // Stage 2: Ice Magician
     const n2t = createRoom();
-    n2t[13][7] = T.EXIT;
+    // n2t[13][7] = T.EXIT;
     n2t[1][7] = T.PATH;
 
     Maps.data.north_stage2 = {
@@ -54,7 +54,7 @@ export function initNorthWeek1(Maps, T) {
 
     // Stage 3: Ice Knight
     const n3t = createRoom();
-    n3t[13][7] = T.EXIT;
+    // n3t[13][7] = T.EXIT;
     n3t[1][7] = T.PATH;
 
     Maps.data.north_stage3 = {
@@ -72,7 +72,7 @@ export function initNorthWeek1(Maps, T) {
 
     // Boss Room (Fake North Boss: Crystal Golem)
     const nbt = createRoom();
-    nbt[13][7] = T.EXIT;
+    // nbt[13][7] = T.EXIT;
     nbt[1][7] = T.PATH;
 
     Maps.data.north_boss_room = {

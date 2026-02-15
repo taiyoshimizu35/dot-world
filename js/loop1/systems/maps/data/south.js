@@ -47,14 +47,14 @@ export function initSouthWeek1(Maps, T) {
 
     // Path
     // Start(20, 2) -> End(20, 39)
-    const path1 = [[20, 2], [5, 10], [35, 20], [20, 39]]; // Zigzag
+    const path1 = [[20, 1], [20, 2], [5, 10], [35, 20], [20, 39]]; // Zigzag
     carvePath(s1t, path1);
 
     // Chest Path (Silver Key)
     // Branch from [35, 20] -> [35, 35]
     for (let y = 21; y <= 35; y++) s1t[y][35] = T.GRAY_GRASS;
 
-    s1t[1][20] = T.EXIT;
+    // s1t[1][20] = T.EXIT;
     s1t[39][20] = T.GRAY_DOOR; // Locked Door (通常のドア)
 
     Maps.data.south_stage1 = {
@@ -91,7 +91,7 @@ export function initSouthWeek1(Maps, T) {
     // Branch from [5, 25] -> [5, 35]
     for (let y = 26; y <= 35; y++) s2t[y][5] = T.GRAY_GRASS;
 
-    s2t[1][20] = T.STAIRS; // 戻り階段
+    s2t[1][20] = T.GRAY_DOOR; // 戻り階段
     s2t[39][20] = T.GRAY_DOOR; // To Boss (Locked)
 
     Maps.data.south_stage2 = {
@@ -114,14 +114,14 @@ export function initSouthWeek1(Maps, T) {
 
     // Path
     for (let y = 2; y <= 12; y++) sbt[y][7] = T.PATH;
-    sbt[1][7] = T.STAIRS;
+    sbt[1][7] = T.GRAY_DOOR;
 
     Maps.data.south_boss_room = {
         w: 15, h: 15, tiles: sbt, encounterRate: 0.0, area: 'south', week1Map: true,
         baseTile: T.GRAY_GRASS,
         bgm: 'boss',
         npcs: [
-            { id: 'southBoss', type: 'enemy_skeleton', img: 'phantom_knight_map', x: 6.5, y: 10, width: 2.4, height: 3, msg: null, areaBoss: 'south', blocking: true }
+            { id: 'southBoss', type: 'enemy_skeleton', img: 'phantom_knight_map', x: 6.7, y: 10, width: 1.8, height: 2.25, msg: null, areaBoss: 'south', blocking: true }
         ],
         warps: [{ x: 7, y: 1, to: 'south_stage2', tx: 20, ty: 38 }],
         start: { x: 7, y: 2 }

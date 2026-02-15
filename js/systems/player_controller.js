@@ -230,8 +230,18 @@ export class PlayerController {
         let npc = npcs.find(n => {
             const w = n.width || 1;
             const h = n.height || 1;
-            return tx >= n.x && tx < n.x + w && ty >= n.y && ty < n.y + h;
+            // Check intersection between target tile (tx, ty, 1, 1) and NPC (n.x, n.y, w, h)
+            return n.x < tx + 1 && n.x + w > tx && n.y < ty + 1 && n.y + h > ty;
         });
+
+        if (!npc) {
+            // Check current tile (too close)
+            npc = npcs.find(n => {
+                const w = n.width || 1;
+                const h = n.height || 1;
+                return n.x < playerTx + 1 && n.x + w > playerTx && n.y < playerTy + 1 && n.y + h > playerTy;
+            });
+        }
 
         if (!npc) {
             const adjacents = [
@@ -242,7 +252,7 @@ export class PlayerController {
                 const adjNpc = npcs.find(n => {
                     const w = n.width || 1;
                     const h = n.height || 1;
-                    return adj.x >= n.x && adj.x < n.x + w && adj.y >= n.y && adj.y < n.y + h;
+                    return n.x < adj.x + 1 && n.x + w > adj.x && n.y < adj.y + 1 && n.y + h > adj.y;
                 });
                 if (adjNpc) { npc = adjNpc; break; }
             }

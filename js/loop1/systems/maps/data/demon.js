@@ -16,7 +16,7 @@ export function initDemonCastleMaps(Maps, T) {
     // 北ボスからのワープ着地点(7, 12)からメイン通路への道
     dc1t[12][7] = T.PATH; dc1t[12][8] = T.PATH; dc1t[12][9] = T.PATH;
 
-    dc1t[17][10] = T.EXIT;
+    // dc1t[17][10] = T.EXIT;
 
     Maps.data.demon_castle = {
         w: 20, h: 18, tiles: dc1t, isDungeon: true, encounterRate: 0.12, area: 'demon',
@@ -34,7 +34,7 @@ export function initDemonCastleMaps(Maps, T) {
     // 魔王城 - 玉座の間
     const dc2t = createDungeonTiles(16, 14, T);
     for (let y = 1; y <= 11; y++) dc2t[y][8] = T.PATH;
-    dc2t[12][8] = T.EXIT;
+    // dc2t[12][8] = T.EXIT;
 
     Maps.data.demon_throne = {
         w: 16, h: 14, tiles: dc2t, isDungeon: true, encounterRate: 0, area: 'demon',

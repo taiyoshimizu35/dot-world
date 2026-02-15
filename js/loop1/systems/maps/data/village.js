@@ -97,7 +97,7 @@ export function initShopMaps(Maps, T) {
         ht.push(r);
     }
     ht[2][3] = T.COUNTER; ht[2][4] = T.COUNTER; ht[2][5] = T.COUNTER;
-    ht[hh - 1][4] = T.EXIT;
+    ht[hh - 1][4] = T.FLOOR;
     Maps.data.magic_shop = {
         w: hw, h: hh, tiles: ht,
         baseTile: T.FLOOR,
@@ -114,7 +114,7 @@ export function initShopMaps(Maps, T) {
         st.push(r);
     }
     st[2][3] = T.COUNTER; st[2][4] = T.COUNTER; st[2][5] = T.COUNTER;
-    st[sh - 1][4] = T.EXIT;
+    st[sh - 1][4] = T.FLOOR;
     Maps.data.shop_interior = {
         w: sw, h: sh, tiles: st,
         baseTile: T.FLOOR,
@@ -142,7 +142,7 @@ export function initShopMaps(Maps, T) {
         it.push(r);
     }
     it[2][4] = T.PULPIT; // カウンター1つ
-    it[ih - 1][4] = T.EXIT;
+    it[ih - 1][4] = T.FLOOR;
     it[2][6] = T.BED; it[2][7] = T.BED; // ベッド装飾
 
     Maps.data.inn = {
