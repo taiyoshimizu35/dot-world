@@ -153,8 +153,8 @@ export function initShopMaps(Maps, T) {
         w: iw, h: ih, tiles: it,
         baseTile: T.FLOOR,
         npcs: [
-            { id: 'innkeeper', type: 'villager', img: 'priest', x: 4, y: 1, msg: null, inn: true, blocking: true },
-            { id: 'save_point', type: 'goddes', x: 1, y: 1, savePoint: true, blocking: true }
+            { id: 'innkeeper', type: 'villager', img: 'priest', x: 4.1, y: 1, width:0.8, height:1, msg: null, inn: true, blocking: true },
+            { id: 'save_point', type: 'goddes', x: 1, y: 0.2, width:1, height:2, savePoint: true, blocking: true }
         ],
         warps: [{ x: 4, y: 7, to: 'village', tx: 19, ty: 16 }],
         start: { x: 4, y: 5 }
