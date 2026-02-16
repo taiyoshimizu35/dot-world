@@ -15,34 +15,45 @@ import { WorldState } from '../../../loop1/world.js'; // Context
 // 2週目バトルコアシステム
 // ===========================================
 export const Battle2 = {
-    active: false, enemy: null, enemyHp: 0, phase: 'command', cur: 0, msg: '', msgTimer: 0,
+    active: false, enemies: [], phase: 'command', cur: 0, msg: '', msgTimer: 0,
     commands: ['こうげき', 'スキル', 'アイテム', 'にげる'], itemCur: 0, magicCur: 0,
     isBoss: false, enemyAttackCount: 0, playerRef: null, waitForInput: false, nextPhase: null,
     currentArea: null, isTrueBoss: false, isDemonKing: false,
+    targetIndex: 0, // Currently selected target
 
     start(mapId) {
         // EnemyData2 is imported
         const m = Maps.get();
-        const enemies = getEnemiesForMap2(m, mapId);
-        if (!enemies || enemies.length === 0) {
+        const enemiesList = getEnemiesForMap2(m, mapId);
+        if (!enemiesList || enemiesList.length === 0) {
             console.warn('No enemies found for map', mapId);
             return;
         }
-        const id = enemies[Math.floor(Math.random() * enemies.length)];
-        this.enemy = { ...EnemyData2[id], type: id };
+
+        this.enemies = [];
+        // Spawn 1-3 enemies for testing multiple support
+        const count = Math.floor(Math.random() * 2) + 1; // 1 or 2
+        for (let i = 0; i < count; i++) {
+            const id = enemiesList[Math.floor(Math.random() * enemiesList.length)];
+            const data = EnemyData2[id];
+            if (data) {
+                this.enemies.push({ ...data, type: id, maxHp: data.hp, id: i });
+            }
+        }
         this.startCommon();
     },
 
     startTrueBoss(area) {
         const key = `true_${area}_boss`;
-        this.enemy = { ...EnemyData2[key], type: key };
+        this.enemies = [{ ...EnemyData2[key], type: key, maxHp: EnemyData2[key].hp, id: 0 }];
         this.currentArea = area;
         this.isTrueBoss = true;
         this._startBossCommon();
     },
 
     startTrueDemonKing() {
-        this.enemy = { ...EnemyData2.true_demon_king, type: 'true_demon_king' };
+        const key = 'true_demon_king';
+        this.enemies = [{ ...EnemyData2[key], type: key, maxHp: EnemyData2[key].hp, id: 0 }];
         this.currentArea = 'demon';
         this.isTrueBoss = true;
         this.isDemonKing = true;
@@ -50,9 +61,8 @@ export const Battle2 = {
     },
 
     _startBossCommon() {
-        this.enemyHp = this.enemy.hp;
         this.phase = 'wait_input'; this.nextPhase = 'command'; this.cur = 0;
-        this.msg = `ボス：${this.enemy.name}が現れた！`;
+        this.msg = `ボス：${this.enemies[0].name}が現れた！`;
         this.msgTimer = 0;
         this.isBoss = true; this.enemyAttackCount = 0;
         this.active = true;
@@ -63,9 +73,9 @@ export const Battle2 = {
     },
 
     startCommon() {
-        this.enemyHp = this.enemy.hp;
         this.phase = 'wait_input'; this.nextPhase = 'command'; this.cur = 0;
-        this.msg = `${this.enemy.name}が現れた！`;
+        const name = this.enemies.length > 1 ? '魔物たち' : this.enemies[0].name;
+        this.msg = `${name}が現れた！`;
         this.msgTimer = 0;
         this.isBoss = false; this.enemyAttackCount = 0;
         this.currentArea = null;
@@ -114,15 +124,22 @@ export const Battle2 = {
     },
 
     doPlayerAtk() {
-        const dmg = Math.max(1, PlayerStats2.getTotalAtk() - this.enemy.def + Math.floor(Math.random() * 4));
-        this.enemyHp -= dmg;
+        // Auto-target first living enemy for now
+        const target = this.enemies.find(e => e.hp > 0);
+        if (!target) {
+            this.checkVictory();
+            return;
+        }
+
+        const dmg = Math.max(1, PlayerStats2.getTotalAtk() - target.def + Math.floor(Math.random() * 4));
+        target.hp -= dmg;
 
         FX.shake(200); FX.flash(100);
-        this.msg = `${this.enemy.name}に${dmg}ダメージ！`;
+        this.msg = `${target.name}に${dmg}ダメージ！`;
         this.msgTimer = 0;
         this.waitForInput = true;
 
-        if (this.enemyHp <= 0) {
+        if (this.enemies.every(e => e.hp <= 0)) {
             this.checkVictory();
         } else {
             // 仲間がいれば仲間ターンへ
@@ -138,16 +155,19 @@ export const Battle2 = {
     doPartyActions() {
         let msgs = [];
         Party2.members.forEach(member => {
-            if (this.enemyHp <= 0) return;
+            if (this.enemies.every(e => e.hp <= 0)) return;
 
-            const action = Party2.getAction(member, this);
+            const target = this.enemies.find(e => e.hp > 0);
+            if (!target) return;
+
+            const action = Party2.getAction(member, this); // Might need update if getAction uses this.enemy
             if (action.type === 'attack') {
-                const dmg = Math.max(1, action.power - this.enemy.def);
-                this.enemyHp -= dmg;
+                const dmg = Math.max(1, action.power - target.def);
+                target.hp -= dmg;
                 msgs.push(`${member.name}の攻撃！${dmg}ダメージ！`);
             } else if (action.type === 'magic') {
                 const dmg = Math.max(1, action.power);
-                this.enemyHp -= dmg;
+                target.hp -= dmg;
                 member.mp -= 5;
                 msgs.push(`${member.name}の魔法！${dmg}ダメージ！`);
             } else if (action.type === 'heal') {
@@ -160,7 +180,7 @@ export const Battle2 = {
         this.msgTimer = 0;
         this.waitForInput = true;
 
-        if (this.enemyHp <= 0) {
+        if (this.enemies.every(e => e.hp <= 0)) {
             this.checkVictory();
         } else {
             this.phase = 'enemyAttack';
@@ -168,15 +188,31 @@ export const Battle2 = {
     },
 
     doEnemyAtk() {
-        const dmg = Math.max(1, this.enemy.atk - PlayerStats2.def);
-        const dead = PlayerStats2.takeDamage(dmg);
+        let damageTaken = false;
+        let totalDmg = 0;
+        let msgs = [];
 
-        FX.shake(150);
-        this.msg = `${this.enemy.name}の攻撃！\n${dmg}ダメージ！`;
+        this.enemies.forEach(enemy => {
+            if (enemy.hp <= 0) return;
+            const dmg = Math.max(1, enemy.atk - PlayerStats2.def);
+            const dead = PlayerStats2.takeDamage(dmg);
+            totalDmg += dmg;
+            msgs.push(`${enemy.name}の攻撃！${dmg}ダメージ！`);
+            damageTaken = true;
+            if (dead) return;
+        });
+
+        if (damageTaken) {
+            FX.shake(150);
+            this.msg = msgs.join('\n');
+        } else {
+            this.msg = '敵の攻撃！ミス！';
+        }
+
         this.msgTimer = 0;
         this.waitForInput = true;
 
-        if (dead) {
+        if (PlayerStats2.hp <= 0) {
             this.phase = 'defeat';
             this.msg = '力尽きた...';
         } else {
@@ -193,8 +229,7 @@ export const Battle2 = {
         } else if (Math.random() < 0.8) {
             this.msg = 'うまく逃げ切れた！';
             this.phase = 'victory';  // 報酬なしで終了
-            this.enemy.exp = 0;
-            this.enemy.gold = 0;
+            this.enemies = []; // Clear
         } else {
             this.msg = '逃げられなかった！';
             this.phase = 'enemyAttack';
@@ -205,29 +240,31 @@ export const Battle2 = {
 
     checkVictory() {
         this.phase = 'victory';
-        const goldGain = this.enemy.gold;
-        PlayerStats2.addGold(goldGain);
+
+        let totalGold = 0;
+        let totalExp = 0;
+        let dropItems = [];
+
+        this.enemies.forEach(e => {
+            totalGold += e.gold;
+            totalExp += e.exp;
+            if (e.drop && Math.random() < e.drop.rate) {
+                dropItems.push(e.drop.item);
+            }
+        });
+
+        PlayerStats2.addGold(totalGold);
 
         // 内部exp加算
-        const grew = PlayerStats2.addHiddenExp(this.enemy.exp);
-        Party2.addExpToAll(this.enemy.exp);
+        const grew = PlayerStats2.addHiddenExp(totalExp);
+        Party2.addExpToAll(totalExp);
 
-        // 討伐カウント
-        // 討伐クエスト廃止のためコメントアウト
-        // QuestSystem2.recordKill(this.enemy.type);
-
-        this.msg = `${this.enemy.name}を倒した！\n${goldGain}G を獲得！`;
+        this.msg = `敵を一掃した！\n${totalGold}G を獲得！`;
         if (grew) this.msg += '\n（力が少し強くなった）';
 
-        // Item Drop Logic
-        if (this.enemy.drop) {
-            if (Math.random() < this.enemy.drop.rate) {
-                const itemName = this.enemy.drop.item;
-                // if (window.Inv) Inv.add(itemName); // Inv is Loop 1 Inventory. Loop 2 has no inventory yet?
-                // For now, ignore drops or add to Loop 2 Inventory if exists
-                this.msg += `\n${itemName}を手に入れた！`;
-            }
-        }
+        dropItems.forEach(item => {
+            this.msg += `\n${item}を手に入れた！`;
+        });
 
         this.msgTimer = 0;
         this.waitForInput = true;
