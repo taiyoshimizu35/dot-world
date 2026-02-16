@@ -54,7 +54,10 @@ export class MapRenderer {
                     else if (t === T.INN_SIGN_LEFT) imgName = 'inn_sign_left';
                     else if (t === T.INN_SIGN_RIGHT) imgName = 'inn_sign_right';
                     else if (t === T.PULPIT) imgName = 'pulpit';
-
+                    else if (t === T.WEAPON_SHOP) imgName = 'weapon_shop';
+                    else if (t === T.MAGIC_SHOP) imgName = 'magic_shop';
+                    else if (t === T.INN) imgName = 'inn';
+                    else if (t === T.ADVANCED_SHOP) imgName = 'advanced_shop';
                     const sp = camera.toScreen(x * TS, y * TS);
 
                     // Overlay Check (Base Tile Rendering)

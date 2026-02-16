@@ -67,6 +67,10 @@ export const AssetLoader = {
             ['statue', 'assets/objects/statue.png'],
             ['goddes', 'assets/objects/goddes.png'],
             ['pulpit', 'assets/objects/pulpit.png'],
+            ['weapon_shop', 'assets/objects/weapon_shop.png'],
+            ['magic_shop', 'assets/objects/magic_shop.png'],
+            ['inn', 'assets/objects/inn.png'],
+            ['advanced_shop', 'assets/objects/advanced_shop.png'],
             // 敵キャラクター
             ['enemy_slime', 'assets/enemies/enemy_slime.png'],
             ['enemy_goblin', 'assets/enemies/enemy_goblin.png'],

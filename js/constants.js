@@ -47,6 +47,10 @@ export const GameConfig = {
         INN_SIGN_LEFT: 25,
         INN_SIGN_RIGHT: 26,
         PULPIT: 27,
+        WEAPON_SHOP: 28,
+        MAGIC_SHOP: 29,
+        INN: 30,
+        ADVANCED_SHOP: 31,
     },
     // Tiles that should be drawn over a base tile (e.g. grass/floor)
     OVERLAY_TILES: new Set([
@@ -70,7 +74,11 @@ export const GameConfig = {
         24, // WEAPON_SHOP_SIGN_RIGHT
         25, // INN_SIGN_LEFT
         26,  // INN_SIGN_RIGHT
-        27
+        27,
+        28,
+        29,
+        30,
+        31
     ])
 };
 

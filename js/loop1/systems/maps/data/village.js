@@ -29,31 +29,31 @@ export function initVillageMap(Maps, T) {
 
 
     // 建物
-    for (let y = 3; y <= 5; y++) for (let x = 3; x <= 6; x++) vt[y][x] = T.HOUSE_WOOD;
-    vt[5][4] = T.DOOR_LEFT;
-    vt[5][5] = T.DOOR_RIGHT;
-    vt[4][4] = T.MAGIC_SHOP_SIGN_LEFT;
-    vt[4][5] = T.MAGIC_SHOP_SIGN_RIGHT;
-    for (let y = 3; y <= 5; y++) for (let x = 18; x <= 21; x++) vt[y][x] = T.HOUSE_WOOD;
-    vt[5][19] = T.DOOR_LEFT;
-    vt[5][20] = T.DOOR_RIGHT;
-    vt[4][19] = T.WEAPON_SHOP_SIGN_LEFT;
-    vt[4][20] = T.WEAPON_SHOP_SIGN_RIGHT;
-    for (let y = 13; y <= 15; y++) for (let x = 18; x <= 21; x++) vt[y][x] = T.HOUSE_WOOD;
-    vt[15][19] = T.DOOR_LEFT;
-    vt[15][20] = T.DOOR_RIGHT;
-    vt[14][19] = T.INN_SIGN_LEFT;
-    vt[14][20] = T.INN_SIGN_RIGHT;
-    for (let y = 13; y <= 15; y++) for (let x = 3; x <= 6; x++) vt[y][x] = T.HOUSE_WOOD;
-    vt[15][4] = T.DOOR_LEFT;
-    vt[15][5] = T.DOOR_RIGHT;
+    // for (let y = 3; y <= 5; y++) for (let x = 3; x <= 6; x++) vt[y][x] = T.HOUSE_WOOD;
+    // vt[5][4] = T.DOOR_LEFT;
+    // vt[5][5] = T.DOOR_RIGHT;
+    // vt[4][4] = T.MAGIC_SHOP_SIGN_LEFT;
+    // vt[4][5] = T.MAGIC_SHOP_SIGN_RIGHT;
+    // for (let y = 3; y <= 5; y++) for (let x = 18; x <= 21; x++) vt[y][x] = T.HOUSE_WOOD;
+    // vt[5][19] = T.DOOR_LEFT;
+    // vt[5][20] = T.DOOR_RIGHT;
+    // vt[4][19] = T.WEAPON_SHOP_SIGN_LEFT;
+    // vt[4][20] = T.WEAPON_SHOP_SIGN_RIGHT;
+    // for (let y = 13; y <= 15; y++) for (let x = 18; x <= 21; x++) vt[y][x] = T.HOUSE_WOOD;
+    // vt[15][19] = T.DOOR_LEFT;
+    // vt[15][20] = T.DOOR_RIGHT;
+    // vt[14][19] = T.INN_SIGN_LEFT;
+    // vt[14][20] = T.INN_SIGN_RIGHT;
+    // for (let y = 13; y <= 15; y++) for (let x = 3; x <= 6; x++) vt[y][x] = T.HOUSE_WOOD;
+    // vt[15][4] = T.DOOR_LEFT;
+    // vt[15][5] = T.DOOR_RIGHT;
 
 
 
     // 岩
-    [[1, 1], [23, 3], [2, 15], [20, 1], [15, 15]].forEach(([x, y]) => {
-        if (vt[y] && vt[y][x] === T.GRASS) vt[y][x] = T.ROCK;
-    });
+    // [[1, 1], [23, 3], [2, 15], [20, 1], [15, 15]].forEach(([x, y]) => {
+    //     if (vt[y] && vt[y][x] === T.GRASS) vt[y][x] = T.ROCK;
+    // });
 
     Maps.data.village = {
         w: vw, h: vh, tiles: vt, encounterRate: 0.5,
@@ -62,7 +62,11 @@ export function initVillageMap(Maps, T) {
             { id: 'npc1', type: 'villager', x: 8, y: 8, msg: '草原を歩くとモンスターに会うぞ。\n勇者！魔王様を倒してくれよな！', blocking: true },
             { id: 'npc2', type: 'villager', x: 10, y: 15, msg: '女神像は記憶を保持してくれるらしい', blocking: true },
             { id: 'sign1', type: 'signpost', x: 11, y: 7, msg: '四天王を倒せ。\nさすれば道は開かれん', blocking: true },
-            { id: 'demon_guide', type: 'villager', x: 14, y: 11, msg: null, demonGuide: true, blocking: true }
+            { id: 'demon_guide', type: 'villager', x: 14, y: 11, msg: null, demonGuide: true, blocking: true },
+            { id: 'magic_shop', type: 'shop', img: 'magic_shop', x: 2.5, y: 1.5, width:5, height:4.5, msg: null, blocking: true },
+            { id: 'weapon_shop', type: 'shop', img: 'weapon_shop', x: 17.5, y: 1.5, width:5, height:4.5, msg: null, blocking: true },
+            { id: 'inn', type: 'inn', img: 'inn', x: 18, y: 11, width:4, height:5, msg: null, blocking: true },
+            { id: 'advanced_shop', type: 'shop', img: 'advanced_shop', x: 2.5, y: 11, width:4.5, height:5, msg: null, blocking: true },
         ],
         warps: [
             { x: 4, y: 5, to: 'magic_shop', tx: 4, ty: 6 },
