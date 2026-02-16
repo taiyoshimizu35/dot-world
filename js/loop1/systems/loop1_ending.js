@@ -168,27 +168,18 @@ export const Loop1Ending = {
             WorldState.holySwordStolen = true;
         }
 
-        // 村に戻る
-        // 村に戻る、またはStartMapへ
-        if (Maps.data && Maps.data.start) {
-            Maps.current = 'start';
-        } else {
-            console.warn("Start map not found, falling back to village");
-            Maps.current = 'village';
-        }
-
+        // Set Player Position to Start of Loop 2 (Center Map)
         const start = Maps.get().start;
-        // window.game usage - replace with direct game object if possible, but window.game is common pattern here
-        if (this.game) {
+        if (this.game && start) {
             this.game.player.x = start.x * GameConfig.TILE_SIZE;
             this.game.player.y = start.y * GameConfig.TILE_SIZE;
             this.game.player.dir = 0;
             this.game.player.moving = false;
 
-            // Immediately update camera so we don't show wrong location for 1 frame
-            if (Maps.get()) {
-                Camera.update(this.game.player.x, this.game.player.y, Maps.get().w, Maps.get().h);
-            }
+            // Immediately update camera
+            Camera.update(this.game.player.x, this.game.player.y, Maps.get().w, Maps.get().h);
+        } else {
+            console.error("Failed to set Loop 2 start position. Map or Game instance missing.");
         }
 
         // Transition Logic:

@@ -97,6 +97,9 @@ export const AssetLoader = {
             ['phantom_knight_map', 'assets/enemies/enemy_phantom_knight-map.png'],
             ['dragon_map', 'assets/enemies/enemy_dragon_map.png'],
             ['great_mage_map', 'assets/enemies/enemy_mage_map.png'],
+            // UI / Backgrounds
+            ['world_map', 'assets/ui/world_map.png'],
+            ['cursor', 'assets/ui/cursor.png'],
         ];
         await Promise.all(assets.map(([n, s]) => this.loadImage(n, s)));
         console.log('Assets loaded');

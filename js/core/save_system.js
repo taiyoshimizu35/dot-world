@@ -1,5 +1,5 @@
 import { WorldState } from '../loop1/world.js';
-import { WorldState2 } from '../loop2/world.js';
+
 import { PlayerStats2 } from '../loop2/player.js';
 import { Party2 } from '../loop2/party.js';
 import { QuestSystem2 } from '../loop2/quest.js';
@@ -119,8 +119,8 @@ export const SaveSystem = {
         } else {
             // Loop 2 Data
             data.world2 = {
-                trueBosses: { ...WorldState2.trueBosses },
-                trueDemonKingDefeated: WorldState2.trueDemonKingDefeated
+                trueBosses: { ...WorldState.world2.trueBosses },
+                trueDemonKingDefeated: WorldState.world2.trueDemonKingDefeated
             };
             data.player2 = {
                 name: PlayerStats2.name,
@@ -222,8 +222,8 @@ export const SaveSystem = {
                 WorldState.startWeek2(); // Switch to Loop 2 managers
 
                 if (data.world2) {
-                    WorldState2.trueBosses = data.world2.trueBosses;
-                    WorldState2.trueDemonKingDefeated = data.world2.trueDemonKingDefeated;
+                    WorldState.world2.trueBosses = data.world2.trueBosses;
+                    WorldState.world2.trueDemonKingDefeated = data.world2.trueDemonKingDefeated;
                 }
 
                 // Initialize Week 2 Maps

@@ -58,6 +58,10 @@ export class MapRenderer {
                     else if (t === T.MAGIC_SHOP) imgName = 'magic_shop';
                     else if (t === T.INN) imgName = 'inn';
                     else if (t === T.ADVANCED_SHOP) imgName = 'advanced_shop';
+                    else if (t === T.WALL) imgName = 'rock'; // Loop 2 Wall
+                    else if (t === T.EXIT) imgName = 'floor'; // Loop 2 Exit
+                    else if (t === T.SHOP) imgName = 'weapon_shop'; // Loop 2 Shop (placeholder)
+                    else if (t === T.INN) imgName = 'inn'; // Loop 2 Inn (placeholder)
                     const sp = camera.toScreen(x * TS, y * TS);
 
                     // Overlay Check (Base Tile Rendering)

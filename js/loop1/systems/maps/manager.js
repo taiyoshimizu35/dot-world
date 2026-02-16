@@ -3,6 +3,7 @@ import { WorldState } from '../../world.js';
 import { QuestSystem as QuestFlags } from '../../quest.js';
 import { Msg } from '../../../core/message.js';
 import { initMapData } from './data.js';
+import { Areas } from '../../../loop2/systems/maps/data/areas.js'; // Import Loop 2 Areas
 
 // ===========================================
 // マップマネージャー
@@ -14,22 +15,47 @@ export const Maps = {
     init() {
         this.data = {};
         initMapData(this);
+        // We can merge Areas into this.data or check separate list?
+        // Merging is cleaner if names don't collide.
+        // Loop 2 names: center, east, west, north, south, demon
+        // Loop 1 names: village, castle, field, dungeon, etc.
+        // No collision likely.
+        Object.assign(this.data, Areas);
     },
 
     get() { return this.data[this.current]; },
 
+    // Explicit load method for switching maps with logic (e.g., reset NPC state)
+    load(id) {
+        if (this.data[id]) {
+            this.current = id;
+            console.log(`Map loaded: ${id}`);
+        } else {
+            console.error(`Map not found: ${id}`);
+        }
+    },
+
     getTile(x, y) {
-        if (Number.isNaN(x) || Number.isNaN(y)) {
-            console.error("Maps.getTile received NaN:", x, y);
-            return GameConfig.TILE_TYPES ? GameConfig.TILE_TYPES.HOUSE_WOOD : 2;
+        if (Number.isNaN(x) || Number.isNaN(y) || x === undefined || y === undefined) {
+            // console.warn("Maps.getTile received invalid coords:", x, y);
+            return GameConfig.TILE_TYPES ? GameConfig.TILE_TYPES.WALL : 1;
         }
         const m = this.get();
-        if (x < 0 || x >= m.w || y < 0 || y >= m.h) return GameConfig.TILE_TYPES.HOUSE_WOOD;
+        if (!m) return GameConfig.TILE_TYPES ? GameConfig.TILE_TYPES.WALL : 1;
+        if (x < 0 || x >= m.w || y < 0 || y >= m.h) return GameConfig.TILE_TYPES ? GameConfig.TILE_TYPES.WALL : 1;
+
+        // Unified Support: Check map format
+        // Loop 1 Maps: m.tiles[y][x] might be object or ID depending on data.js?
+        // Actually Loop 1 tiles in `data.js` seem to be 2D array of IDs.
+        // Loop 2 maps are also 2D array of IDs.
+        // So this code should naturally work for both IF m.tiles structure is same.
+        // Let's verify Loop 1 data structure.
         return m.tiles[y][x];
     },
 
     isBlocking(t) {
         const T = GameConfig.TILE_TYPES;
+        if (t === T.WALL) return true; // Loop 2 Wall
         return t === T.ROCK || t === T.WATER || t === T.HOUSE_WOOD || t === T.HOUSE_STONE || t === T.DESK || t === T.BED || t === T.COUNTER || t === T.TREE || t === T.STATUE || t === T.DOOR_LEFT || t === T.DOOR_RIGHT || t === T.PULPIT;
     },
 

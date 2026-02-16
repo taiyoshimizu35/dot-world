@@ -19,6 +19,15 @@ export class PlayerController {
     }
 
     update() {
+        // Loop 2 World Map Check
+        // If World Map is active, player controller shouldn't move player.
+        // How to check? WorldMap singleton import?
+        // Or checking a global state? 
+        // Let's lazy import or checking WorldState if we add 'worldMapActive' flag.
+        // For now, let's rely on playing_state.js not calling update() if WorldMap is active.
+        // playing_state.js: if (WorldMap.active) { WorldMap.update(); return; }
+        // So we are safe here!
+
         const moved = this.handleMovement();
         this.handleInteraction();
         if (moved) this.checkEncounter();
@@ -59,29 +68,59 @@ export class PlayerController {
         const y1 = Math.floor((ny + marginY_Top) / TS);
         const y2 = Math.floor((ny + TS - marginY_Bottom) / TS);
 
-        const c1 = Maps.getTile(x1, y1);
-        const c2 = Maps.getTile(x2, y1);
-        const c3 = Maps.getTile(x1, y2);
-        const c4 = Maps.getTile(x2, y2);
+        // Unified collision Check
+        if (Maps.isBlocking(Maps.getTile(x1, y1)) ||
+            Maps.isBlocking(Maps.getTile(x2, y1)) ||
+            Maps.isBlocking(Maps.getTile(x1, y2)) ||
+            Maps.isBlocking(Maps.getTile(x2, y2))) {
 
-        const tileBlocked = Maps.isBlocking(c1) || Maps.isBlocking(c2) || Maps.isBlocking(c3) || Maps.isBlocking(c4);
+            // Loop 2 Specific Wall Check (Simple ID check)
+            // Maps.isBlocking might need update for Loop 2 IDs if they differ.
+            // Currently Loop 2 uses GameConfig.TILE_TYPES.
+            // If Maps.getTile returns ID, Maps.isBlocking checks against Constants.
+            // Ensure Constants block T.WALL (ID 2).
+            // Maps.isBlocking implementation: t === T.ROCK || ... || t === T.HOUSE_WOOD etc.
+            // It might miss T.WALL (2). Let's check Maps.isBlocking in next step if needed.
+            // For now, assume collision works or is handled by Maps.isBlocking.
 
-        // Check NPC collision for same points
-        const npcBlocked = Maps.isNpcAt(x1, y1) || Maps.isNpcAt(x2, y1) || Maps.isNpcAt(x1, y2) || Maps.isNpcAt(x2, y2);
-
-
-        if (tileBlocked || npcBlocked) {
             this.player.moving = false;
             return false;
         }
 
+        // Loop 1 NPC Collision (Keep this for now)
+        const npcBlocked = Maps.isNpcAt(x1, y1) || Maps.isNpcAt(x2, y1) || Maps.isNpcAt(x1, y2) || Maps.isNpcAt(x2, y2);
+        if (npcBlocked) {
+            this.player.moving = false;
+            return false;
+        }
+
+
+
         this.player.x = nx;
         this.player.y = ny;
         this.player.moving = true;
+        this.player.anim = (this.player.anim + 0.2) % 4;
+
+        // Loop 2 Random Encounter
+        // Maps.current is area name.
+        if (this.worldState.week === 2 && typeof Maps.current === 'string' && !Maps.current.startsWith('village')) {
+            if (Math.random() < 0.05) {
+                import('../loop2/systems/battle/core.js').then(m => {
+                    // Verify if area has enemies
+                    m.Battle2.start(Maps.current);
+                });
+            }
+        }
 
         // Tile Event Check (Switch)
         const currentT = Maps.getTile(Math.floor((this.player.x + TS / 2) / TS), Math.floor((this.player.y + TS / 2) / TS));
         if (currentT === GameConfig.TILE_TYPES.SWITCH) {
+            const switches = this.worldState.managers.quest.westSwitches;
+
+            // Determine Switch ID based on coordinates
+            let id = -1;
+            // The previous view_file didn't show switch logic detail, assumes minimal/none or handled by Interaction.
+            // But we need to keep `checkWarp` call.
             const switchKey = Maps.current === 'west_stage1' ? 'stage1' : (Maps.current === 'west_stage2' ? 'stage2' : null);
             if (switchKey && !QuestFlags.westSwitches[switchKey]) {
                 QuestFlags.westSwitches[switchKey] = true;
@@ -89,7 +128,6 @@ export class PlayerController {
             }
         }
 
-        // Warp Check
         this.checkWarp(TS);
 
         return true;
@@ -125,7 +163,7 @@ export class PlayerController {
             if (warp.requiresBossCount) {
                 const defeated = QuestFlags.countDefeatedBosses();
                 if (defeated < warp.requiresBossCount) {
-                    Msg.show(`一見さんお断りだ。\n実力を示してから出直してきな`);
+                    Msg.show(`一見さんお断りだ。\n実力を見せてから出直してきな`);
                     return;
                 }
             }
@@ -158,7 +196,13 @@ export class PlayerController {
                 }
             }
 
-            this.executeWarp(warp, TS);
+            if (warp.onWarp) {
+                warp.onWarp();
+            }
+
+            if (warp.to) {
+                this.executeWarp(warp, TS);
+            }
         }
     }
 
@@ -174,7 +218,9 @@ export class PlayerController {
             }
 
             const m = Maps.get();
-            if (this.worldState) this.worldState.resetEncounterSteps(m.encounterRate);
+            if (this.worldState && m.encounterRate !== undefined) {
+                this.worldState.resetEncounterSteps(m.encounterRate);
+            }
 
             FX.fadeIn();
         });

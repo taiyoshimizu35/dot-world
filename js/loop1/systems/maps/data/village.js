@@ -103,7 +103,7 @@ export function initShopMaps(Maps, T) {
     ht[2][3] = T.COUNTER; ht[2][4] = T.COUNTER; ht[2][5] = T.COUNTER;
     ht[hh - 1][4] = T.FLOOR;
     Maps.data.magic_shop = {
-        w: hw, h: hh, tiles: ht,
+        w: hw, h: hh, tiles: ht, encounterRate: 0.0,
         baseTile: T.FLOOR,
         npcs: [{ id: 'mage_shopkeeper', type: 'villager', x: 4, y: 1, msg: null, magicShop: true, blocking: true }],
         warps: [{ x: 4, y: 7, to: 'village', tx: 4, ty: 6 }],
@@ -120,7 +120,7 @@ export function initShopMaps(Maps, T) {
     st[2][3] = T.COUNTER; st[2][4] = T.COUNTER; st[2][5] = T.COUNTER;
     st[sh - 1][4] = T.FLOOR;
     Maps.data.shop_interior = {
-        w: sw, h: sh, tiles: st,
+        w: sw, h: sh, tiles: st, encounterRate: 0.0,
         baseTile: T.FLOOR,
         npcs: [{ id: 'shopkeeper', type: 'villager', x: 4, y: 1, msg: null, shop: true, blocking: true }],
         warps: [{ x: 4, y: 7, to: 'village', tx: 19, ty: 6 }],
@@ -131,7 +131,7 @@ export function initShopMaps(Maps, T) {
     const aw = 9, ah = 8;
     // タイルは通常ショップと同じものを使用
     Maps.data.advanced_shop = {
-        w: aw, h: ah, tiles: st,
+        w: aw, h: ah, tiles: st, encounterRate: 0.0,
         baseTile: T.FLOOR,
         npcs: [{ id: 'adv_shopkeeper', type: 'villager', x: 4, y: 1, msg: null, advancedShop: true, blocking: true }],
         warps: [{ x: 4, y: 7, to: 'village', tx: 4, ty: 16 }],
@@ -150,7 +150,7 @@ export function initShopMaps(Maps, T) {
     it[2][6] = T.BED; it[2][7] = T.BED; // ベッド装飾
 
     Maps.data.inn = {
-        w: iw, h: ih, tiles: it,
+        w: iw, h: ih, tiles: it, encounterRate: 0.0,
         baseTile: T.FLOOR,
         npcs: [
             { id: 'innkeeper', type: 'villager', img: 'priest', x: 4.1, y: 1, width:0.8, height:1, msg: null, inn: true, blocking: true },

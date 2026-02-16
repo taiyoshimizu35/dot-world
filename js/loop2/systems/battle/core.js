@@ -7,7 +7,7 @@ import { PlayerStats2 } from '../../player.js';
 import { Party2 } from '../../party.js';
 import { BattleRender2 } from './render.js';
 import { EnemyData2, getEnemiesForMap2 } from '../../data/enemies.js';
-import { WorldState2 } from '../../world.js';
+
 import { WorldState } from '../../../loop1/world.js'; // Context
 // import { Inv } from '../../loop1/systems/inventory.js'; // If Inv is used (line 212)
 
@@ -20,6 +20,16 @@ export const Battle2 = {
     isBoss: false, enemyAttackCount: 0, playerRef: null, waitForInput: false, nextPhase: null,
     currentArea: null, isTrueBoss: false, isDemonKing: false,
     targetIndex: 0, // Currently selected target
+
+    init(worldState) {
+        this.active = false;
+        this.enemies = [];
+        this.phase = 'command';
+        this.msg = '';
+        this.currentArea = null;
+        this.isTrueBoss = false;
+        this.isDemonKing = false;
+    },
 
     start(mapId) {
         // EnemyData2 is imported
@@ -271,10 +281,10 @@ export const Battle2 = {
 
         // ボス撃破フラグ
         if (this.isTrueBoss && this.currentArea) {
-            WorldState2.trueBosses[this.currentArea] = true;
+            WorldState.world2.trueBosses[this.currentArea] = true;
         }
         if (this.isDemonKing) {
-            WorldState2.trueDemonKingDefeated = true;
+            WorldState.world2.trueDemonKingDefeated = true;
         }
     },
 

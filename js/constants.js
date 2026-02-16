@@ -12,7 +12,7 @@ export const GameConfig = {
     TILE_SIZE: 16,
 
     // Debug Mode
-    DEBUG_MODE: false,
+    DEBUG_MODE: true,
 
     // Player Speed
     PLAYER_SPEED: 2,
@@ -38,6 +38,10 @@ export const GameConfig = {
         GRAY_GRASS: 16,
         GRAY_DOOR: 17,
         HOUSE_WOOD: 18,
+        WALL: 99, // Loop 2 Wall
+        EXIT: 98, // Loop 2 Exit
+        SHOP: 97, // Loop 2 Shop/Facility
+        INN: 96,   // Loop 2 Inn
         DOOR_LEFT: 19,
         DOOR_RIGHT: 20,
         MAGIC_SHOP_SIGN_LEFT: 21,

@@ -102,36 +102,32 @@ export class TitleState extends BaseState {
                 Input.lock(150);
             } else if (selected === 'DEBUG: Loop 2') {
                 WorldState.reset();
-                SaveSystem.clear(); // Clear saves for fresh debug start?
-                // Or maybe keep them? User said "Debug Loop 2" clears.
+                // SaveSystem.clear(); // Optional: keeps previous saves
 
+                // Dummy Stats for Week 2
                 const dummyStats = {
                     level: 50,
                     maxHp: 500, maxMp: 200,
                     atk: 100, def: 100,
                     matk: 80, mdef: 80
                 };
+
+                // Initialize Week 2
                 WorldState.startWeek2(dummyStats);
 
-                if (Maps.initWeek2) {
-                    Maps.initWeek2();
-                }
-
-                if (Maps.data && Maps.data.start) {
-                    Maps.current = 'start';
-                } else {
-                    Maps.current = 'village';
-                }
-
+                // Map loading is handled in startWeek2 ('center'), but we need to set player position
                 const m = Maps.get();
-                const start = m.start;
-                this.game.player.x = start.x * GameConfig.TILE_SIZE;
-                this.game.player.y = start.y * GameConfig.TILE_SIZE;
-                this.game.player.dir = 0;
-                this.game.player.moving = false;
+                if (m && m.start) {
+                    this.game.player.x = m.start.x * GameConfig.TILE_SIZE;
+                    this.game.player.y = m.start.y * GameConfig.TILE_SIZE;
+                    this.game.player.dir = 0;
+                    this.game.player.moving = false;
+                    Camera.update(this.game.player.x, this.game.player.y, m.w, m.h);
 
-                Camera.update(this.game.player.x, this.game.player.y, m.w, m.h);
-                WorldState.resetEncounterSteps(m.encounterRate);
+                    if (WorldState.resetEncounterSteps && m.encounterRate !== undefined) {
+                        WorldState.resetEncounterSteps(m.encounterRate);
+                    }
+                }
 
                 if (window.currentState !== undefined) window.currentState = GameState.PLAYING;
                 this.game.stateMachine.change('playing');
