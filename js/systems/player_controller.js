@@ -101,16 +101,8 @@ export class PlayerController {
         this.player.moving = true;
         this.player.anim = (this.player.anim + 0.2) % 4;
 
-        // Loop 2 Random Encounter
-        // Maps.current is area name.
-        if (this.worldState.week === 2 && typeof Maps.current === 'string' && !Maps.current.startsWith('village')) {
-            if (Math.random() < 0.05) {
-                import('../loop2/systems/battle/core.js').then(m => {
-                    // Verify if area has enemies
-                    m.Battle2.start(Maps.current);
-                });
-            }
-        }
+        // Loop 2 Random Encounter logic is now handled in checkEncounter() below
+        // Legacy block removed to prevent double/uncontrolled encounters
 
         // Tile Event Check (Switch)
         const currentT = Maps.getTile(Math.floor((this.player.x + TS / 2) / TS), Math.floor((this.player.y + TS / 2) / TS));

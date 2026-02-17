@@ -2,6 +2,7 @@ import { GameConfig } from '../../constants.js';
 import { Draw } from '../../core/draw.js';
 import { Input } from '../../core/input.js';
 import { AssetLoader } from '../../core/assets.js';
+import { WorldState } from '../../loop1/world.js';
 import { Maps } from '../../loop1/systems/maps/manager.js';
 
 // Actually, Loop 2 should have its own map loader or reuse Loop 1's manager if adapted.
@@ -88,6 +89,22 @@ export const WorldMap = {
         // Load Map using Unified Maps Manager
         import('../../loop1/systems/maps/manager.js').then(m => {
             m.Maps.load(areaName);
+            const map = m.Maps.get();
+            if (map && map.start) {
+                // Ensure player is available (global or via manager system)
+                // Assuming standard player object in Loop 2 context
+                if (WorldState.game && WorldState.game.player) {
+                    WorldState.game.player.x = map.start.x * GameConfig.TILE_SIZE;
+                    WorldState.game.player.y = map.start.y * GameConfig.TILE_SIZE;
+                    // Reset direction if needed?
+                } else if (WorldState.managers.player) {
+                    // Loop 1 manager fallback
+                    // But loop2 player might be different object? 
+                    // map.start logic handled above
+                    // Let's stick to modifying coordinates directly if possible or finding the right reference.
+                    // In Loop 2, PlayerStats2 is stats, but entity is game.player.
+                }
+            }
         });
     },
 

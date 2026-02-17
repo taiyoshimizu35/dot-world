@@ -44,6 +44,15 @@ export class InteractionSystem2 {
         }
 
         // Loop 2 Shops
+        if (npc.savePoint) {
+            Msg.choice('記録しますか？', ['はい', 'いいえ'], (idx) => {
+                if (idx === 0) {
+                    this.worldState.changeState('save');
+                }
+            });
+            return;
+        }
+
         if (npc.shop || npc.magicShop || npc.advancedShop) {
             Msg.show('「いらっしゃいませ。まだ準備中です」');
         }

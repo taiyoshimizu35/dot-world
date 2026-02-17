@@ -198,14 +198,7 @@ export const Loop1Ending = {
         FX.fadeIn(() => {
             Input.lock(100);
             // 2週目開始メッセージ
-            Msg.show('……目が覚めた。\n何もかもが…違って見える…\n\n【2週目開始】', () => {
-                // Auto-Save after message closed
-                // Assuming SaveSystem is imported
-                if (typeof SaveSystem !== 'undefined') {
-                    SaveSystem.save();
-                    Msg.show('セーブしました。');
-                }
-            });
+            Msg.show('…ここは？');
         });
     }
 };

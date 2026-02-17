@@ -41,6 +41,7 @@ class Game {
 
         // State Machine Initialization
         this.stateMachine = new StateMachine();
+        WorldState.registerGame(this);
         this.initStates();
     }
 

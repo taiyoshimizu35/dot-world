@@ -30,6 +30,19 @@ export const Maps = {
         if (this.data[id]) {
             this.current = id;
             console.log(`Map loaded: ${id}`);
+
+            // Auto-apply encounter rate on load
+            const m = this.data[id];
+            if (WorldState && m.encounterRate !== undefined) {
+                WorldState.resetEncounterSteps(m.encounterRate);
+            } else if (WorldState) {
+                // If undefined, maybe strict safe mode? or default?
+                // Loop 1 village has no encounterRate (0), field has it.
+                // If undefined, it effectively keeps previous or sets to Infinity if we want safety.
+                // Let's safe default to 0 (Infinity steps) if undefined, ensuring no random battles in towns if forgot.
+                if (m.encounterRate === undefined) WorldState.resetEncounterSteps(0);
+            }
+
         } else {
             console.error(`Map not found: ${id}`);
         }

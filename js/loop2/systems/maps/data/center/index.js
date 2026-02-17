@@ -20,8 +20,10 @@ const createMap = (areaName, baseTile) => {
     return {
         w: W, h: H, tiles: tiles,
         area: areaName,
-        baseTile: baseTile,
-        npcs: [],
+        baseTile: baseTile, 
+        npcs: [
+            { x: 10, y: 5, sprite: 'goddes', savePoint: true, blocking: true }
+        ],
         warps: [
             {
                 x: Math.floor(W / 2),

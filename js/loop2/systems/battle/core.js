@@ -123,12 +123,11 @@ export const Battle2 = {
         } else if (this.phase === 'enemyAttack') {
             if (this.msgTimer > 40) this.doEnemyAtk();
         } else if (this.phase === 'victory') {
-            if (Input.interact()) this.end();
+            this.end();
         } else if (this.phase === 'defeat') {
-            if (Input.interact()) {
-                this.active = false;
-                if (WorldState) WorldState.changeState('gameover'); // currentState = GameState.GAMEOVER;
-            }
+            this.active = false;
+            // Loop 1 WorldState usage
+            if (WorldState) WorldState.changeState('gameover');
         }
         this.msgTimer++;
     },
@@ -290,7 +289,7 @@ export const Battle2 = {
 
     end() {
         this.active = false;
-        if (window.game && window.game.stateMachine) window.game.stateMachine.change('playing'); // currentState = GameState.PLAYING;
+        if (WorldState) WorldState.changeState('playing');
         this.phase = 'command';
         this.isDemonKing = false;
         this.isTrueBoss = false;

@@ -13,22 +13,36 @@ const createMap = (areaName, baseTile) => {
             else tiles[y][x] = baseTile;
         }
     }
-    tiles[H - 1][Math.floor(W / 2)] = T.EXIT;
+
+    // Exits (North -> World, Others -> Dungeon)
+    const midX = Math.floor(W / 2);
+    const midY = Math.floor(H / 2);
+
+    // Make exits passable
+    tiles[0][midX] = baseTile; // North
+    tiles[midY][0] = baseTile; // West
+    tiles[H - 1][midX] = baseTile; // South
+    tiles[midY][W - 1] = baseTile; // East
+
     return {
         w: W, h: H, tiles: tiles,
         area: areaName,
         baseTile: baseTile,
         npcs: [],
         warps: [
+            // North: World Map
             {
-                x: Math.floor(W / 2),
-                y: H - 1,
-                onWarp: () => {
-                    import('../../../world_map.js').then(m => m.WorldMap.open());
-                }
-            }
+                x: midX, y: 0,
+                onWarp: () => { import('../../../world_map.js').then(m => m.WorldMap.open()); }
+            },
+            // West: Dungeon 1
+            { x: 0, y: midY, to: 'south_dungeon_1', tx: 18, ty: 7 },
+            // South: Dungeon 2
+            { x: midX, y: H - 1, to: 'south_dungeon_2', tx: 10, ty: 2 },
+            // East: Dungeon 3
+            { x: W - 1, y: midY, to: 'south_dungeon_3', tx: 2, ty: 7 }
         ],
-        start: { x: Math.floor(W / 2), y: H - 2 },
+        start: { x: midX, y: midY },
         encounterRate: 15
     };
 };

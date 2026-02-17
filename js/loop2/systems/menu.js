@@ -5,7 +5,7 @@ import { Draw } from '../../core/draw.js';
 import { SaveSystem } from '../../core/save_system.js';
 import { PlayerStats2 } from '../player.js';
 import { Party2 } from '../party.js';
-import { WorldState } from '../../loop1/world.js'; // Context
+import { WorldState } from '../../loop1/world.js';
 
 // ===========================================
 // Loop 2 Menu System
@@ -19,7 +19,7 @@ export const Menu2 = {
     actionCur: 0,
     targetMember: null, // Selected companion
 
-    opts: ['アイテム', 'ステータス', 'なかま', 'セーブ', 'ロード', 'とじる'],
+    opts: ['アイテム', 'ステータス', 'なかま', 'とじる'],
 
     open() {
         this.visible = true;
@@ -28,19 +28,29 @@ export const Menu2 = {
         this.subCur = 0;
         this.actionWindow = false;
         this.targetMember = null;
-        if (window.game && window.game.stateMachine) window.game.stateMachine.change('menu'); // currentState = GameState.MENU;
+        if (WorldState) WorldState.changeState('menu'); // currentState = GameState.MENU;
         Input.lock(200);
     },
 
     close() {
         this.visible = false;
         this.sub = null;
-        if (window.game && window.game.stateMachine) window.game.stateMachine.change('playing'); // currentState = GameState.PLAYING;
+        if (WorldState) WorldState.changeState('playing'); // currentState = GameState.PLAYING;
         Input.lock(150);
     },
 
     update() {
         if (!this.visible) return;
+
+        // Delegate to Save/Load Menus (If visible on top)
+        if (SaveMenu.visible) {
+            SaveMenu.update();
+            return;
+        }
+        if (LoadMenu.visible) {
+            LoadMenu.update();
+            return;
+        }
 
         // Submenu: Status
         if (this.sub === 'status') {
@@ -84,12 +94,6 @@ export const Menu2 = {
                     this.subCur = 0;
                     this.actionWindow = false;
                 }
-            } else if (selected === 'セーブ') {
-                this.close();
-                SaveMenu.open();
-            } else if (selected === 'ロード') {
-                this.close();
-                LoadMenu.open();
             } else if (selected === 'とじる') {
                 this.close();
             }
@@ -163,6 +167,18 @@ export const Menu2 = {
 
     render(ctx) {
         if (!this.visible) return;
+
+        // Delegate to Save/Load Menus (Removed as invoked separately now)
+        if (SaveMenu.visible) {
+            SaveMenu.render(ctx);
+            return;
+        }
+        // Load Menu might still be needed for Title screen but not main menu? 
+        // Or keep LoadMenu accessible via debug or title? 
+        if (LoadMenu.visible) {
+            LoadMenu.render(ctx);
+            return;
+        }
 
         const { VIEWPORT_WIDTH: VW, VIEWPORT_HEIGHT: VH } = GameConfig;
 
@@ -292,13 +308,13 @@ export const SaveMenu = {
         this.cur = 0;
         this.saveList = SaveSystem.getSaveList();
         Input.lock(200);
-        if (window.game && window.game.stateMachine) window.game.stateMachine.change('menu'); // currentState = GameState.MENU;
+        if (WorldState) WorldState.changeState('menu'); // currentState = GameState.MENU;
     },
 
     close() {
         this.visible = false;
         Input.lock(150);
-        if (window.game && window.game.stateMachine) window.game.stateMachine.change('playing'); // currentState = GameState.PLAYING;
+        if (WorldState) WorldState.changeState('playing'); // currentState = GameState.PLAYING;
     },
 
     update() {
@@ -391,7 +407,7 @@ export const LoadMenu = {
             if (slot.exists) {
                 if (SaveSystem.load(slot.slot)) {
                     this.close();
-                    if (WorldState) WorldState.changeState('playing'); // currentState = GameState.PLAYING;
+                    if (WorldState) WorldState.changeState('playing'); // Success load -> Playing
                     // Reset or logic?
                     // SaveSystem.load handles restoration
                 } else {

@@ -127,6 +127,9 @@ export const WorldState = {
         // Maps.load('center') will be called by Loop1Ending or here?
         // Let's call it here to be safe and ensure data is loaded.
         Maps.load('center');
+
+        // Disable encounters initially (Center has 0 rate usually)
+        // this.resetEncounterSteps(0); // Handled in Maps.load now
     },
 
     // Game Instance Registry
