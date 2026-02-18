@@ -25,7 +25,7 @@ export const EastDungeon1 = {
     })(),
     area: 'east_dungeon_1',
     baseTile: T.STONE,
-    encounterRate: 0.0,
+    encounterRate: 0.1,
     npcs: [
         { x: Math.floor(W / 2), y: H - 3, msg: 'この先は危険だ…' }
     ],

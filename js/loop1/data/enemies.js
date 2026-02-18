@@ -5,7 +5,7 @@ import { WorldState } from '../world.js';
 // ===========================================
 export const Enemies = {
     // ===== 村エリア =====
-    slime: { name: 'グリーンスライム', hp: 10, atk: 7, def: 4, exp: 10, gold: 10, img: 'enemy_slime' },
+    slime: { name: 'スライム', hp: 10, atk: 7, def: 4, exp: 10, gold: 10, img: 'enemy_slime' },
     goblin: { name: 'ゴブリン', hp: 1, atk: 9, def: 1, exp: 10000, gold: 20000, img: 'enemy_goblin' },
     bat: { name: 'ダークバット', hp: 12, atk: 8, def: 5, exp: 15, gold: 15, img: 'enemy_bat' },
 

@@ -4,6 +4,7 @@ import { FX } from '../../core/effects.js';
 import { PlayerStats2 } from '../player.js';
 import { Battle2 } from './battle/core.js';
 import { SaveMenu } from './menu.js';
+import { Party2 } from '../party.js';
 
 export class InteractionSystem2 {
     constructor(worldState) {
@@ -45,9 +46,15 @@ export class InteractionSystem2 {
 
         // Loop 2 Shops
         if (npc.savePoint) {
-            Msg.choice('記録しますか？', ['はい', 'いいえ'], (idx) => {
+            Msg.choice('女神像だ。', ['記録する', '仲間募集中(Debug)', 'やめる'], (idx) => {
                 if (idx === 0) {
                     this.worldState.changeState('save');
+                } else if (idx === 1) {
+                    const party = this.worldState.managers.party;
+                    if (party) {
+                        if (party.add('warrior')) Msg.show('戦士が仲間になった！');
+                        else Msg.show('これ以上仲間にならない、または既にいる。');
+                    }
                 }
             });
             return;
