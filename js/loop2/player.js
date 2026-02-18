@@ -68,24 +68,24 @@ export const PlayerStats2 = {
         this.hp = Math.min(this.maxHp, this.hp + amount);
     },
 
-    healMp(amount) {
-        this.mp = Math.min(this.maxMp, this.mp + amount);
+    healSp(amount) {
+        this.sp = Math.min(this.maxSp, this.sp + amount);
     },
 
-    fullHealMp() {
-        this.mp = this.maxMp;
+    fullHealSp() {
+        this.sp = this.maxSp;
     },
 
-    useMp(amount) {
-        if (this.mp >= amount) {
-            this.mp -= amount;
+    useSp(amount) {
+        if (this.sp >= amount) {
+            this.sp -= amount;
             return true;
         }
         return false;
     },
 
-    hasSufficientMp(amount) {
-        return this.mp >= amount;
+    hasSufficientSp(amount) {
+        return this.sp >= amount;
     },
 
     addGold(amount) { this.gold += amount; },
@@ -124,14 +124,14 @@ export const PlayerStats2 = {
 
     fullRestore() {
         this.hp = this.maxHp;
-        this.mp = this.maxMp;
+        this.sp = this.maxSp;
         this.status = { poisonVal: 0, silence: 0, atkDownVal: 0, defDownVal: 0 };
     },
 
     // 2週目初期化
     init() {
         this.hp = 30; this.maxHp = 30;
-        this.mp = 10; this.maxMp = 10;
+        this.sp = 10; this.maxSp = 10;
         this.atk = 8; this.def = 4; this.baseDef = 4;
         this.matk = 6; this.mdef = 3;
         this.gold = 50;

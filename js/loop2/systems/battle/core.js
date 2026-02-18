@@ -9,7 +9,8 @@ import { BattleRender2 } from './render.js';
 import { EnemyData2, getEnemiesForMap2 } from '../../data/enemies.js';
 
 import { WorldState } from '../../../loop1/world.js'; // Context
-// import { Inv } from '../../loop1/systems/inventory.js'; // If Inv is used (line 212)
+import { Inventory2 } from '../../inventory.js';
+import { ItemData2 } from '../../data/items.js';
 
 // ===========================================
 // 2週目バトルコアシステム
@@ -143,6 +144,20 @@ export const Battle2 = {
             }
         } else if (this.phase === 'playerTarget') {
             this.handlePlayerTargetInput();
+        } else if (this.phase === 'magic') {
+            // Player Magic Placeholder
+            this.msg = 'まだ魔法は覚えられない！';
+            this.msgTimer = 0;
+            this.waitForInput = true;
+            this.nextPhase = 'command';
+            this.phase = 'wait_input';
+        } else if (this.phase === 'item') {
+            // Player Item Placeholder
+            this.msg = '道具はまだ持っていない！';
+            this.msgTimer = 0;
+            this.waitForInput = true;
+            this.nextPhase = 'command';
+            this.phase = 'wait_input';
         } else if (this.phase === 'partyCommand') {
             this.handlePartyCommandInput();
         } else if (this.phase === 'partyTarget') {
@@ -316,27 +331,52 @@ export const Battle2 = {
         let msg = '';
         if (action.type === 'attack') {
             const dmg = Math.floor(Math.max(1, action.power - target.def + Math.random() * 2));
+            // Critical check?
             target.hp = Math.floor(target.hp - dmg);
             msg = `${actor.name}の攻撃！${target.name}に${dmg}ダメージ！`;
             FX.shake(100);
         } else if (action.type === 'magic') {
-            if (actor.mp >= 5) {
+            // Skill placeholder
+            if (actor.sp >= 5) {
                 const dmg = Math.max(1, action.power);
                 target.hp -= dmg;
-                actor.mp -= 5;
-                msg = `${actor.name}の魔法！${target.name}に${dmg}ダメージ！`;
+                actor.sp -= 5;
+                msg = `${actor.name}のスキル攻撃！${target.name}に${dmg}ダメージ！`;
                 FX.flash(100);
             } else {
-                msg = `${actor.name}は魔法を唱えようとしたがMPが足りない！`;
+                msg = `${actor.name}はスキルを使おうとしたがSPが足りない！`;
             }
-        } else if (action.type === 'heal') {
-            if (actor.mp >= 3) {
-                PlayerStats2.heal(action.power);
-                actor.mp -= 3;
-                msg = `${actor.name}の回復魔法！HPが${action.power}回復した！`;
-                FX.flash(50); // Green flash?
+        } else if (action.type === 'item') {
+            // Use Item
+            // Target is 'target' (enemy) or Self/Ally? 
+            // Currently battle commands target Enemies by default in this structure.
+            // Items usually target allies.
+            // We need to support ally targeting for items.
+            // For now, if item is healing, assume self-use or auto-target injured?
+            // Simplified: Use on Self (actor)
+            const res = Inventory2.useItem(action.item, actor);
+            if (res.success) {
+                msg = `${actor.name}は${ItemData2[action.item].name}を使った！\n${res.msg}`;
             } else {
-                msg = `${actor.name}は祈ったがMPが足りない！`;
+                msg = `${actor.name}は${ItemData2[action.item].name}を使おうとしたが、効果がなかった！`;
+            }
+        } else if (action.type === 'flee') {
+            // Flee attempt (Party Member)
+            if (this.isBoss) {
+                this.msg = `${actor.name}は逃げようとした！\nしかし回り込まれてしまった！`; // Boss fail
+                this.phase = 'enemyAttack'; // Turn over
+                this.partyActionQueue = []; // Clear remaining? Already cleared on input, but just in case
+            } else if (Math.random() < 0.5) {
+                this.msg = `${actor.name}は逃げ出した！`;
+                this.phase = 'victory';
+                this.enemies = [];
+                return;
+            } else {
+                this.msg = `${actor.name}は逃げようとした！\nしかし回り込まれてしまった！`;
+                // Fail -> Enemy Turn
+                this.phase = 'enemyAttack';
+                this.enemyAttackCount = 0;
+                this.partyActionQueue = []; // Ensure no more actions
             }
         } else {
             msg = `${actor.name}は様子を見ている。`;
@@ -414,13 +454,15 @@ export const Battle2 = {
             this.msg = 'ボス戦からは逃げられない！';
             this.phase = 'wait_input';
             this.nextPhase = 'command';
-        } else if (Math.random() < 0.8) {
+        } else if (Math.random() < 0.8) { // Player has high flee chance?
             this.msg = 'うまく逃げ切れた！';
             this.phase = 'victory';  // 報酬なしで終了
             this.enemies = []; // Clear
         } else {
             this.msg = '逃げられなかった！';
+            // Fail means turn ends -> Enemy Attack
             this.phase = 'enemyAttack';
+            this.enemyAttackCount = 0;
         }
         this.msgTimer = 0;
         this.waitForInput = true;
@@ -436,26 +478,56 @@ export const Battle2 = {
             const member = Party2.members[this.partyTurnIndex];
 
             if (this.cur === 0) {
-                // Attack -> Select Target
+                // こうげき
                 this.phase = 'partyTarget';
                 this.partyTargetIndex = 0;
-                // Skip dead enemies in target selection init?
                 while (this.partyTargetIndex < this.enemies.length && this.enemies[this.partyTargetIndex].hp <= 0) {
                     this.partyTargetIndex++;
                 }
-                if (this.partyTargetIndex >= this.enemies.length) this.partyTargetIndex = 0; // Should be at least one alive
+                if (this.partyTargetIndex >= this.enemies.length) this.partyTargetIndex = 0;
             } else if (this.cur === 1) {
-                // Magic -> Select Target (assuming offensive for now)
+                // スキル
                 this.phase = 'partyTarget';
                 this.partyTargetIndex = 0;
                 while (this.partyTargetIndex < this.enemies.length && this.enemies[this.partyTargetIndex].hp <= 0) {
                     this.partyTargetIndex++;
                 }
             } else if (this.cur === 2) {
-                // Heal -> Select Ally (Simplified: Auto for now to avoid ally target UI complexity yet)
-                this.pushPartyCommand({ type: 'heal', power: 15 }, null);
+                // どうぐ
+                if (Inventory2.items.length === 0) {
+                    this.msg = '道具を何も持っていない！';
+                    this.msgTimer = 0;
+                    this.waitForInput = true;
+                    this.phase = 'wait_input';
+                    this.nextPhase = 'partyCommand';
+                } else {
+                    // Enter Item Selection Phase (Simplification: just use first consumable for now, 
+                    // or better, create a 'partyItem' phase? 
+                    // Given time constraints, let's use first available consumable or fail)
+                    const consumable = Inventory2.items.find(id => ItemData2[id] && ItemData2[id].type === 'consumable');
+                    if (consumable) {
+                        // Auto-select first consumable
+                        // Support for selection requires new phase.
+                        this.pushPartyCommand({ type: 'item', item: consumable }, null);
+                    } else {
+                        this.msg = '使える道具がない！';
+                        this.msgTimer = 0;
+                        this.waitForInput = true;
+                        this.phase = 'wait_input';
+                        this.nextPhase = 'partyCommand';
+                    }
+                }
             } else {
-                this.pushPartyCommand({ type: 'guard' }, null);
+                // にげる (全員の行動をスキップして逃走試行)
+                this.partyActionQueue = []; // Clear other actions
+                this.partyCommands = []; // Clear
+                // Add Flee action for this member (or generic)
+                // We'll treat it as this member initiating the flee
+                this.partyActionQueue.push({ member, action: { type: 'flee' }, targetIndex: null });
+
+                // Immediately go to execution
+                this.phase = 'partyTurn';
+                this.partyTurnIndex = Party2.members.length; // Stop input loop
             }
         }
     },

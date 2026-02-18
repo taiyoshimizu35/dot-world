@@ -61,23 +61,8 @@ export const Party2 = {
         });
     },
 
-    // 戦闘中の自動行動選択
-    getAction(member, battle) {
-        if (member.type === 'healer') {
-            // 回復役：HPが低い味方がいたら回復
-            if (PlayerStats2.hp < PlayerStats2.maxHp * 0.4) {
-                return { type: 'heal', target: 'player', power: 15 };
-            }
-        }
-        if (member.type === 'magic') {
-            // 魔法役：魔法攻撃
-            if (member.mp >= 5) {
-                return { type: 'magic', power: member.matk * 2 };
-            }
-        }
-        // 物理役・その他：通常攻撃
-        return { type: 'attack', power: member.atk };
-    },
+    // 戦闘中の自動行動選択 - AI廃止のため削除
+    // getAction(member, battle) { ... }
 
     // パーティ全体のHP回復
     healAll(amount) {

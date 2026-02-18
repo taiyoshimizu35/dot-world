@@ -40,7 +40,7 @@ export const BattleRender2 = {
             // Draw name below image to avoid overlap if images are close?
             // Or stagger?
             // Let's draw name *below* image.
-            const nameY = y + size / 2 + 5;
+            const nameY = y + size / 2 - 2;
             Draw.text(ctx, enemy.name, x, nameY, '#fff', 10, 'center');
             // Draw.text(ctx, `HP:${enemy.hp}`, x, nameY + 10, '#f88', 10, 'center');
         });
@@ -136,11 +136,12 @@ export const BattleRender2 = {
         Draw.text(ctx, 'HP', x + 4, cy, '#aaa', 8);
 
         // SP (Show if maxSp > 0)
-        if (maxMp > 0) {
+        const maxSp = stats.maxSp || 0;
+        if (maxSp > 0) {
             cy += 6;
-            this.renderBar(ctx, x + 4, cy, barW, 6, stats.mp, maxMp, '#004', '#fa0');
+            this.renderBar(ctx, x + 4, cy, barW, 6, stats.sp, maxSp, '#004', '#fa0');
             cy += 10;
-            Draw.text(ctx, `${stats.mp}/${maxMp}`, x + w - 4, cy, '#fff', 9, 'right');
+            Draw.text(ctx, `${stats.sp}/${maxSp}`, x + w - 4, cy, '#fff', 9, 'right');
             Draw.text(ctx, 'SP', x + 4, cy, '#aaa', 8);
         }
     },

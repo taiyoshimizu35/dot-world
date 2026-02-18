@@ -6,6 +6,8 @@ import { SaveSystem } from '../../core/save_system.js';
 import { PlayerStats2 } from '../player.js';
 import { Party2 } from '../party.js';
 import { WorldState } from '../../loop1/world.js';
+import { Inventory2 } from '../inventory.js';
+import { ItemData2 } from '../data/items.js';
 
 // ===========================================
 // Loop 2 Menu System
@@ -28,7 +30,7 @@ export const Menu2 = {
         this.subCur = 0;
         this.actionWindow = false;
         this.targetMember = null;
-        if (WorldState) WorldState.changeState('menu'); // currentState = GameState.MENU;
+        // if (WorldState) WorldState.changeState('menu'); // Removed to prevent recursion (MenuState calls open)
         Input.lock(200);
     },
 
@@ -61,11 +63,9 @@ export const Menu2 = {
             return;
         }
 
-        // Submenu: Items (Placeholder)
+        // Submenu: Items
         if (this.sub === 'items') {
-            if (Input.cancel() || Input.interact()) {
-                this.sub = null;
-            }
+            this.updateItems();
             return;
         }
 
@@ -85,7 +85,9 @@ export const Menu2 = {
                 this.sub = 'status';
             } else if (selected === 'アイテム') {
                 this.sub = 'items';
-                Msg.show('アイテムは現在持っていない。');
+                this.itemCatCur = 0;
+                this.subCur = 0;
+                this.targetMember = null;
             } else if (selected === 'なかま') {
                 if (Party2.members.length === 0) {
                     Msg.show('今は一人旅だ。');
@@ -173,8 +175,8 @@ export const Menu2 = {
             SaveMenu.render(ctx);
             return;
         }
-        // Load Menu might still be needed for Title screen but not main menu? 
-        // Or keep LoadMenu accessible via debug or title? 
+        // Load Menu might still be needed for Title screen but not main menu?
+        // Or keep LoadMenu accessible via debug or title?
         if (LoadMenu.visible) {
             LoadMenu.render(ctx);
             return;
@@ -189,8 +191,10 @@ export const Menu2 = {
         }
         if (this.sub === 'companions') {
             this.renderCompanions(ctx);
-            // Don't return, allow drawing main menu backdrop? No, usually overlays or replace.
-            // Let's replace Main Menu visually or draw on top.
+            return;
+        }
+        if (this.sub === 'items' || this.sub === 'item_list') {
+            this.renderItems(ctx);
             return;
         }
 
@@ -216,7 +220,7 @@ export const Menu2 = {
         Draw.rect(ctx, 10, 10, VW - 20, VH - 20, 'rgba(0, 0, 0, 0.95)');
         Draw.stroke(ctx, 10, 10, VW - 20, VH - 20, '#fff', 2);
 
-        Draw.text(ctx, '【ステータス】', 20, 30, '#fc0', 14);
+        Draw.text(ctx, '【ステータス】', 15, 30, '#fc0', 14);
 
         // Player
         const p = PlayerStats2.getDisplayStats();
@@ -289,12 +293,192 @@ export const Menu2 = {
                 Draw.text(ctx, act, actX + 25, y, color, 12);
             });
         }
+    },
+
+    // Categories: 0:Tools, 1:Weapons, 2:Armor, 3:Accessories
+    itemCats: ['道具', '武器', '防具', '装飾品'],
+    itemCatCur: 0,
+
+    updateItems() {
+        // If in Category Selection
+        if (this.sub === 'items') {
+            if (Input.cancel()) {
+                this.sub = null;
+                return;
+            }
+            if (Input.justPressed('ArrowUp')) this.itemCatCur = (this.itemCatCur - 1 + 4) % 4;
+            if (Input.justPressed('ArrowDown')) this.itemCatCur = (this.itemCatCur + 1) % 4;
+
+            if (Input.interact()) {
+                this.sub = 'item_list';
+                this.subCur = 0;
+            }
+            return;
+        }
+
+        // If in Item List
+        if (this.sub === 'item_list') {
+            const filteredItems = this.getFilteredItems();
+
+            // Target Selection
+            if (this.targetMember) {
+                const len = Party2.members.length + 1;
+                if (Input.justPressed('ArrowUp')) this.actionCur = (this.actionCur - 1 + len) % len;
+                if (Input.justPressed('ArrowDown')) this.actionCur = (this.actionCur + 1) % len;
+
+                if (Input.cancel()) {
+                    this.targetMember = null;
+                    return;
+                }
+
+                if (Input.interact()) {
+                    const targets = [PlayerStats2, ...Party2.members];
+                    const target = targets[this.actionCur];
+                    const itemId = filteredItems[this.subCur];
+
+                    const res = Inventory2.useItem(itemId, target);
+                    Msg.show(res.msg);
+
+                    if (res.success) {
+                        // Check if item still exists
+                        const newFiltered = this.getFilteredItems();
+                        if (this.subCur >= newFiltered.length) this.subCur = Math.max(0, newFiltered.length - 1);
+                        this.targetMember = null;
+                    }
+                }
+                return;
+            }
+
+            // List Navigation
+            if (filteredItems.length === 0) {
+                if (Input.cancel()) this.sub = 'items'; // Back to category
+                return;
+            }
+
+            if (Input.justPressed('ArrowUp')) this.subCur = (this.subCur - 1 + filteredItems.length) % filteredItems.length;
+            if (Input.justPressed('ArrowDown')) this.subCur = (this.subCur + 1) % filteredItems.length;
+
+            if (Input.interact()) {
+                const itemId = filteredItems[this.subCur];
+                const data = ItemData2[itemId];
+                if (data && data.type === 'consumable') {
+                    this.targetMember = true;
+                    this.actionCur = 0;
+                } else {
+                    // Gear - just show msg
+                    Msg.show(`${data.name} は装備画面で装備できる。`);
+                }
+            }
+
+            if (Input.cancel()) {
+                this.sub = 'items'; // Back to category
+            }
+        }
+    },
+
+    getFilteredItems() {
+        const types = ['consumable', 'weapon', 'armor', 'accessory'];
+        const targetType = types[this.itemCatCur];
+        return Inventory2.items.filter(id => ItemData2[id] && ItemData2[id].type === targetType);
+    },
+
+    renderItems(ctx) {
+        const { VIEWPORT_WIDTH: VW, VIEWPORT_HEIGHT: VH } = GameConfig;
+
+        // Category Window
+        const catX = 20, catY = 30, catW = 140, catH = 140;
+        Draw.rect(ctx, catX, catY, catW, catH, 'rgba(0,0,0,0.95)');
+        Draw.stroke(ctx, catX, catY, catW, catH, '#fff', 2);
+
+        // Safety check for Inventory
+        const items = Inventory2.items || [];
+        const capacity = Inventory2.getCapacity ? Inventory2.getCapacity() : 20;
+
+        // Count items per category
+        const counts = [0, 0, 0, 0];
+        const types = ['consumable', 'weapon', 'armor', 'accessory'];
+        items.forEach(id => {
+            const data = ItemData2[id];
+            if (data) {
+                const idx = types.indexOf(data.type);
+                if (idx !== -1) counts[idx]++;
+            }
+        });
+
+        // Show Remaining Capacity
+        const remaining = capacity - items.length;
+        Draw.text(ctx, `【分類】 残り:${remaining}`, catX + 10, catY + 20, '#fc0', 14);
+
+        this.itemCats.forEach((cat, i) => {
+            const y = catY + 50 + i * 25;
+            const isSel = (this.sub === 'items' && i === this.itemCatCur) || (this.sub === 'item_list' && i === this.itemCatCur);
+            // Highlight active selection
+            const color = (i === this.itemCatCur) ? '#fc0' : '#fff';
+
+            // Cursor only if in category mode
+            if (this.sub === 'items' && i === this.itemCatCur) Draw.text(ctx, '▶', catX + 5, y, '#fc0', 12);
+            Draw.text(ctx, cat, catX + 15, y, color, 12);
+            // Draw Count
+            Draw.text(ctx, `${counts[i]}コ`, catX + 110, y, '#ccc', 12);
+        });
+
+        // Item List Window
+        if (this.sub === 'item_list') {
+            const listX = 40, listY = 20, listW = 240, listH = 200;
+            Draw.rect(ctx, listX, listY, listW, listH, 'rgba(0, 0, 0, 0.95)');
+            Draw.stroke(ctx, listX, listY, listW, listH, '#fff', 2);
+
+            const filtered = this.getFilteredItems();
+            Draw.text(ctx, `【${this.itemCats[this.itemCatCur]}】`, listX + 10, listY + 20, '#fc0', 14);
+
+            if (filtered.length === 0) {
+                Draw.text(ctx, '持っていない', listX + 20, listY + 50, '#ccc', 12);
+            } else {
+                const maxShow = 9;
+                let startIdx = 0;
+                if (this.subCur >= maxShow) startIdx = this.subCur - maxShow + 1;
+                const visible = filtered.slice(startIdx, startIdx + maxShow);
+
+                visible.forEach((id, i) => {
+                    const y = listY + 50 + i * 20;
+                    const data = ItemData2[id];
+                    const absIdx = startIdx + i;
+                    const isSel = (absIdx === this.subCur);
+                    const color = isSel ? '#fc0' : '#fff';
+
+                    if (isSel && !this.targetMember) Draw.text(ctx, '▶', listX + 10, y, '#fc0', 12);
+                    Draw.text(ctx, data.name, listX + 25, y, color, 12);
+                });
+
+                // Description
+                const selId = filtered[this.subCur];
+                if (selId) {
+                    const data = ItemData2[selId];
+                    Draw.rect(ctx, listX, listY + listH + 5, listW, 50, 'rgba(0,0,0,0.9)');
+                    Draw.stroke(ctx, listX, listY + listH + 5, listW, 50, '#fff', 1);
+                    Draw.text(ctx, data.desc, listX + 10, listY + listH + 25, '#fff', 11);
+                }
+            }
+
+            // Target Selection
+            if (this.targetMember) {
+                const tX = listX + 50, tY = listY + 30, tW = 120, tH = 120;
+                Draw.rect(ctx, tX, tY, tW, tH, 'rgba(0,0,50,0.95)');
+                Draw.stroke(ctx, tX, tY, tW, tH, '#fff', 2);
+                const targets = [PlayerStats2, ...Party2.members];
+                targets.forEach((t, i) => {
+                    const y = tY + 20 + i * 20;
+                    const isSel = (i === this.actionCur);
+                    const color = isSel ? '#fc0' : '#fff';
+                    if (isSel) Draw.text(ctx, '▶', tX + 5, y, '#fc0', 12);
+                    Draw.text(ctx, t.name, tX + 20, y, color, 12);
+                    Draw.text(ctx, `HP:${t.hp}`, tX + 80, y, '#8f8', 10);
+                });
+            }
+        }
     }
 };
 
-// ===========================================
-// Save Menu (For Save Points)
-// ===========================================
 // ===========================================
 // Save Menu (For Save Points)
 // ===========================================

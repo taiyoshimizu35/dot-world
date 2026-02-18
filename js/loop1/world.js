@@ -12,6 +12,7 @@ import { PlayerStats2 } from '../loop2/player.js';
 import { Party2 } from '../loop2/party.js';
 import { Battle2 } from '../loop2/systems/battle/core.js';
 import { QuestSystem2 } from '../loop2/quest.js';
+import { Menu2 } from '../loop2/systems/menu.js';
 
 
 import { PlayerController } from '../systems/player_controller.js';
@@ -118,6 +119,7 @@ export const WorldState = {
         this.managers.player = PlayerStats2;
         this.managers.party = Party2;
         this.managers.battle = Battle2;
+        this.managers.menu = Menu2;
         this.managers.controllerClass = PlayerController; // Use Unified Controller
         this.managers.interaction = new InteractionSystem2(this);
 
