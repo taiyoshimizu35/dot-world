@@ -71,6 +71,15 @@ export const Party2 = {
         });
     },
 
+    // パーティ全体の全回復 (HP/SP/Status)
+    fullHealAll() {
+        this.members.forEach(m => {
+            m.hp = m.maxHp;
+            if (m.maxSp) m.sp = m.maxSp;
+            // Status reset if members have complex status
+        });
+    },
+
     // 初期化
     init() {
         this.members = [];

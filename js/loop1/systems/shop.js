@@ -188,7 +188,7 @@ export const Shop = {
         } else if (item.type === 'armor') {
             Msg.show(`${item.name}を購入した！\nメニューから装備しよう。`, () => { Input.lock(100); }, 'overlay');
         } else if (item.type === 'spell') {
-            PlayerStats.spells[item.spell] = true;
+            PlayerStats.skills[item.spell] = true;
             Msg.show(`${item.name}を読んだ！\n習得した！`, () => { Input.lock(100); }, 'overlay');
         } else if (item.type === 'staff') {
             Msg.show(`${item.name}を購入した！\nメニューから装備しよう。`, () => { Input.lock(100); }, 'overlay');

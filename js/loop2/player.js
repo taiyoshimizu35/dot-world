@@ -2,60 +2,174 @@
 // 2週目プレイヤー（内部exp成長システム）
 // ===========================================
 
+// ===========================================
+// 2週目プレイヤー（レベル制・SPシステム）
+// ===========================================
+
+import { ItemData2 } from './data/items.js';
+import { QuestSystem2 } from './quest.js';
+
 export const PlayerStats2 = {
     name: '勇者',
-    hp: 30, maxHp: 30,
-    mp: 10, maxMp: 10,
-    atk: 8, def: 4,
-    matk: 6, mdef: 3,
-    baseDef: 4,
+    level: 1,
+
+    // Base stats (without equipment)
+    baseMaxHp: 30, maxHp: 30, hp: 30,
+    baseMaxSp: 10, maxSp: 10, sp: 10, // MP -> SP
+    baseAtk: 8, atk: 8,
+    baseDef: 4, def: 4,
+    baseMatk: 6, matk: 6,
+    baseMdef: 3, mdef: 3,
+
+    exp: 0, nextExp: 40,
     gold: 50,
 
-    // 内部経験値（プレイヤーには非表示）
-    hiddenExp: 0,
-
-    // 装備武器
-    weapon: null,
+    // Equipment Slots
+    equipment: {
+        weapon: null,
+        armor: null,
+        accessory: null
+    },
 
     spells: { fire: false, heal: false, water: false, wind: false },
     status: { poisonVal: 0, silence: 0, atkDownVal: 0, defDownVal: 0 },
     magicBoost: 1.0,
     isDefending: false,
 
-    // 表示用ステータス取得（2週目はレベル非表示）
+    holySwordBonus: 0, // Not used in Loop 2 explicitly yet, but kept for compatibility/future use
+
+    _worldState: null,
+
+    init(worldState) {
+        this._worldState = worldState; // Determine if needed
+        this.reset();
+    },
+
+    reset() {
+        this.level = 1;
+        this.baseMaxHp = 30; this.maxHp = 30; this.hp = 30;
+        this.baseMaxSp = 10; this.maxSp = 10; this.sp = 10;
+        this.baseAtk = 8; this.atk = 8;
+        this.baseDef = 4; this.def = 4;
+        this.baseMatk = 6; this.matk = 6;
+        this.baseMdef = 3; this.mdef = 3;
+
+        this.exp = 0; this.nextExp = 40;
+        this.gold = 50;
+
+        this.equipment = { weapon: null, armor: null, accessory: null };
+        this.status = { poisonVal: 0, silence: 0, atkDownVal: 0, defDownVal: 0 };
+        this.spells = { fire: false, heal: false, water: false, wind: false };
+        this.magicBoost = 1.0;
+        this.recalcStats();
+    },
+
+    // Recalculate stats based on level and equipment
+    recalcStats() {
+        // 1. Reset to base stats
+        this.maxHp = this.baseMaxHp;
+        this.maxSp = this.baseMaxSp;
+        this.atk = this.baseAtk;
+        this.def = this.baseDef;
+        this.matk = this.baseMatk;
+        this.mdef = this.baseMdef;
+        this.magicBoost = 1.0;
+
+        // 2. Add Equipment Bonuses
+        const equipList = [this.equipment.weapon, this.equipment.armor, this.equipment.accessory];
+
+        equipList.forEach(itemId => {
+            if (!itemId) return;
+            const item = ItemData2[itemId];
+            if (item && item.stats) {
+                if (item.stats.atk) this.atk += item.stats.atk;
+                if (item.stats.def) this.def += item.stats.def;
+                if (item.stats.matk) this.matk += item.stats.matk;
+                if (item.stats.mdef) this.mdef += item.stats.mdef;
+                if (item.stats.maxHp) this.maxHp += item.stats.maxHp;
+                if (item.stats.maxSp) this.maxSp += item.stats.maxSp;
+            }
+        });
+
+        // Cap HP/SP to new max
+        this.hp = Math.min(this.hp, this.maxHp);
+        this.sp = Math.min(this.sp, this.maxSp);
+    },
+
+    // Equip item
+    equip(itemId) {
+        const item = ItemData2[itemId];
+        if (!item) return false;
+
+        let slot = null;
+        if (item.type === 'weapon') slot = 'weapon';
+        else if (item.type === 'armor') slot = 'armor';
+        else if (item.type === 'accessory') slot = 'accessory';
+
+        if (slot) {
+            this.equipment[slot] = itemId;
+            this.recalcStats();
+            return true;
+        }
+        return false;
+    },
+
+    unequip(slot) {
+        if (this.equipment[slot]) {
+            this.equipment[slot] = null;
+            this.recalcStats();
+        }
+    },
+
     getDisplayStats() {
-        const weaponAtk = this.weapon ? this.weapon.atk : 0;
         return {
             hp: this.hp,
             maxHp: this.maxHp,
-            mp: this.mp,
-            maxMp: this.maxMp,
-            atk: this.atk + weaponAtk,
+            mp: this.sp,    // Display uses 'mp' property key commonly in Menu code, but value is SP
+            maxMp: this.maxSp, // Same here
+            sp: this.sp,    // Also provide sp for SP-aware code
+            maxSp: this.maxSp,
+            atk: this.atk,
             def: this.def,
             matk: this.matk,
             mdef: this.mdef,
+            level: this.level,
+            exp: this.exp,
+            nextExp: this.nextExp,
             gold: this.gold,
             name: this.name
-            // レベル・経験値は表示しない
         };
     },
 
-    // 内部経験値を加算し、閾値到達でステータス成長
-    addHiddenExp(amount) {
-        this.hiddenExp += amount;
-        let grew = false;
-        // 100ごとにステータス成長
-        while (this.hiddenExp >= 100) {
-            this.hiddenExp -= 100;
-            this.maxHp += 2;
-            this.maxMp += 1;
-            this.atk += 1;
-            this.def += 1;
-            this.matk += 1;
-            this.mdef += 1;
-            grew = true;
+    addExp(amount) {
+        this.exp += amount;
+        let leveledUp = false;
+        while (this.exp >= this.nextExp) {
+            this.exp -= this.nextExp;
+            this.levelUp();
+            leveledUp = true;
         }
-        return grew;
+        return leveledUp;
+    },
+
+    levelUp() {
+        this.level++;
+
+        // Base stats growth (Simple linear for now)
+        this.baseMaxHp += 5;
+        this.baseMaxSp += 2;
+        this.baseAtk += 2;
+        this.baseDef += 1;
+        this.baseMatk += 2;
+        this.baseMdef += 1;
+
+        // Increase Exp requirement
+        this.nextExp = Math.floor(this.nextExp * 1.2);
+
+        this.recalcStats();
+
+        // Setup notification or message in Battle/Menu? 
+        // Battle loop handles the message usually.
     },
 
     // 戦闘でのダメージ処理
@@ -98,16 +212,6 @@ export const PlayerStats2 = {
         return false;
     },
 
-    // 武器装備
-    equipWeapon(weapon) {
-        this.weapon = weapon;
-    },
-
-    // 実際の攻撃力（ステータス + 武器）
-    getTotalAtk() {
-        return this.atk + (this.weapon ? this.weapon.atk : 0);
-    },
-
     tickStatus() {
         let msgs = [];
         if (this.status.poisonVal > 0) {
@@ -126,19 +230,5 @@ export const PlayerStats2 = {
         this.hp = this.maxHp;
         this.sp = this.maxSp;
         this.status = { poisonVal: 0, silence: 0, atkDownVal: 0, defDownVal: 0 };
-    },
-
-    // 2週目初期化
-    init() {
-        this.hp = 30; this.maxHp = 30;
-        this.sp = 10; this.maxSp = 10;
-        this.atk = 8; this.def = 4; this.baseDef = 4;
-        this.matk = 6; this.mdef = 3;
-        this.gold = 50;
-        this.hiddenExp = 0;
-        this.weapon = null;
-        this.status = { poisonVal: 0, silence: 0, atkDownVal: 0, defDownVal: 0 };
-        this.spells = { fire: false, heal: false, water: false, wind: false };
-        this.magicBoost = 1.0;
     }
 };

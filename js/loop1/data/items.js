@@ -41,8 +41,8 @@ export const MapItems = {
 // ===========================================
 export const MagicShopData = {
     items: [
-        { name: '魔力の小瓶', price: 25, type: 'item', desc: 'MP+10回復', sold: false },
-        { name: 'ハイ・エーテル', price: 80, type: 'item', desc: 'MP+30回復', sold: false },
+        { name: '魔力の小瓶', price: 25, type: 'item', desc: 'SP+10回復', sold: false },
+        { name: 'ハイ・エーテル', price: 80, type: 'item', desc: 'SP+30回復', sold: false },
         { name: '解毒ポーション', price: 50, type: 'item', desc: '毒を治療', sold: false },
         { name: '気付け薬', price: 50, type: 'item', desc: '沈黙を治療', sold: false },
         { name: '力の粉', price: 50, type: 'item', desc: '攻撃力低下治療', sold: false },
@@ -52,8 +52,8 @@ export const MagicShopData = {
         { name: '風の魔導書', price: 200, type: 'spell', spell: 'wind', desc: 'ウィンド習得', sold: false },
         { name: '銀の杖', price: 350, type: 'staff', atk: 3, matk: 3, magicBoost: 1.3, desc: '攻撃+3,魔攻+3,魔法1.3倍', sold: false },
         { name: '賢者の杖', price: 1000, type: 'staff', atk: 5, matk: 5, magicBoost: 1.5, desc: '攻撃+5,魔攻+5,魔法1.5倍', sold: false },
-        { name: '魔法のローブ', price: 400, type: 'robe', def: 5, mdef: 5, maxMp: 10, desc: '防御+5,魔防+5,MP+10', sold: false },
-        { name: '大魔道士のローブ', price: 1200, type: 'robe', def: 8, mdef: 8, maxMp: 20, desc: '防御+10,魔防+10,MP+20', sold: false }
+        { name: '魔法のローブ', price: 400, type: 'robe', def: 5, mdef: 5, maxSp: 10, desc: '防御+5,魔防+5,SP+10', sold: false },
+        { name: '大魔道士のローブ', price: 1200, type: 'robe', def: 8, mdef: 8, maxSp: 20, desc: '防御+10,魔防+10,SP+20', sold: false }
     ],
     reset() { this.items.forEach(item => item.sold = false); }
 };
@@ -106,8 +106,8 @@ export const ItemEffects = {
     'ポーション': { type: 'heal', amount: 30 },
     '上薬草': { type: 'heal', amount: 60 },
     'エリクサー': { type: 'heal', amount: 100 },
-    '魔力の小瓶': { type: 'healMp', amount: 10 },
-    'ハイ・エーテル': { type: 'healMp', amount: 30 },
+    '魔力の小瓶': { type: 'healSp', amount: 10 },
+    'ハイ・エーテル': { type: 'healSp', amount: 30 },
     '解毒ポーション': { type: 'curePoison' },
     '気付け薬': { type: 'cureSilence' },
     '力の粉': { type: 'cureAtkDown' },

@@ -348,7 +348,7 @@ export const Menu = {
         Draw.text(ctx, s.name, 24, 44, '#fff', 12);
         Draw.text(ctx, `Lv: ${s.level}`, 24, 62, '#fff', 12);
         Draw.text(ctx, `HP: ${s.hp}/${s.maxHp}`, 24, 80, '#8f8', 12);
-        Draw.text(ctx, `MP: ${s.mp}/${s.maxMp}`, 24, 98, '#8cf', 12);
+        Draw.text(ctx, `SP: ${s.sp}/${s.maxSp}`, 24, 98, '#8cf', 12); // MP -> SP
         Draw.text(ctx, `ATK: ${s.atk}`, 24, 116, '#f88', 12);
         Draw.text(ctx, `DEF: ${s.def}`, 90, 116, '#88f', 12);
         Draw.text(ctx, `MATK: ${s.matk}`, 24, 134, '#f8f', 12);

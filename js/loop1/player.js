@@ -11,7 +11,7 @@ export const PlayerStats = {
     level: 1,
     // Base stats (without equipment)
     baseMaxHp: 30, maxHp: 30, hp: 30,
-    baseMaxMp: 10, maxMp: 10, mp: 10,
+    baseMaxSp: 10, maxSp: 10, sp: 10, // MP -> SP
     baseAtk: 8, atk: 8,
     baseDef: 4, def: 4,
     baseMatk: 6, matk: 6,
@@ -19,11 +19,11 @@ export const PlayerStats = {
 
     exp: 0, nextExp: 40,
     gold: 50,
-    spells: { fire: false, heal: false, water: false, wind: false },
+    skills: { fire: false, heal: false, water: false, wind: false }, // spells -> skills
     status: { poisonVal: 0, silence: 0, atkDownVal: 0, defDownVal: 0 },
     magicBoost: 1.0,
     isDefending: false,
-    displayMpOffset: 0,
+    displaySpOffset: 0, // displayMpOffset -> displaySpOffset
     holySwordBonus: 0,
 
     // Equipment Slots
@@ -44,7 +44,7 @@ export const PlayerStats = {
     recalcStats() {
         // 1. Reset to base stats
         this.maxHp = this.baseMaxHp;
-        this.maxMp = this.baseMaxMp;
+        this.maxSp = this.baseMaxSp;
         this.atk = this.baseAtk;
         this.def = this.baseDef;
         this.matk = this.baseMatk;
@@ -75,7 +75,7 @@ export const PlayerStats = {
                 if (a.def) this.def += a.def;
                 if (a.matk) this.matk += a.matk;
                 if (a.mdef) this.mdef += a.mdef;
-                if (a.maxMp) this.maxMp += a.maxMp;
+                if (a.maxSp) this.maxSp += a.maxSp;
             }
         }
         // Accessory
@@ -89,9 +89,9 @@ export const PlayerStats = {
             }
         }
 
-        // Cap HP/MP to new max
+        // Cap HP/SP to new max
         this.hp = Math.min(this.hp, this.maxHp);
-        this.mp = Math.min(this.mp, this.maxMp);
+        this.sp = Math.min(this.sp, this.maxSp);
     },
 
     // Helper to find item data (needs refernce to ShopData/Items)
@@ -132,16 +132,16 @@ export const PlayerStats = {
         }
     },
 
-    // DECEPTION_LOGIC: 表示用ステータス取得 - 1週目はLv×3の下駄 -> 廃止
+    // DECEPTION_LOGIC: 表示用ステータス取得
     getDisplayStats() {
-        // ステータスの嘘: 廃止 (truthFlags check removed or always true essentially)
-        // User requested: "Remove level * 3 status, remove waste internal number system, make it normal RPG"
-
         return {
             hp: this.hp,
             maxHp: this.maxHp,
-            mp: this.mp,
-            maxMp: this.maxMp,
+            sp: this.sp,
+            maxSp: this.maxSp,
+            /* Compatibility properties if needed, but we refactor fully */
+            // mp: this.sp, 
+            // maxMp: this.maxSp,
             atk: this.atk,
             def: this.def,
             matk: this.matk,
@@ -161,39 +161,34 @@ export const PlayerStats = {
     },
     healFull() {
         this.hp = this.maxHp;
-        this.mp = this.maxMp;
-        this.displayMpOffset = 0;
+        this.sp = this.maxSp;
+        this.displaySpOffset = 0;
         // Reset status ailments
         this.status.poisonVal = 0;
         this.status.silence = 0;
         this.status.atkDownVal = 0;
         this.status.defDownVal = 0;
-        // Reset base stats if needed (atk/def might be lowered by debuffs)
-        // Since debuffs modify current stats, we should probably reset/recalc?
-        // Current implementation seems to modify `this.atk` directly in `applyAtkDebuff`.
-        // So we need to ensure stats are restored.
-        // For now, simpler reset:
         this.recalcStats();
     },
-    healMp(amount) {
-        this.mp = Math.min(this.maxMp, this.mp + amount);
-        this.displayMpOffset = Math.max(0, this.displayMpOffset - amount);
+    healSp(amount) {
+        this.sp = Math.min(this.maxSp, this.sp + amount);
+        this.displaySpOffset = Math.max(0, this.displaySpOffset - amount);
     },
-    fullHealMp() {
-        this.mp = this.maxMp;
-        this.displayMpOffset = 0;
+    fullHealSp() {
+        this.sp = this.maxSp;
+        this.displaySpOffset = 0;
     },
 
-    useMp(amount) {
-        const actualDecrease = Math.min(this.mp, amount);
-        this.mp = Math.max(0, this.mp - amount);
+    useSp(amount) {
+        const actualDecrease = Math.min(this.sp, amount);
+        this.sp = Math.max(0, this.sp - amount);
         const displayDecrease = amount - actualDecrease;
-        this.displayMpOffset += displayDecrease;
+        this.displaySpOffset += displayDecrease;
         return true;
     },
 
-    hasSufficientMp(amount) {
-        return this.mp >= amount;
+    hasSufficientSp(amount) {
+        return this.sp >= amount;
     },
 
     addExp(amount) {
@@ -240,7 +235,6 @@ export const PlayerStats = {
         this.level++;
 
         // Holy Sword Growth Rule: +3 ATK per level if possessed
-        // Check inventory via WorldState manager (Inv is usually attached there or global Inv object)
         const inv = this._worldState ? this._worldState.managers.inventory : null;
         if (inv && (inv.has('聖剣') || this.equipment.weapon === '聖剣')) {
             this.holySwordBonus += 3;
@@ -248,15 +242,11 @@ export const PlayerStats = {
 
         // Base stats growth
         this.baseMaxHp += 5;
-        this.baseMaxMp += 2;
+        this.baseMaxSp += 2;
         this.baseAtk += 2;
         this.baseDef += 1;
         this.baseMatk += 2;
         this.baseMdef += 1;
-
-        // No full heal on level up (User Request)
-        // this.hp = this.baseMaxHp;
-        // this.mp = this.baseMaxMp;
 
         this.exp = 0;
         this.nextExp = Math.floor(this.nextExp * 1.15);
@@ -267,13 +257,13 @@ export const PlayerStats = {
 
     fullRestore() {
         this.hp = this.maxHp;
-        this.mp = this.maxMp;
-        this.displayMpOffset = 0;
+        this.sp = this.maxSp;
+        this.displaySpOffset = 0;
         this.status = { poisonVal: 0, silence: 0, atkDownVal: 0, defDownVal: 0 };
     },
 
     resetSpells() {
-        this.spells = { fire: false, heal: false, water: false, wind: false };
+        this.skills = { fire: false, heal: false, water: false, wind: false };
         this.magicBoost = 1.0;
     },
 
@@ -292,7 +282,7 @@ export const PlayerStats = {
 
         this.level = 1;
         this.baseMaxHp = 30; this.maxHp = 30; this.hp = 30;
-        this.baseMaxMp = 10; this.maxMp = 10; this.mp = 10;
+        this.baseMaxSp = 10; this.maxSp = 10; this.sp = 10;
         this.baseAtk = 8; this.atk = 8;
         this.baseDef = 4; this.def = 4;
         this.baseMatk = 6; this.matk = 6;
@@ -302,9 +292,9 @@ export const PlayerStats = {
 
         this.exp = 0; this.nextExp = 50;
         this.gold = 50;
-        this.displayMpOffset = 0;
+        this.displaySpOffset = 0;
         this.status = { poisonVal: 0, silence: 0, atkDownVal: 0, defDownVal: 0 };
-        this.spells = { fire: false, heal: false, water: false, wind: false };
+        this.skills = { fire: false, heal: false, water: false, wind: false };
         this.magicBoost = 1.0;
     }
 };

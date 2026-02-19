@@ -28,8 +28,8 @@ export const BattleItems = {
             else if (name === 'ポーション') { Inv.remove('ポーション'); PlayerStats.heal(30); battle.msg = 'ポーション使用！HP+30！'; }
             else if (name === '上薬草') { Inv.remove('上薬草'); PlayerStats.heal(60); battle.msg = '上薬草を使用！HP+60！'; }
             else if (name === 'エリクサー') { Inv.remove('エリクサー'); PlayerStats.heal(100); battle.msg = 'エリクサー使用！HP+100！'; }
-            else if (name === '魔力の小瓶') { Inv.remove('魔力の小瓶'); PlayerStats.healMp(10); battle.msg = '魔力の小瓶を使用！MP+10！'; }
-            else if (name === 'ハイ・エーテル') { Inv.remove('ハイ・エーテル'); PlayerStats.healMp(30); battle.msg = 'ハイ・エーテル使用！MP+30！'; }
+            else if (name === '魔力の小瓶') { Inv.remove('魔力の小瓶'); PlayerStats.healSp(10); battle.msg = '魔力の小瓶を使用！SP+10！'; }
+            else if (name === 'ハイ・エーテル') { Inv.remove('ハイ・エーテル'); PlayerStats.healSp(30); battle.msg = 'ハイ・エーテル使用！SP+30！'; }
             else if (name === '解毒ポーション') {
                 Inv.remove('解毒ポーション');
                 if (PlayerStats.status.poisonVal > 0) { PlayerStats.status.poisonVal = 0; battle.msg = '毒が消えた！'; }

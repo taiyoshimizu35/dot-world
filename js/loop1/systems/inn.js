@@ -70,7 +70,7 @@ export const Inn = {
         // Show Success Message
         this.step = 1; // Move to result step
 
-        Msg.show('「神の御加護があらんことを…」\n(体力と魔力が全回復した！)', () => {
+        Msg.show('「神の御加護があらんことを…」\n(体力とSPが全回復した！)', () => {
             this.close();
         }, 'overlay');
     },

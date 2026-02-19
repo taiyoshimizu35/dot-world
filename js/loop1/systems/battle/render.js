@@ -39,27 +39,33 @@ export const BattleRender = {
 
         if (battle.phase === 'command') {
             Draw.text(ctx, 'どうする？', 16, y + 8, '#fff', 12);
-            const cmds = ['こうげき', '魔法', 'アイテム', 'にげる'];
+            Draw.text(ctx, '▶', 16 + (battle.cur % 2) * 80 - 10, y + 24 + Math.floor(battle.cur / 2) * 16, '#fc0', 12);
+
+            const cmds = ['こうげき', 'スキル', 'アイテム', 'にげる']; // 魔法 -> スキル
             for (let i = 0; i < 4; i++) {
                 const cx = 16 + (i % 2) * 80;
                 const cy = y + 24 + Math.floor(i / 2) * 16;
-                if (i === battle.cur) Draw.text(ctx, '▶', cx - 10, cy, '#fc0', 12);
                 Draw.text(ctx, cmds[i], cx, cy, '#fff', 12);
             }
-        } else if (battle.phase === 'magic') {
-            Draw.text(ctx, '魔法を選択', 16, y + 8, '#fc0', 12);
-            const spells = getLearnedSpells(PlayerStats.spells);
-            if (spells.length === 0) {
-                Draw.text(ctx, '魔法を覚えていない', 32, y + 24, '#888', 12);
+        } else if (battle.phase === 'skill') { // magic -> skill
+            Draw.text(ctx, 'スキルを選択', 16, y + 8, '#fc0', 12);
+            // Assuming getLearnedSpells returns skills array based on PlayerStats.skills logic now
+            const skills = getLearnedSpells(PlayerStats.skills);
+            if (skills.length === 0) {
+                Draw.text(ctx, 'スキルを覚えていない', 32, y + 24, '#888', 12);
             } else {
-                const s = spells[battle.magicCur];
-                Draw.text(ctx, '▶ ' + s.name, 32, y + 24, '#fff', 12);
-                Draw.text(ctx, `MP: ${s.mp}`, 120, y + 24, '#8cf', 12);
+                if (battle.skillCur === undefined || isNaN(battle.skillCur)) battle.skillCur = 0;
+                const s = skills[battle.skillCur]; // magicCur -> skillCur
+                if (s) {
+                    Draw.text(ctx, '▶ ' + s.name, 32, y + 24, '#fff', 12);
+                    Draw.text(ctx, `SP: ${s.mp || s.sp || 5}`, 120, y + 24, '#8cf', 12); // MP -> SP
+                }
                 Draw.text(ctx, '▲▼で選択', 160, y + 40, '#888', 10);
             }
         } else if (battle.phase === 'item') {
             Draw.text(ctx, 'アイテムを選択', 16, y + 8, '#fc0', 12);
             const items = Inv.list();
+            // ... (item section unchanged, just skipping it in context if possible or including it)
             if (items.length === 0) {
                 Draw.text(ctx, 'アイテムを持っていない', 32, y + 24, '#888', 12);
             } else {
@@ -69,18 +75,20 @@ export const BattleRender = {
             }
         } else {
             let ty = y + 10;
-            for (const line of battle.msg.split('\n')) {
+            // Handle newlines in battle message
+            const lines = battle.msg ? battle.msg.split('\n') : [];
+            for (const line of lines) {
                 Draw.text(ctx, line, 16, ty, '#fff', 12);
                 ty += 16;
             }
             if (battle.waitForInput) Draw.text(ctx, '▼', VW - 20, y + h - 16, '#fff', 10);
         }
 
-        // DECEPTION_LOGIC: ステータスオーバーレイ - 偽装されたステータスを表示
+        // DECEPTION_LOGIC: ステータスオーバーレイ
         const s = PlayerStats.getDisplayStats();
         Draw.rect(ctx, 4, 4, 100, 40, 'rgba(0,0,0,0.5)');
         Draw.text(ctx, `${s.name} Lv${s.level}`, 8, 8, '#fff', 10);
         Draw.text(ctx, `HP: ${s.hp}/${s.maxHp}`, 8, 20, '#8f8', 10);
-        Draw.text(ctx, `MP: ${s.mp}/${s.maxMp}`, 60, 20, '#8cf', 10);
+        Draw.text(ctx, `SP: ${s.sp}/${s.maxSp}`, 60, 20, '#8cf', 10); // MP -> SP
     }
 };

@@ -2,10 +2,10 @@
 // 魔法データ
 // ===========================================
 export const MagicData = {
-    fire: { id: 'fire', name: 'ファイア', mp: 5, type: 'attack', element: 'fire', basePower: 1.1 },
-    water: { id: 'water', name: 'アクア', mp: 5, type: 'attack', element: 'water', basePower: 1.1 },
-    wind: { id: 'wind', name: 'ウィンド', mp: 5, type: 'attack', element: 'wind', basePower: 1.1 },
-    heal: { id: 'heal', name: 'ヒール', mp: 3, type: 'heal', healPercent: 0.5 }
+    fire: { id: 'fire', name: 'ファイア', sp: 5, type: 'attack', element: 'fire', basePower: 1.1 },
+    water: { id: 'water', name: 'アクア', sp: 5, type: 'attack', element: 'water', basePower: 1.1 },
+    wind: { id: 'wind', name: 'ウィンド', sp: 5, type: 'attack', element: 'wind', basePower: 1.1 },
+    heal: { id: 'heal', name: 'ヒール', sp: 3, type: 'heal', healPercent: 0.5 }
 };
 
 // 習得可能な魔法リストを取得

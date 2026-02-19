@@ -12,7 +12,7 @@ import { Checkpoint } from '../../checkpoint.js';
 import { Maps } from '../maps/manager.js';
 import { Loop1Ending } from '../loop1_ending.js';
 import { BattleActions } from './actions.js';
-import { BattleMagic } from './magic.js';
+import { BattleSkills } from './skills.js';
 import { BattleItems } from './items.js';
 import { BattleRender } from './render.js';
 
@@ -95,6 +95,7 @@ export const Battle = {
         if (!this.northMinibossStage) this.northMinibossStage = null; // Reset stage flag if not set
         this.enemyHp = this.enemy.hp;
         this.phase = 'wait_input'; this.nextPhase = 'command'; this.cur = 0;
+        this.skillCur = 0; this.itemCur = 0; // Reset cursors
         this.msg = `${this.enemy.name}が現れた！`;
         this.msgTimer = 0; this.leveledUp = false; this.goldGain = 0;
         this.isBoss = false; this.enemyAttackCount = 0;
@@ -128,12 +129,12 @@ export const Battle = {
             if (Input.justPressed('ArrowRight')) this.cur = (this.cur ^ 1);
             if (Input.interact()) {
                 if (this.cur === 0) BattleActions.doPlayerAtk(this);
-                else if (this.cur === 1) this.phase = 'magic';
+                else if (this.cur === 1) this.phase = 'skill'; // magic -> skill
                 else if (this.cur === 2) this.phase = 'item';
                 else BattleActions.doFlee(this);
             }
-        } else if (this.phase === 'magic') {
-            BattleMagic.updateMagic(this);
+        } else if (this.phase === 'skill') { // magic -> skill
+            BattleSkills.updateSkills(this); // BattleMagic -> BattleSkills
         } else if (this.phase === 'item') {
             BattleItems.updateItem(this);
         } else if (this.phase === 'enemyAttack') {

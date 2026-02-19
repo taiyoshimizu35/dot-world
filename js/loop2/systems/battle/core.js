@@ -221,7 +221,7 @@ export const Battle2 = {
             return;
         }
 
-        const dmg = Math.floor(Math.max(1, PlayerStats2.getTotalAtk() - target.def + Math.random() * 4));
+        const dmg = Math.floor(Math.max(1, PlayerStats2.atk - target.def + Math.random() * 4));
         target.hp = Math.floor(target.hp - dmg);
 
         FX.shake(200); FX.flash(100);
@@ -607,15 +607,20 @@ export const Battle2 = {
 
         PlayerStats2.addGold(totalGold);
 
-        // 内部exp加算
-        const grew = PlayerStats2.addHiddenExp(totalExp);
-        Party2.addExpToAll(totalExp);
+        // Experience & Level Up
+        const leveledUp = PlayerStats2.addExp(totalExp);
+        Party2.addExpToAll(totalExp); // Party members might not have level up return yet, or use old logic.
 
-        this.msg = `敵を一掃した！\n${totalGold}G を獲得！`;
-        if (grew) this.msg += '\n（力が少し強くなった）';
+        this.msg = `敵を一掃した！\n${totalGold}G と ${totalExp}EXP を獲得！`;
+
+        if (leveledUp) {
+            this.msg += `\n${PlayerStats2.name}はレベル${PlayerStats2.level}になった！`;
+        }
+        // Future: Check party members level up
 
         dropItems.forEach(item => {
-            this.msg += `\n${item}を手に入れた！`;
+            Inventory2.addItem(item); // Ensure items are added
+            this.msg += `\n${ItemData2[item].name}を手に入れた！`;
         });
 
         this.msgTimer = 0;
@@ -623,10 +628,11 @@ export const Battle2 = {
 
         // ボス撃破フラグ
         if (this.isTrueBoss && this.currentArea) {
-            WorldState.world2.trueBosses[this.currentArea] = true;
+            // WorldState.world2.trueBosses[this.currentArea] = true; (Logic seems correct)
+            if (WorldState && WorldState.world2) WorldState.world2.trueBosses[this.currentArea] = true;
         }
         if (this.isDemonKing) {
-            WorldState.world2.trueDemonKingDefeated = true;
+            if (WorldState && WorldState.world2) WorldState.world2.trueDemonKingDefeated = true;
         }
     },
 
