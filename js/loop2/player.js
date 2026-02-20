@@ -20,6 +20,7 @@ export const PlayerStats2 = {
     baseDef: 4, def: 4,
     baseMatk: 6, matk: 6,
     baseMdef: 3, mdef: 3,
+    baseAgi: 5, agi: 5,
 
     exp: 0, nextExp: 40,
     gold: 50,
@@ -73,6 +74,7 @@ export const PlayerStats2 = {
         this.def = this.baseDef;
         this.matk = this.baseMatk;
         this.mdef = this.baseMdef;
+        this.agi = this.baseAgi || 5;
         this.magicBoost = 1.0;
 
         // 2. Add Equipment Bonuses
@@ -88,6 +90,7 @@ export const PlayerStats2 = {
                 if (item.stats.mdef) this.mdef += item.stats.mdef;
                 if (item.stats.maxHp) this.maxHp += item.stats.maxHp;
                 if (item.stats.maxSp) this.maxSp += item.stats.maxSp;
+                if (item.stats.agi) this.agi += item.stats.agi;
             }
         });
 

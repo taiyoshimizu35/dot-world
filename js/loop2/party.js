@@ -2,6 +2,7 @@ import { Msg } from '../core/message.js';
 import { PlayerStats2 } from './player.js';
 import { QuestSystem2 } from './quest.js';
 import { PartyMemberData2 } from './data/companions.js';
+import { LevelSystem } from './systems/level.js';
 
 export const Party2 = {
     members: [],  // 現在のパーティメンバー
@@ -29,7 +30,12 @@ export const Party2 = {
 
         this.members.push({
             ...data,
-            hiddenExp: 0
+            level: 1,
+            exp: 0,
+            nextExp: LevelSystem.getNextExp(1),
+            // 初期スキルは data.initialSkills からコピーするか、LevelSystemで管理するかだが
+            // データ側で持っているのでそのままコピーされる
+            // hiddenExp: 0 // Old system
         });
         return true;
     },
@@ -62,55 +68,14 @@ export const Party2 = {
     // 仲間のステータス成長
     addExpToAll(amount) {
         this.members.forEach(member => {
-            member.hiddenExp += amount;
-            // 簡易レベルアップ仮定 (150expで1レベル相当アップ)
-            while (member.hiddenExp >= 150) {
-                member.hiddenExp -= 150;
+            // 安全策: プロパティ初期化
+            if (member.level === undefined) member.level = 1;
+            if (member.exp === undefined) member.exp = 0;
+            if (member.nextExp === undefined) member.nextExp = LevelSystem.getNextExp(member.level);
 
-                // 成長タイプによるステータス上昇
-                const type = member.growthType || 'balanced';
-
-                // HP
-                let hpUp = 2;
-                if (type === 'warrior' || type === 'tank') hpUp = 4;
-                if (type === 'mage' || type === 'cleric') hpUp = 1;
-
-                // SP
-                let spUp = 1;
-                if (type === 'mage' || type === 'cleric' || type === 'special') spUp = 3;
-
-                // ATK
-                let atkUp = 1;
-                if (type === 'warrior' || type === 'monk' || type === 'physical_dex') atkUp = 2;
-                if (type === 'mage' || type === 'cleric') atkUp = 0;
-
-                // DEF
-                let defUp = 1;
-                if (type === 'tank') defUp = 2;
-
-                // MATK
-                let matkUp = 1;
-                if (type === 'mage' || type === 'special' || type === 'cleric') matkUp = 2;
-                if (type === 'warrior' || type === 'tank') matkUp = 0;
-
-                // MDEF
-                let mdefUp = 1;
-                if (type === 'cleric' || type === 'mage') mdefUp = 2;
-
-                member.maxHp += hpUp;
-                member.hp += hpUp; // 全快させるかはゲームバランス次第だが、最大値増えた分は増やす
-                member.maxSp += spUp;
-                member.sp += spUp;
-                member.atk += atkUp;
-                member.def += defUp;
-                member.matk += matkUp;
-                member.mdef += mdefUp;
-            }
+            LevelSystem.addExp(member, amount);
         });
     },
-
-    // 戦闘中の自動行動選択 - AI廃止のため削除
-    // getAction(member, battle) { ... }
 
     // パーティ全体のHP回復
     healAll(amount) {
@@ -124,7 +89,8 @@ export const Party2 = {
         this.members.forEach(m => {
             m.hp = m.maxHp;
             if (m.maxSp) m.sp = m.maxSp;
-            // Status reset if members have complex status
+            m.status = {};
+            m.buffs = {};
         });
     },
 

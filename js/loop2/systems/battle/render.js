@@ -51,8 +51,9 @@ export const BattleRender2 = {
         Draw.stroke(ctx, 8, y, VW - 16, h, '#fff', 2);
 
         // Command Phase
-        if (battle.phase === 'command') {
-            Draw.text(ctx, 'どうする？', 16, y + 8, '#fff', 12);
+        if (battle.phase === 'command' || battle.phase === 'partyCommand') {
+            const prompt = (battle.phase === 'partyCommand') ? battle.msg : 'どうする？';
+            Draw.text(ctx, prompt, 16, y + 8, '#fff', 12);
             const cmds = ['こうげき', 'スキル', 'アイテム', 'にげる'];
             for (let i = 0; i < 4; i++) {
                 const cx = 16 + (i % 2) * 80;
@@ -89,27 +90,28 @@ export const BattleRender2 = {
         }
 
         // Stats (Player + Party) - Top Horizontal List
-        const boxW = 80;
+        const playerBoxW = 60;
+        const companionBoxW = 60; // Approx 2/3 of 80
         const boxH = 50; // Compact height
         const boxSpacing = 4;
 
         // Calculate total width to center them
-        let memberCount = 1; // Player
-        if (Party2 && Party2.members) memberCount += Party2.members.length;
+        let partyCount = 0;
+        if (Party2 && Party2.members) partyCount = Party2.members.length;
 
-        const totalW = memberCount * boxW + (memberCount - 1) * boxSpacing;
+        const totalW = playerBoxW + (partyCount * companionBoxW) + (partyCount * boxSpacing); // Player is always 1
         let currentX = (VW - totalW) / 2;
         const baseY = 4;
 
         // Player Info
-        this.renderStatusBox(ctx, currentX, baseY, boxW, boxH, PlayerStats2);
-        currentX += boxW + boxSpacing;
+        this.renderStatusBox(ctx, currentX, baseY, playerBoxW, boxH, PlayerStats2);
+        currentX += playerBoxW + boxSpacing;
 
         // Party Info
         if (Party2 && Party2.members) {
             Party2.members.forEach(m => {
-                this.renderStatusBox(ctx, currentX, baseY, boxW, boxH, m);
-                currentX += boxW + boxSpacing;
+                this.renderStatusBox(ctx, currentX, baseY, companionBoxW, boxH, m);
+                currentX += companionBoxW + boxSpacing;
             });
         }
     },

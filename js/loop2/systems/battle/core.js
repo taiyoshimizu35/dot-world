@@ -25,6 +25,10 @@ export const Battle2 = {
     partyCommands: [], // Store selected commands { member, action, targetIndex }
     partyTargetIndex: 0, // Target selection for Companion
 
+    // New Queue System
+    turnQueue: [], // Order of execution
+    currentExecutor: null, // Acting entity
+
     init(worldState) {
         this.active = false;
         this.enemies = [];
@@ -37,6 +41,8 @@ export const Battle2 = {
         this.currentPartyMember = null;
         this.partyTurnIndex = 0;
         this.partyCommands = [];
+        this.turnQueue = [];
+        this.currentExecutor = null;
     },
 
     start(mapId) {
@@ -158,14 +164,14 @@ export const Battle2 = {
             this.waitForInput = true;
             this.nextPhase = 'command';
             this.phase = 'wait_input';
+        } else if (this.phase === 'partyInputInit') {
+            this.startPartyInput();
         } else if (this.phase === 'partyCommand') {
             this.handlePartyCommandInput();
         } else if (this.phase === 'partyTarget') {
             this.handlePartyTargetInput();
-        } else if (this.phase === 'partyTurn') {
-            this.doPartyActions();
-        } else if (this.phase === 'enemyAttack') {
-            if (this.msgTimer > 40) this.doEnemyAtk();
+        } else if (this.phase === 'execution') {
+            this.processTurnQueue();
         } else if (this.phase === 'victory') {
             this.end();
         } else if (this.phase === 'defeat') {
@@ -201,252 +207,38 @@ export const Battle2 = {
         }
 
         if (Input.interact()) {
-            this.doPlayerAtk();
+            this.queuePlayerAction('attack');
         }
         if (Input.cancel()) {
             this.phase = 'command';
         }
     },
 
-    doPlayerAtk() {
-        // Use selected target
-        let target = this.enemies[this.targetIndex];
-        if (!target || target.hp <= 0) {
-            // Fallback
-            target = this.enemies.find(e => e.hp > 0);
-        }
+    // プレイヤー行動の予約（すぐに実行しない）
+    queuePlayerAction(type) {
+        // ターゲット
+        let targetIdx = this.targetIndex;
 
-        if (!target) {
-            this.checkVictory();
-            return;
-        }
+        // Player Action Object
+        const action = {
+            actor: PlayerStats2,
+            type: type,
+            isPlayer: true,
+            targetIndex: targetIdx,
+            priority: 0 // For future use
+        };
 
-        const dmg = Math.floor(Math.max(1, PlayerStats2.atk - target.def + Math.random() * 4));
-        target.hp = Math.floor(target.hp - dmg);
+        // キューはまだ作らない（パーティ入力後に一括生成）
+        // 一時的に保存
+        this.playerAction = action;
 
-        FX.shake(200); FX.flash(100);
-        this.msg = `${target.name}に${dmg}ダメージ！`;
-        this.msgTimer = 0;
-        this.waitForInput = true;
-
-        if (this.enemies.every(e => e.hp <= 0)) {
-            this.checkVictory();
+        // 次のフェーズへ
+        if (Party2.members.length > 0) {
+            this.phase = 'partyInputInit'; // Jump directly to init
         } else {
-            // 仲間がいれば仲間コマンド入力へ
-            if (Party2.members.length > 0) {
-                this.phase = 'partyCommand';
-                this.partyTurnIndex = 0;
-                this.partyCommands = [];
-                // Skip dead members? 
-                while (this.partyTurnIndex < Party2.members.length && Party2.members[this.partyTurnIndex].hp <= 0) {
-                    this.partyTurnIndex++;
-                }
-                if (this.partyTurnIndex >= Party2.members.length) {
-                    this.phase = 'partyTurn'; // All dead? Just skip to execution (empty) or enemy turn
-                    this.partyActionQueue = [];
-                } else {
-                    this.msg = `${Party2.members[this.partyTurnIndex].name}はどうする？`;
-                    this.cur = 0; // Reset cursor for command selection
-                }
-            } else {
-                this.phase = 'enemyAttack';
-            }
-            this.enemyAttackCount = 0;
+            this.startExecutionPhase();
         }
-    },
-
-    doPartyActions() {
-        if (!this.partyActionQueue) {
-            // Init Queue
-            this.partyActionQueue = [...Party2.members];
-            this.currentPartyMember = null;
-        }
-
-        if (this.waitForInput) {
-            // Waiting for previous message to clear? 
-            // Actually input.interact clears waitForInput in update().
-            return;
-        }
-
-        // If no member currently acting, get next
-        if (!this.currentPartyMember) {
-            // Check Victory before getting next member or ending turn
-            if (this.enemies.every(e => e.hp <= 0)) {
-                this.checkVictory();
-                return;
-            }
-
-            if (this.partyActionQueue.length === 0) {
-                // End of Party Turn
-                this.partyActionQueue = null;
-                this.phase = 'enemyAttack';
-                this.enemyAttackCount = 0;
-                return;
-            }
-            this.currentPartyMember = this.partyActionQueue.shift();
-        }
-
-        const member = this.currentPartyMember.member; // Access the actor property since queue item is command
-        if (member.hp <= 0) {
-            this.currentPartyMember = null; // Skip dead
-            return;
-        }
-
-        // Execute Action
-        if (this.enemies.every(e => e.hp <= 0)) {
-            this.checkVictory();
-            return;
-        }
-
-        // Get saved command info
-        // member is this.currentPartyMember (which is { member, action, targetIndex })
-        // Wait, partyActionQueue stores { member, action, targetIndex } objects now.
-        // But above I assigned this.currentPartyMember = this.partyActionQueue.shift();
-        // and then assigned const member = this.currentPartyMember;
-        // WRONG -> this.currentPartyMember IS the command object now.
-        // Let's fix variable names.
-
-        const cmd = this.currentPartyMember;
-        const actor = cmd.member;
-
-        if (actor.hp <= 0) {
-            this.currentPartyMember = null;
-            return;
-        }
-
-        const action = cmd.action;
-        let target = null;
-        if (cmd.targetIndex !== null && cmd.targetIndex !== undefined) {
-            target = this.enemies[cmd.targetIndex];
-            if (target && target.hp <= 0) target = null; // Target dead
-        }
-
-        // Convert 'target' index to actual target or fallback (dead target logic)
-        if (!target) {
-            target = this.enemies.find(e => e.hp > 0);
-        }
-        if (!target) { this.checkVictory(); return; }
-
-
-        let msg = '';
-        if (action.type === 'attack') {
-            const dmg = Math.floor(Math.max(1, action.power - target.def + Math.random() * 2));
-            // Critical check?
-            target.hp = Math.floor(target.hp - dmg);
-            msg = `${actor.name}の攻撃！${target.name}に${dmg}ダメージ！`;
-            FX.shake(100);
-        } else if (action.type === 'magic') {
-            // Skill placeholder
-            if (actor.sp >= 5) {
-                const dmg = Math.max(1, action.power);
-                target.hp -= dmg;
-                actor.sp -= 5;
-                msg = `${actor.name}のスキル攻撃！${target.name}に${dmg}ダメージ！`;
-                FX.flash(100);
-            } else {
-                msg = `${actor.name}はスキルを使おうとしたがSPが足りない！`;
-            }
-        } else if (action.type === 'item') {
-            // Use Item
-            // Target is 'target' (enemy) or Self/Ally? 
-            // Currently battle commands target Enemies by default in this structure.
-            // Items usually target allies.
-            // We need to support ally targeting for items.
-            // For now, if item is healing, assume self-use or auto-target injured?
-            // Simplified: Use on Self (actor)
-            const res = Inventory2.useItem(action.item, actor);
-            if (res.success) {
-                msg = `${actor.name}は${ItemData2[action.item].name}を使った！\n${res.msg}`;
-            } else {
-                msg = `${actor.name}は${ItemData2[action.item].name}を使おうとしたが、効果がなかった！`;
-            }
-        } else if (action.type === 'flee') {
-            // Flee attempt (Party Member)
-            if (this.isBoss) {
-                this.msg = `${actor.name}は逃げようとした！\nしかし回り込まれてしまった！`; // Boss fail
-                this.phase = 'enemyAttack'; // Turn over
-                this.partyActionQueue = []; // Clear remaining? Already cleared on input, but just in case
-            } else if (Math.random() < 0.5) {
-                this.msg = `${actor.name}は逃げ出した！`;
-                this.phase = 'victory';
-                this.enemies = [];
-                return;
-            } else {
-                this.msg = `${actor.name}は逃げようとした！\nしかし回り込まれてしまった！`;
-                // Fail -> Enemy Turn
-                this.phase = 'enemyAttack';
-                this.enemyAttackCount = 0;
-                this.partyActionQueue = []; // Ensure no more actions
-            }
-        } else {
-            msg = `${actor.name}は様子を見ている。`;
-        }
-
-        this.msg = msg;
-        this.msgTimer = 0;
-        this.waitForInput = true;
-
-        // Done with this member
-        this.currentPartyMember = null;
-
-        // If enemies dead, next update will catch it in checkVictory check inside next call or here
-        if (this.enemies.every(e => e.hp <= 0)) {
-            // Wait for input then check victory
-        }
-    },
-
-    doEnemyAtk() {
-        let damageTaken = false;
-        let totalDmg = 0;
-        let msgs = [];
-
-        this.enemies.forEach(enemy => {
-            if (enemy.hp <= 0) return;
-
-            // Target Selection (Player or Companion)
-            const targets = [{ name: PlayerStats2.name, isPlayer: true, stats: PlayerStats2 }];
-            Party2.members.forEach(m => targets.push({ name: m.name, isPlayer: false, stats: m }));
-
-            // Filter dead targets? No, they can be hit but won't take damage or different msg?
-            // Usually valid targets only.
-            const validTargets = targets.filter(t => t.stats.hp > 0);
-            if (validTargets.length === 0) return;
-
-            const target = validTargets[Math.floor(Math.random() * validTargets.length)];
-            const dmg = Math.max(1, enemy.atk - target.stats.def);
-
-            let dead = false;
-            if (target.isPlayer) {
-                dead = PlayerStats2.takeDamage(dmg);
-            } else {
-                target.stats.hp = Math.max(0, target.stats.hp - dmg);
-                if (target.stats.hp === 0) dead = true;
-            }
-
-            totalDmg += dmg;
-            msgs.push(`${enemy.name}の攻撃！${target.name}に${dmg}ダメージ！`);
-            if (dead) msgs.push(`${target.name}は力尽きた...`);
-
-            damageTaken = true;
-        });
-
-        if (damageTaken) {
-            FX.shake(150);
-            this.msg = msgs.join('\n');
-        } else {
-            this.msg = '敵の攻撃！ミス！';
-        }
-
-        this.msgTimer = 0;
-        this.waitForInput = true;
-
-        if (PlayerStats2.hp <= 0) {
-            this.phase = 'defeat';
-            this.msg = '力尽きた...';
-        } else {
-            this.phase = 'wait_input';
-            this.nextPhase = 'command';
-        }
+        this.enemyAttackCount = 0;
     },
 
     doFlee() {
@@ -454,18 +246,44 @@ export const Battle2 = {
             this.msg = 'ボス戦からは逃げられない！';
             this.phase = 'wait_input';
             this.nextPhase = 'command';
-        } else if (Math.random() < 0.8) { // Player has high flee chance?
-            this.msg = 'うまく逃げ切れた！';
-            this.phase = 'victory';  // 報酬なしで終了
-            this.enemies = []; // Clear
         } else {
-            this.msg = '逃げられなかった！';
-            // Fail means turn ends -> Enemy Attack
-            this.phase = 'enemyAttack';
-            this.enemyAttackCount = 0;
+            // Flee is immediate attempt? Or Speed based?
+            // Usually Flee is first priority.
+            // Let's keep it immediate for now, or queue it with high priority?
+            // User requested speed-based. But Flee usually fails or succeeds. 
+            // Let's Queue it as a special action.
+
+            this.playerAction = {
+                actor: PlayerStats2,
+                type: 'flee',
+                isPlayer: true,
+                priority: 999
+            };
+            if (Party2.members.length > 0) {
+                this.phase = 'partyInputInit';
+            } else {
+                this.startExecutionPhase();
+            }
         }
-        this.msgTimer = 0;
-        this.waitForInput = true;
+    },
+
+    startPartyInput() {
+        this.phase = 'partyCommand';
+        this.partyTurnIndex = 0;
+        this.partyCommands = [];
+
+        // Skip dead members
+        while (this.partyTurnIndex < Party2.members.length && Party2.members[this.partyTurnIndex].hp <= 0) {
+            this.partyTurnIndex++;
+        }
+
+        if (this.partyTurnIndex >= Party2.members.length) {
+            // 全滅または行動不能なら即座にターン処理
+            this.startExecutionPhase();
+        } else {
+            this.msg = `${Party2.members[this.partyTurnIndex].name}はどうする？`;
+            this.cur = 0; // Reset cursor
+        }
     },
 
     handlePartyCommandInput() {
@@ -501,13 +319,8 @@ export const Battle2 = {
                     this.phase = 'wait_input';
                     this.nextPhase = 'partyCommand';
                 } else {
-                    // Enter Item Selection Phase (Simplification: just use first consumable for now, 
-                    // or better, create a 'partyItem' phase? 
-                    // Given time constraints, let's use first available consumable or fail)
                     const consumable = Inventory2.items.find(id => ItemData2[id] && ItemData2[id].type === 'consumable');
                     if (consumable) {
-                        // Auto-select first consumable
-                        // Support for selection requires new phase.
                         this.pushPartyCommand({ type: 'item', item: consumable }, null);
                     } else {
                         this.msg = '使える道具がない！';
@@ -518,16 +331,8 @@ export const Battle2 = {
                     }
                 }
             } else {
-                // にげる (全員の行動をスキップして逃走試行)
-                this.partyActionQueue = []; // Clear other actions
-                this.partyCommands = []; // Clear
-                // Add Flee action for this member (or generic)
-                // We'll treat it as this member initiating the flee
-                this.partyActionQueue.push({ member, action: { type: 'flee' }, targetIndex: null });
-
-                // Immediately go to execution
-                this.phase = 'partyTurn';
-                this.partyTurnIndex = Party2.members.length; // Stop input loop
+                // にげる
+                this.pushPartyCommand({ type: 'flee' }, null);
             }
         }
     },
@@ -539,8 +344,7 @@ export const Battle2 = {
 
         // Safety check
         if (this.enemies.every(e => e.hp <= 0)) {
-            this.checkVictory(); // Or just exit phase
-            return;
+            // Should verify logic here, but usually fine
         }
 
         if (Input.justPressed('ArrowRight')) {
@@ -571,7 +375,13 @@ export const Battle2 = {
 
     pushPartyCommand(action, targetIdx) {
         const member = Party2.members[this.partyTurnIndex];
-        this.partyCommands.push({ member, action, targetIndex: targetIdx });
+        // Queue Action
+        this.partyCommands.push({
+            actor: member,
+            isPlayer: false,
+            action: action,
+            targetIndex: targetIdx
+        });
 
         // Next member
         this.partyTurnIndex++;
@@ -580,14 +390,240 @@ export const Battle2 = {
         }
 
         if (this.partyTurnIndex >= Party2.members.length) {
-            this.phase = 'partyTurn';
-            this.partyActionQueue = this.partyCommands;
-            this.currentPartyMember = null;
+            // Finish Party Input -> Execute
+            this.startExecutionPhase();
         } else {
             this.phase = 'partyCommand';
             this.msg = `${Party2.members[this.partyTurnIndex].name}はどうする？`;
             this.cur = 0;
         }
+    },
+
+    // ===============================================
+    // Execution Phase (Turn Order)
+    // ===============================================
+    startExecutionPhase() {
+        this.phase = 'execution';
+        this.turnQueue = [];
+
+        // 1. Add Player Action
+        if (this.playerAction) {
+            this.turnQueue.push({
+                ...this.playerAction,
+                speed: (PlayerStats2.agi || 5) + Math.random() * 5
+            });
+        }
+
+        // 2. Add Party Actions
+        this.partyCommands.forEach(cmd => {
+            if (cmd.actor.hp > 0) {
+                this.turnQueue.push({
+                    actor: cmd.actor,
+                    type: cmd.action.type, // Simplify structure
+                    action: cmd.action,
+                    targetIndex: cmd.targetIndex,
+                    isPlayer: false,
+                    speed: (cmd.actor.agi || 5) + Math.random() * 5
+                });
+            }
+        });
+
+        // 3. Add Enemy Actions (AI Decision)
+        this.enemies.forEach(enemy => {
+            if (enemy.hp > 0) {
+                this.turnQueue.push({
+                    actor: enemy,
+                    type: 'enemy_attack', // General key, specific AI inside
+                    isEnemy: true,
+                    speed: (enemy.agi || 4) + Math.random() * 5
+                });
+            }
+        });
+
+        // 4. Sort by Speed (Descending)
+        this.turnQueue.sort((a, b) => b.speed - a.speed);
+
+        // Log turn order for debug?
+        // console.log("Turn Order:", this.turnQueue.map(t => `${t.actor.name} (${t.speed.toFixed(1)})`));
+
+        this.processTurnQueue();
+    },
+
+    processTurnQueue() {
+        // If waiting for input, do nothing
+        if (this.waitForInput) return;
+
+        // Check Victory/Defeat continuously
+        if (this.enemies.every(e => e.hp <= 0)) {
+            this.checkVictory();
+            return;
+        }
+        if (PlayerStats2.hp <= 0) {
+            this.phase = 'defeat';
+            this.msg = '力尽きた...';
+            this.waitForInput = true;
+            return;
+        }
+
+        // Get Next Action
+        if (this.turnQueue.length === 0) {
+            // End of Turn
+            this.playerAction = null;
+            this.partyCommands = [];
+            this.phase = 'wait_input';
+            this.nextPhase = 'command';
+            this.msg = ''; // Clear msg
+            // Maybe auto-skip wait if msg is empty?
+            this.phase = 'command'; // Reset directly
+            return;
+        }
+
+        const turn = this.turnQueue.shift();
+        const actor = turn.actor;
+
+        // Skip if dead
+        if ((!actor.maxHp && actor.hp <= 0) || (actor.maxHp && actor.hp <= 0)) {
+            // Re-check death (Enemies use hp/maxHp, Allies same)
+            // Just safely check hp
+            this.processTurnQueue();
+            return;
+        }
+        if (actor.hp <= 0) {
+            this.processTurnQueue();
+            return;
+        }
+
+        this.executeAction(turn);
+    },
+
+    executeAction(turn) {
+        const actor = turn.actor;
+
+        if (turn.isEnemy) {
+            this.doEnemyAction(actor);
+        } else {
+            // Player or Party
+            this.doAllyAction(turn);
+        }
+    },
+
+    doAllyAction(turn) {
+        const actor = turn.actor;
+        const type = turn.type;
+        const targetIndex = turn.targetIndex;
+
+        // Resolve Target
+        let target = null;
+        if (targetIndex !== null && targetIndex !== undefined) {
+            target = this.enemies[targetIndex];
+            if (target && target.hp <= 0) target = null;
+        }
+        // Fallback target
+        if (!target && (type === 'attack' || type === 'magic')) {
+            target = this.enemies.find(e => e.hp > 0);
+        }
+
+        let msg = '';
+
+        if (type === 'flee') {
+            if (this.isBoss) {
+                msg = `${actor.name}は逃げようとした！\nしかし回り込まれてしまった！`;
+                // Fail
+            } else if (Math.random() < 0.5 + (actor.agi || 5) / 20) { // Speed adjust
+                msg = `${actor.name}は逃げ出した！`;
+                this.phase = 'victory';
+                this.enemies = []; // Clear
+                this.msg = msg;
+                this.waitForInput = true;
+                return;
+            } else {
+                msg = `${actor.name}は逃げようとした！\nしかし回り込まれてしまった！`;
+            }
+        }
+        else if (type === 'attack') {
+            if (!target) {
+                msg = `${actor.name}は攻撃しようとしたが、敵がいなかった。`;
+            } else {
+                const power = turn.action?.power || actor.atk; // Default or Skill Power
+                // If simple attack, use actor.atk. If skill, use power.
+                // Logic in handlePartyTargetInput set power manually.
+                // For Player, we just used 'attack'.
+                const finalPower = (turn.isPlayer) ? PlayerStats2.atk : (turn.action.power || actor.atk);
+
+                const dmg = Math.floor(Math.max(1, finalPower - target.def + Math.random() * 2));
+                target.hp = Math.floor(target.hp - dmg);
+                msg = `${actor.name}の攻撃！${target.name}に${dmg}ダメージ！`;
+                FX.shake(100);
+            }
+        }
+        else if (type === 'magic') {
+            if (!target) {
+                msg = `${actor.name}は魔法を唱えたが、敵がいなかった。`;
+            } else {
+                // SP Check
+                if (actor.sp >= 5) {
+                    actor.sp -= 5;
+                    const power = turn.action?.power || actor.matk;
+                    const dmg = Math.max(1, power);
+                    target.hp -= dmg;
+                    msg = `${actor.name}のスキル攻撃！${target.name}に${dmg}ダメージ！`;
+                    FX.flash(100);
+                } else {
+                    msg = `${actor.name}はスキルを使おうとしたがSPが足りない！`;
+                }
+            }
+        }
+        else if (type === 'item') {
+            const res = Inventory2.useItem(turn.action.item, actor);
+            if (res.success) {
+                msg = `${actor.name}は${ItemData2[turn.action.item].name}を使った！\n${res.msg}`;
+            } else {
+                msg = `${actor.name}は${ItemData2[turn.action.item].name}を使おうとしたが、効果がなかった！`;
+            }
+        }
+
+        this.msg = msg;
+        this.msgTimer = 0;
+        this.waitForInput = true;
+
+        // After this phase input is cleared, update() will call processTurnQueue() again
+        this.nextPhase = 'execution';
+        this.phase = 'wait_input';
+    },
+
+    doEnemyAction(enemy) {
+        // Target Selection
+        const targets = [{ name: PlayerStats2.name, isPlayer: true, stats: PlayerStats2 }];
+        Party2.members.forEach(m => targets.push({ name: m.name, isPlayer: false, stats: m }));
+        const validTargets = targets.filter(t => t.stats.hp > 0);
+
+        if (validTargets.length === 0) {
+            // Everyone dead? processTurnQueue will catch it next
+            return;
+        }
+
+        const target = validTargets[Math.floor(Math.random() * validTargets.length)];
+        const dmg = Math.max(1, enemy.atk - target.stats.def);
+
+        let dead = false;
+        if (target.isPlayer) {
+            dead = PlayerStats2.takeDamage(dmg);
+        } else {
+            target.stats.hp = Math.max(0, target.stats.hp - dmg);
+            if (target.stats.hp === 0) dead = true;
+        }
+
+        let msg = `${enemy.name}の攻撃！${target.name}に${dmg}ダメージ！`;
+        if (dead) msg += `\n${target.name}は力尽きた...`;
+
+        // If player dead, game over logic handles in processTurnQueue
+        FX.shake(150);
+
+        this.msg = msg;
+        this.msgTimer = 0;
+        this.waitForInput = true;
+        this.nextPhase = 'execution';
+        this.phase = 'wait_input';
     },
 
     checkVictory() {
@@ -651,6 +687,7 @@ export const Battle2 = {
         this.partyActionQueue = null;
         this.currentPartyMember = null;
         this.msgTimer = 0;
+        this.turnQueue = [];
 
         Input.lock(200);
     },
