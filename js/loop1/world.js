@@ -113,6 +113,10 @@ export const WorldState = {
         Party2.init();
         QuestSystem2.init();
 
+        // Initial Party Member: Lulusia (The Woman / Demon King)
+        Party2.add('lulusia');
+        Msg.show('謎の少女「あのままでは危ないところでした！\n私もお供します、怪我の手当てくらいならできますから…」');
+
         Battle2.init(this);
 
         // Manager Swap

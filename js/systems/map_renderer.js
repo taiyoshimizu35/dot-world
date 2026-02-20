@@ -102,6 +102,7 @@ export class MapRenderer {
 
         // NPCs（条件フィルタリング済み、視界制限適用）
         const visibleNpcs = Maps.getVisibleNpcs();
+
         const currentArea = map.area;
         for (const npc of visibleNpcs) {
             // 南エリアでは視界内のNPCのみ表示
@@ -122,7 +123,15 @@ export class MapRenderer {
             const img = AssetLoader.get(spriteName);
             const w = npc.width || 1;
             const h = npc.height || 1;
-            if (img) ctx.drawImage(img, sp.x, sp.y, TS * w, TS * h);
+
+            if (img) {
+                ctx.drawImage(img, sp.x, sp.y, TS * w, TS * h);
+            } else {
+                // Fallback for missing image (Debug)
+                ctx.fillStyle = 'red';
+                ctx.fillRect(sp.x, sp.y, TS * w, TS * h);
+                // console.warn(`Missing asset for NPC: ${npc.name}, sprite: ${spriteName}`);
+            }
         }
 
         // Player

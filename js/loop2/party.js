@@ -21,9 +21,9 @@ export const Party2 = {
             return false;
         }
 
-        // 3人制限
-        if (this.members.length >= 3) {
-            Msg.show('パーティがいっぱいです。（最大3人）\n誰かと別れる必要があります。');
+        // 4人制限 (勇者+4人=5人パーティ)
+        if (this.members.length >= 4) {
+            Msg.show('パーティがいっぱいです。（最大4人）\n誰かと別れる必要があります。');
             return false;
         }
 
@@ -34,10 +34,21 @@ export const Party2 = {
         return true;
     },
 
+    // メンバーかどうか確認
+    isMember(memberId) {
+        return this.members.some(m => m.id === memberId);
+    },
+
     // 仲間と別れる
     remove(memberId) {
         const idx = this.members.findIndex(m => m.id === memberId);
         if (idx === -1) return false;
+
+        // 固定メンバーは外せない
+        if (this.members[idx].fixed) {
+            Msg.show('「...離れるわけにはいきません。」');
+            return false;
+        }
 
         // 別れフラグを立てる
         if (QuestSystem2.departed) {
@@ -52,11 +63,48 @@ export const Party2 = {
     addExpToAll(amount) {
         this.members.forEach(member => {
             member.hiddenExp += amount;
+            // 簡易レベルアップ仮定 (150expで1レベル相当アップ)
             while (member.hiddenExp >= 150) {
                 member.hiddenExp -= 150;
-                member.maxHp += 2;
-                member.atk += 1;
-                member.def += 1;
+
+                // 成長タイプによるステータス上昇
+                const type = member.growthType || 'balanced';
+
+                // HP
+                let hpUp = 2;
+                if (type === 'warrior' || type === 'tank') hpUp = 4;
+                if (type === 'mage' || type === 'cleric') hpUp = 1;
+
+                // SP
+                let spUp = 1;
+                if (type === 'mage' || type === 'cleric' || type === 'special') spUp = 3;
+
+                // ATK
+                let atkUp = 1;
+                if (type === 'warrior' || type === 'monk' || type === 'physical_dex') atkUp = 2;
+                if (type === 'mage' || type === 'cleric') atkUp = 0;
+
+                // DEF
+                let defUp = 1;
+                if (type === 'tank') defUp = 2;
+
+                // MATK
+                let matkUp = 1;
+                if (type === 'mage' || type === 'special' || type === 'cleric') matkUp = 2;
+                if (type === 'warrior' || type === 'tank') matkUp = 0;
+
+                // MDEF
+                let mdefUp = 1;
+                if (type === 'cleric' || type === 'mage') mdefUp = 2;
+
+                member.maxHp += hpUp;
+                member.hp += hpUp; // 全快させるかはゲームバランス次第だが、最大値増えた分は増やす
+                member.maxSp += spUp;
+                member.sp += spUp;
+                member.atk += atkUp;
+                member.def += defUp;
+                member.matk += matkUp;
+                member.mdef += mdefUp;
             }
         });
     },

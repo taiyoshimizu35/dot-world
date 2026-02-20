@@ -29,7 +29,14 @@ const createMap = (areaName, baseTile) => {
         w: W, h: H, tiles: tiles,
         area: areaName,
         baseTile: baseTile,
-        npcs: [],
+        npcs: [
+            // Rin (Dragon Warrior)
+            { x: 5, y: 5, name: 'リン', img: 'rin', partyJoin: 'rin' },
+            // Shera (Thief)
+            { x: 15, y: 5, name: 'シェラ', img: 'shera', partyJoin: 'shera' },
+            // George (Porter)
+            { x: 10, y: 10, name: 'ジョージ', img: 'george', partyJoin: 'george' }
+        ],
         warps: [
             // West: World Map
             {

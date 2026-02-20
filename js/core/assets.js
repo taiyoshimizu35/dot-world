@@ -32,6 +32,17 @@ export const AssetLoader = {
             ['villager', 'assets/characters/villager.png'],
             ['priest', 'assets/characters/priest.png'],
             ['guard', 'assets/characters/guard.png'],
+            // Loop 2 Companions
+            ['lulusia', 'assets/characters/lulusia.png'],
+            ['rin', 'assets/characters/rin.png'],
+            ['elena', 'assets/characters/elena.png'],
+            ['aldo', 'assets/characters/aldo.png'],
+            ['george', 'assets/characters/george.png'],
+            ['shera', 'assets/characters/shera.png'],
+            ['gordon', 'assets/characters/gordon.png'],
+            ['gawain', 'assets/characters/gawain.png'],
+            ['sophina', 'assets/characters/sophina.png'],
+            ['kron', 'assets/characters/kron.png'],
             // タイル
             ['grass', 'assets/tiles/grass.png'],
             ['path', 'assets/tiles/path.png'],

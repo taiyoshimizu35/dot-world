@@ -28,7 +28,14 @@ const createMap = (areaName, baseTile) => {
         w: W, h: H, tiles: tiles,
         area: areaName,
         baseTile: baseTile,
-        npcs: [],
+        npcs: [
+            // Aldo (Swordsman)
+            { x: 8, y: 6, name: 'アルド', img: 'aldo', partyJoin: 'aldo' },
+            // Sophina (Forbidden Mage)
+            { x: 14, y: 12, name: 'ソフィーナ', img: 'sophina', partyJoin: 'sophina' },
+            // Kron (Time Mage)
+            { x: 16, y: 4, name: 'クロン', img: 'kron', partyJoin: 'kron' }
+        ],
         warps: [
             // North: World Map
             {
@@ -43,7 +50,7 @@ const createMap = (areaName, baseTile) => {
             { x: W - 1, y: midY, to: 'south_dungeon_3', tx: 2, ty: 7 }
         ],
         start: { x: midX, y: midY },
-        encounterRate: 15
+        encounterRate: 0.0
     };
 };
 

@@ -6,6 +6,8 @@ import { Battle2 } from './battle/core.js';
 import { SaveMenu } from './menu.js';
 import { Party2 } from '../party.js';
 
+import { PartyMemberData2 } from '../data/companions.js';
+
 export class InteractionSystem2 {
     constructor(worldState) {
         this.worldState = worldState;
@@ -18,16 +20,24 @@ export class InteractionSystem2 {
 
         if (npc.partyJoin) {
             const party = this.worldState.managers.party;
+            const data = PartyMemberData2[npc.partyJoin];
+
+            // 既に仲間の場合
             if (party && party.isMember(npc.partyJoin)) {
-                Msg.show(npc.joinedMsg || '「よろしく頼む」');
+                const joinedMsg = npc.joinedMsg || (data && data.messages && data.messages.join_after) || '「よろしく頼む」';
+                Msg.show(joinedMsg);
                 return;
             }
 
-            Msg.choice(npc.msg || '仲間になる？', ['はい', 'いいえ'], (idx) => {
+            // 勧誘メッセージ
+            const joinMsg = npc.msg || (data && data.messages && data.messages.join) || '仲間になる？';
+
+            Msg.choice(joinMsg, ['仲間として誘う', 'やめる'], (idx) => {
                 if (idx === 0) {
                     if (party) {
-                        party.add(npc.partyJoin);
-                        Msg.show(`${npc.name}が仲間になった！`);
+                        if (party.add(npc.partyJoin)) {
+                            Msg.show(`${data ? data.name : npc.name}が仲間になった！`);
+                        }
                     }
                 }
             });

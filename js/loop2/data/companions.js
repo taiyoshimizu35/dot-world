@@ -1,181 +1,220 @@
 export const PartyMemberData2 = {
-    // 1. 戦士 (物理アタッカー)
-    'warrior': {
-        id: 'warrior',
-        name: 'アルド',
-        job: '傭兵',
-        profile: 'かつて王国軍に所属していた剣の腕立つ傭兵。金で動くが、信義には厚い。',
-        hp: 150, maxHp: 150,
-        sp: 20, maxSp: 20,
-        atk: 18, def: 12,
-        matk: 5, mdef: 8,
-        agi: 10,
-        growthType: 'warrior', // 成長タイプ
-        initialSkills: ['slash'], // 将来用: 初期スキルID
-        joinCondition: { type: 'gold', value: 500 }, // 将来用: 加入条件
-        messages: {
-            join: '「雇い主はお前か？ いいだろう、背中は任せな。」',
-            leave: '「契約終了だな。また縁があったら頼むぜ。」'
-        }
-    },
-
-    // 2. 魔導士 (魔法アタッカー)
-    'mage': {
-        id: 'mage',
-        name: 'エレナ',
-        job: '魔導士',
-        profile: '古代語魔法を研究する学者。知識欲が旺盛で、未知の遺跡に興味を持つ。',
-        hp: 80, maxHp: 80,
-        sp: 100, maxSp: 100,
+    // 固定メンバー (ヒロイン/真の魔王)
+    'lulusia': {
+        id: 'lulusia',
+        name: 'ルルシア',
+        job: '謎の少女', // 実は魔王
+        img: 'lulusia',
+        profile: '魔王城で勇者を助けた謎の女性。清楚で可憐な振る舞いをするが、どこかミステリアス。',
+        hp: 120, maxHp: 120,
+        sp: 200, maxSp: 200,
         atk: 5, def: 8,
         matk: 25, mdef: 20,
-        agi: 12,
-        growthType: 'mage',
-        initialSkills: ['fireball'],
-        joinCondition: { type: 'item', value: 'ancient_book' },
+        agi: 10,
+        growthType: 'mage', // 魔法特化
+        initialSkills: ['dark_blast'], // 戦闘魔法のみ
+        fixed: true, // パーティから外せない
+        joinCondition: { type: 'auto' },
         messages: {
-            join: '「貴方の旅、興味深いわね。同行させてもらうわ。」',
-            leave: '「十分なデータは取れたわ。それじゃ。」'
+            join: '「あのままでは危ないところでした！私もお供します、怪我の手当てくらいならできますから…」',
+            leave: '「……。（離れるわけにはいかない）」' // 通常は呼ばれない
         }
     },
 
-    // 3. 僧侶 (ヒーラー)
-    'cleric': {
-        id: 'cleric',
-        name: 'ミリア',
-        job: '聖職者',
-        profile: '怪我人を放っておけない心優しいシスター。戦いは好まないが、護るための力を行使する。',
-        hp: 100, maxHp: 100,
-        sp: 120, maxSp: 120,
-        atk: 8, def: 10,
-        matk: 15, mdef: 25,
-        agi: 8,
-        growthType: 'cleric',
-        initialSkills: ['heal', 'cure'],
-        joinCondition: { type: 'event', value: 'church_donation' },
-        messages: {
-            join: '「神のご加護がありますように。私もお手伝いします。」',
-            leave: '「教会に戻らなくてはなりません。お元気で。」'
-        }
-    },
-
-    // 4. 盗賊 (素早さ・アイテム)
-    'thief': {
-        id: 'thief',
-        name: 'ジグ',
-        job: '盗賊',
-        profile: 'スラム街出身の軽薄な男。手先が器用で、鍵開けや罠の解除が得意。',
-        hp: 110, maxHp: 110,
-        sp: 40, maxSp: 40,
-        atk: 14, def: 9,
-        matk: 8, mdef: 8,
-        agi: 20,
-        growthType: 'thief',
-        initialSkills: ['steal'],
-        joinCondition: { type: 'event', value: 'thieves_guild' },
-        messages: {
-            join: '「へっ、面白そうなことやってんじゃん。俺も混ぜろよ。」',
-            leave: '「じゃあな、あばよ！」'
-        }
-    },
-
-    // 5. 重戦士 (タンク)
-    'tank': {
-        id: 'tank',
-        name: 'ガルド',
-        job: '重装兵',
-        profile: '全身を厚い鎧で包んだ大男。その巨体は動く城壁のよう。',
-        hp: 200, maxHp: 200,
-        sp: 10, maxSp: 10,
-        atk: 12, def: 25,
-        matk: 0, mdef: 15,
-        agi: 5,
-        growthType: 'tank',
-        initialSkills: ['guard'],
-        joinCondition: { type: 'event', value: 'colosseum_win' },
-        messages: {
-            join: '「俺の盾が必要か？ ...いいだろう、共に往く。」',
-            leave: '「任務完了だ。」'
-        }
-    },
-
-    // 6. 吟遊詩人 (バッファー)
-    'bard': {
-        id: 'bard',
-        name: 'ルル',
-        job: '吟遊詩人',
-        profile: '世界中を旅して歌を歌う旅人。その歌声は仲間の士気を高める。',
-        hp: 90, maxHp: 90,
-        sp: 80, maxSp: 80,
-        atk: 10, def: 10,
-        matk: 18, mdef: 18,
-        agi: 14,
-        growthType: 'support',
-        initialSkills: ['song_of_courage'],
-        joinCondition: { type: 'event', value: 'pub_performance' },
-        messages: {
-            join: '「君たちの冒険、素敵な詩になりそうね！」',
-            leave: '「新しい歌を探しに行くね。バイバイ！」'
-        }
-    },
-
-    // 7. 狩人 (遠距離・クリティカル)
-    'ranger': {
-        id: 'ranger',
-        name: 'ホーク',
-        job: '狩人',
-        profile: '森で暮らす寡黙な弓使い。百発百中の腕前を持つ。',
-        hp: 110, maxHp: 110,
-        sp: 30, maxSp: 30,
-        atk: 16, def: 10,
-        matk: 5, mdef: 10,
-        agi: 16,
-        growthType: 'physical_dex',
-        initialSkills: ['aimed_shot'],
-        joinCondition: { type: 'event', value: 'forest_encounter' },
-        messages: {
-            join: '「...ついていく。森の外にも獲物はいる。」',
-            leave: '「森へ帰る。」'
-        }
-    },
-
-    // 8. 武闘家 (高HP・連撃)
-    'monk': {
-        id: 'monk',
+    // 関係者1: 竜族 (東エリア) - 姉(Loop1 Dragon)を探している
+    'rin': {
+        id: 'rin',
         name: 'リン',
-        job: '武闘家',
-        profile: '東方の国から来た修行僧。己の肉体のみを武器とする。',
-        hp: 160, maxHp: 160,
-        sp: 40, maxSp: 40,
-        atk: 13, def: 11,
-        matk: 10, mdef: 10,
-        agi: 15,
-        growthType: 'monk',
-        initialSkills: ['double_punch'],
-        joinCondition: { type: 'level', value: 10 },
+        job: '竜族の戦士',
+        img: 'rin',
+        profile: '行方不明の姉を探して旅をする竜族の少女。勇者の雰囲気に懐かしさを感じている。',
+        hp: 180, maxHp: 180,
+        sp: 30, maxSp: 30,
+        atk: 22, def: 18,
+        matk: 5, mdef: 12,
+        agi: 10,
+        growthType: 'warrior', // 高ステータス
+        initialSkills: ['dragon_claw'], // 強力な物理
+        joinCondition: { type: 'event', region: 'east', id: 'find_sister' },
         messages: {
-            join: '「修行の道も一歩から。同行させていただけますか？」',
-            leave: '「更なる高みを目指して参ります。」'
+            join: '「貴方の匂い…どこかで。姉さんの手掛かりを知っているの？ ついていくわ。」',
+            leave: '「姉さんの情報を探してくる。」'
         }
     },
 
-    // 9. 錬金術師 (特殊・アイテム)
-    'alchemist': {
-        id: 'alchemist',
-        name: 'ネロ',
-        job: '錬金術師',
-        profile: '怪しげな薬を調合する錬金術師。マッドサイエンティスト気味。',
+    // 関係者2: 魔術師 (西エリア) - 勇者の元仲間(Mage)の子孫
+    'elena': {
+        id: 'elena',
+        name: 'エレナ',
+        job: '魔術師',
+        img: 'elena',
+        profile: 'かつての勇者の仲間の血を引く魔術師。攻撃魔法の才能が枯渇しており、回復魔法しか使えないことにコンプレックスを持つ。',
         hp: 90, maxHp: 90,
-        sp: 70, maxSp: 70,
-        atk: 6, def: 7,
-        matk: 20, mdef: 15,
-        agi: 11,
-        growthType: 'special',
-        initialSkills: ['poison_flask'],
-        joinCondition: { type: 'item', value: 'rare_herb' },
+        sp: 120, maxSp: 120,
+        atk: 6, def: 8,
+        matk: 15, mdef: 18,
+        agi: 9,
+        growthType: 'cleric', // 回復特化
+        initialSkills: ['heal', 'cure'], // 回復魔法のみ
+        joinCondition: { type: 'event', region: 'west', id: 'elena_intro' },
         messages: {
-            join: '「ヒヒッ、君実験台に良さそうだねぇ。ついてってあげるよ。」',
-            leave: '「材料切れだ。補充してくるよ。」'
+            join: '「私、ご先祖様みたいな凄い魔法は使えないけど…回復なら任せてください。」',
+            leave: '「もっと修行しなきゃ…ごめんなさい。」'
+        }
+    },
+
+    // 関係者3: 剣士 (南エリア) - 勇者の元仲間(Knight?)の子孫
+    'aldo': {
+        id: 'aldo',
+        name: 'アルド',
+        job: '剣士',
+        img: 'aldo',
+        profile: '勇者の伝説に憧れる若き剣士。我流の剣技だが、筋が良い。',
+        hp: 150, maxHp: 150,
+        sp: 20, maxSp: 20,
+        atk: 18, def: 14,
+        matk: 4, mdef: 8,
+        agi: 12,
+        growthType: 'warrior', // バランス型
+        initialSkills: ['slash'],
+        joinCondition: { type: 'event', region: 'south', id: 'aldo_duel' },
+        messages: {
+            join: '「あんた、ただ者じゃないな！ 俺に剣を教えてくれよ！」',
+            leave: '「俺の剣じゃ、まだ足手まといか…」'
+        }
+    },
+
+    // ---------------------------------------------
+    // その他の仲間候補 (ユニーク能力持ち)
+    // ---------------------------------------------
+
+    // 荷物持ち (東)
+    'george': {
+        id: 'george',
+        name: 'ジョージ',
+        job: '荷物持ち',
+        img: 'george',
+        profile: '力持ちの心優しい大男。戦いは苦手だが、荷物をたくさん持てる。',
+        hp: 200, maxHp: 200,
+        sp: 0, maxSp: 0,
+        atk: 10, def: 10,
+        matk: 0, mdef: 0,
+        agi: 5,
+        growthType: 'tank', // HP高いだけ
+        initialSkills: [], // スキルなし？あるいは「荷物を投げる」？
+        passive: 'inventory_expand', // インベントリ拡張
+        joinCondition: { type: 'gold', value: 100 }, // 雇う？
+        messages: {
+            join: '「荷物なら任せてくれ！ 力仕事は得意なんだ。」',
+            leave: '「また呼んでくれよな！」'
+        }
+    },
+
+    // 盗賊 (東)
+    'shera': {
+        id: 'shera',
+        name: 'シェラ',
+        job: '盗賊',
+        img: 'shera',
+        profile: 'スラム育ちの盗賊。目にも止まらぬ早業で、先手を取るのが得意。',
+        hp: 100, maxHp: 100,
+        sp: 40, maxSp: 40,
+        atk: 14, def: 8,
+        matk: 8, mdef: 8,
+        agi: 30, // 非常に高い
+        growthType: 'thief',
+        initialSkills: ['mug'], // 盗む攻撃
+        passive: 'trap_master', // 罠解除、先制攻撃
+        joinCondition: { type: 'event', region: 'east', id: 'thieves_guild' },
+        messages: {
+            join: '「あたしと組む？ 悪い話じゃないね。分け前は弾んでよ？」',
+            leave: '「あばよ！ お宝は山分けだ。」'
+        }
+    },
+
+    // 成金 (西)
+    'gordon': {
+        id: 'gordon',
+        name: 'ゴルドン',
+        job: '商人',
+        img: 'gordon',
+        profile: '金にうるさい商人。戦闘能力は皆無だが、コネを使って安く買い叩く。',
+        hp: 80, maxHp: 80,
+        sp: 10, maxSp: 10,
+        atk: 5, def: 5,
+        matk: 5, mdef: 5,
+        agi: 8,
+        growthType: 'special',
+        initialSkills: ['bribe'], // 賄賂（敵を帰らせる？）
+        passive: 'merchant_perk', // 売買有利
+        joinCondition: { type: 'gold', value: 1000 },
+        messages: {
+            join: '「ほう、私を護衛につけるとは。……まあ、商売の邪魔をしないならついていこう。」',
+            leave: '「時間は金なりだ。失礼するよ。」'
+        }
+    },
+
+    // 守護者 (西)
+    'gawain': {
+        id: 'gawain',
+        name: 'ガウェイン',
+        job: '重装騎士',
+        img: 'gawain',
+        profile: '主を失った老騎士。最期まで誰かを守り抜くことを望んでいる。',
+        hp: 180, maxHp: 180,
+        sp: 20, maxSp: 20,
+        atk: 14, def: 25,
+        matk: 0, mdef: 15,
+        agi: 4,
+        growthType: 'tank',
+        initialSkills: ['cover', 'shield_bash'], // デコイ、防御攻撃
+        passive: 'party_def_up', // パッシブで防御微増？
+        joinCondition: { type: 'event', region: 'west', id: 'knight_pledge' },
+        messages: {
+            join: '「老骨ですが、盾くらいにはなりましょう。我が剣、貴方に捧げます。」',
+            leave: '「ご武運を……。」'
+        }
+    },
+
+    // 禁術師 (南)
+    'sophina': {
+        id: 'sophina',
+        name: 'ソフィーナ',
+        job: '禁術師',
+        img: 'sophina',
+        profile: '禁忌の魔法に手を染めた魔女。味方を強化し、敵を弱体化させるスペシャリスト。',
+        hp: 90, maxHp: 90,
+        sp: 100, maxSp: 100,
+        atk: 8, def: 8,
+        matk: 18, mdef: 22,
+        agi: 10,
+        growthType: 'debuffer',
+        initialSkills: ['curse', 'blood_pact'], // デバフ、強化
+        joinCondition: { type: 'item', value: 'forbidden_scroll' },
+        messages: {
+            join: '「ククク……私の実験に付き合ってくれるのかしら？ いいわよ。」',
+            leave: '「興味が尽きたわ。」'
+        }
+    },
+
+    // 時魔導士 (南)
+    'kron': {
+        id: 'kron',
+        name: 'クロン',
+        job: '時魔導士',
+        img: 'kron',
+        profile: '時間を操る不思議な少女。常に眠そうにしている。',
+        hp: 85, maxHp: 85,
+        sp: 150, maxSp: 150,
+        atk: 6, def: 6,
+        matk: 22, mdef: 20,
+        agi: 14,
+        growthType: 'special',
+        initialSkills: ['slow', 'haste'], // 時間操作
+        joinCondition: { type: 'event', region: 'south', id: 'clock_tower' },
+        messages: {
+            join: '「……ふわぁ。あなたと行くと、面白い未来が見えそう。」',
+            leave: '「……おやすみ。」'
         }
     }
 };

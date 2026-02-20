@@ -30,7 +30,14 @@ const createMap = (areaName, baseTile) => {
         w: W, h: H, tiles: tiles,
         area: areaName,
         baseTile: baseTile,
-        npcs: [],
+        npcs: [
+            // Elena (Mage)
+            { x: 5, y: 10, name: 'エレナ', img: 'elena', partyJoin: 'elena' },
+            // Gordon (Merchant)
+            { x: 15, y: 10, name: 'ゴルドン', img: 'gordon', partyJoin: 'gordon' },
+            // Gawain (Guardian)
+            { x: 5, y: 5, name: 'ガウェイン', img: 'gawain', partyJoin: 'gawain' }
+        ],
         warps: [
             // East: World Map
             {
@@ -45,7 +52,7 @@ const createMap = (areaName, baseTile) => {
             { x: midX, y: H - 1, to: 'west_dungeon_3', tx: 10, ty: 2 }
         ],
         start: { x: midX, y: midY },
-        encounterRate: 15
+        encounterRate: 0.0
     };
 };
 
