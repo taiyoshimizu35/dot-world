@@ -8,8 +8,9 @@
 
 import { ItemData2 } from './data/items.js';
 import { QuestSystem2 } from './quest.js';
-
+import { LevelSystem } from './systems/level.js';
 export const PlayerStats2 = {
+    id: 'hero', // Added ID for learning lookup
     name: '勇者',
     level: 1,
 
@@ -32,7 +33,8 @@ export const PlayerStats2 = {
         accessory: null
     },
 
-    spells: { fire: false, heal: false, water: false, wind: false },
+    spells: { fire: false, heal: false, water: false, wind: false }, // Old system (keep for safety?)
+    skills: [], // New Skill System (Array of IDs)
     status: { poisonVal: 0, silence: 0, atkDownVal: 0, defDownVal: 0 },
     magicBoost: 1.0,
     isDefending: false,
@@ -61,6 +63,8 @@ export const PlayerStats2 = {
         this.equipment = { weapon: null, armor: null, accessory: null };
         this.status = { poisonVal: 0, silence: 0, atkDownVal: 0, defDownVal: 0 };
         this.spells = { fire: false, heal: false, water: false, wind: false };
+        this.skills = []; // Logic to reload skills from save needed later, or re-learn? 
+        // For now, reset clears them. Savedata should load them.
         this.magicBoost = 1.0;
         this.recalcStats();
     },
@@ -173,6 +177,7 @@ export const PlayerStats2 = {
 
         // Setup notification or message in Battle/Menu? 
         // Battle loop handles the message usually.
+        LevelSystem.checkDoLearning(this);
     },
 
     // 戦闘でのダメージ処理

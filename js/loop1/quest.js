@@ -4,6 +4,7 @@
 export const QuestSystem = {
     // 旧フラグ（互換性維持）
     hasSword: false,
+    hasHolySword: false, // New flag for Holy Sword ending condition
     gateOpen: false,
     bossDefeated: false,
     guardMoved: false,
@@ -60,6 +61,7 @@ export const QuestSystem = {
     // 初期化
     reset() {
         this.hasSword = false;
+        this.hasHolySword = false;
         this.gateOpen = false;
         this.bossDefeated = false;
         this.guardMoved = false;

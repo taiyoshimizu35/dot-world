@@ -100,7 +100,7 @@ export const GameState = {
     LOOP1_ENDING: 10
 };
 
-// Legacy Global State for compatibility
-window.GameState = GameState;
-window.GameConfig = GameConfig;
-window.currentState = GameState.TITLE;
+// Legacy Global State for compatibility - REMOVED for ESM Strictness
+// window.GameState = GameState;
+// window.GameConfig = GameConfig;
+// window.currentState = GameState.TITLE;

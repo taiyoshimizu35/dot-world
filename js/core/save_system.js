@@ -107,6 +107,7 @@ export const SaveSystem = {
                     northMinibosses: { ...Q.northMinibosses },
                     // Legacy flags
                     hasSword: Q.hasSword,
+                    hasHolySword: Q.hasHolySword,
                     gateOpen: Q.gateOpen,
                     hasAmulet: Q.hasAmulet
                 };
@@ -124,10 +125,15 @@ export const SaveSystem = {
             };
             data.player2 = {
                 name: PlayerStats2.name,
-                hp: PlayerStats2.hp, maxHp: PlayerStats2.maxHp,
-                mp: PlayerStats2.mp, maxMp: PlayerStats2.maxMp,
+                hp: PlayerStats2.hp, maxHp: PlayerStats2.maxHp, baseMaxHp: PlayerStats2.baseMaxHp, // Added base
+                mp: PlayerStats2.mp, maxMp: PlayerStats2.maxMp, baseMaxSp: PlayerStats2.baseMaxSp, // Added base
                 atk: PlayerStats2.atk, def: PlayerStats2.def,
+                baseAtk: PlayerStats2.baseAtk, baseDef: PlayerStats2.baseDef, // Added base
                 matk: PlayerStats2.matk, mdef: PlayerStats2.mdef,
+                baseMatk: PlayerStats2.baseMatk, baseMdef: PlayerStats2.baseMdef, // Added base
+                level: PlayerStats2.level, // Added
+                exp: PlayerStats2.exp, // Added
+                skills: PlayerStats2.skills, // Added
                 gold: PlayerStats2.gold,
                 hiddenExp: PlayerStats2.hiddenExp,
                 weapon: PlayerStats2.weapon,
@@ -137,10 +143,13 @@ export const SaveSystem = {
             };
             data.party2 = Party2.members.map(m => ({
                 id: m.id,
-                hp: m.hp, maxHp: m.maxHp,
-                mp: m.mp, maxMp: m.maxMp,
-                atk: m.atk, def: m.def,
-                matk: m.matk, mdef: m.mdef,
+                hp: m.hp, maxHp: m.maxHp, baseMaxHp: m.baseMaxHp, // Added base
+                sp: m.sp, maxSp: m.maxSp, baseMaxSp: m.baseMaxSp, // Added base
+                atk: m.atk, def: m.def, baseAtk: m.baseAtk, baseDef: m.baseDef, // Added base
+                matk: m.matk, mdef: m.mdef, baseMatk: m.baseMatk, baseMdef: m.baseMdef, // Added base
+                level: m.level, // Added
+                exp: m.exp, // Added
+                skills: m.skills, // Added
                 hiddenExp: m.hiddenExp
             }));
             data.quest2 = {
@@ -213,6 +222,7 @@ export const SaveSystem = {
                     Q.doors = data.quest1.doors;
                     Q.northMinibosses = data.quest1.northMinibosses;
                     Q.hasSword = data.quest1.hasSword;
+                    Q.hasHolySword = data.quest1.hasHolySword;
                     Q.gateOpen = data.quest1.gateOpen;
                     Q.hasAmulet = data.quest1.hasAmulet;
                 }
@@ -227,17 +237,22 @@ export const SaveSystem = {
                 }
 
                 // Initialize Week 2 Maps
-                if (window.Maps && window.Maps.initWeek2) {
-                    window.Maps.initWeek2();
+                if (Maps && Maps.initWeek2) {
+                    Maps.initWeek2();
                 }
 
                 const P2 = PlayerStats2;
                 if (data.player2) {
                     P2.name = data.player2.name;
-                    P2.hp = data.player2.hp; P2.maxHp = data.player2.maxHp;
-                    P2.mp = data.player2.mp; P2.maxMp = data.player2.maxMp;
+                    P2.hp = data.player2.hp; P2.maxHp = data.player2.maxHp; P2.baseMaxHp = data.player2.baseMaxHp; // Added base
+                    P2.mp = data.player2.mp; P2.maxMp = data.player2.maxMp; P2.baseMaxSp = data.player2.baseMaxSp; // Added base
                     P2.atk = data.player2.atk; P2.def = data.player2.def;
+                    P2.baseAtk = data.player2.baseAtk; P2.baseDef = data.player2.baseDef; // Added base
                     P2.matk = data.player2.matk; P2.mdef = data.player2.mdef;
+                    P2.baseMatk = data.player2.baseMatk; P2.baseMdef = data.player2.baseMdef; // Added base
+                    P2.level = data.player2.level || 1; // Added
+                    P2.exp = data.player2.exp || 0; // Added
+                    P2.skills = data.player2.skills || []; // Added
                     P2.gold = data.player2.gold;
                     P2.hiddenExp = data.player2.hiddenExp;
                     P2.status = data.player2.status;

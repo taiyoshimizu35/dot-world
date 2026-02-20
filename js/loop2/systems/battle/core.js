@@ -12,6 +12,7 @@ import { WorldState } from '../../../loop1/world.js'; // Context
 import { Inventory2 } from '../../inventory.js';
 import { ItemData2 } from '../../data/items.js';
 import { QuestSystem2, StoryFlags } from '../../quest.js';
+import { SkillData2 } from '../../data/skills.js';
 
 // ===========================================
 // 2週目バトルコアシステム
@@ -25,6 +26,10 @@ export const Battle2 = {
     partyTurnIndex: 0, // Which member is inputting command
     partyCommands: [], // Store selected commands { member, action, targetIndex }
     partyTargetIndex: 0, // Target selection for Companion
+
+    skillCur: 0, // Skill Menu Cursor
+    skillOffset: 0, // Scroll Offset
+    selectedSkillId: null, // Temporary storage
 
     // New Queue System
     turnQueue: [], // Order of execution
@@ -43,7 +48,11 @@ export const Battle2 = {
         this.partyTurnIndex = 0;
         this.partyCommands = [];
         this.turnQueue = [];
+        this.turnQueue = [];
         this.currentExecutor = null;
+        this.skillCur = 0;
+        this.skillOffset = 0;
+        this.selectedSkillId = null;
     },
 
     start(mapId) {
@@ -145,12 +154,28 @@ export const Battle2 = {
                     }
                     if (this.targetIndex >= this.enemies.length) this.targetIndex = 0;
                 }
-                else if (this.cur === 1) this.phase = 'magic';
+                else if (this.cur === 1) {
+                    // Magic/Skill
+                    const skills = PlayerStats2.skills || [];
+                    if (skills.length === 0) {
+                        this.msg = 'スキルをまだ覚えていない！';
+                        this.msgTimer = 0;
+                        this.waitForInput = true;
+                        this.nextPhase = 'command';
+                        this.phase = 'wait_input';
+                    } else {
+                        this.phase = 'playerSkillSelect';
+                        this.skillCur = 0;
+                        this.skillOffset = 0;
+                    }
+                }
                 else if (this.cur === 2) this.phase = 'item';
                 else this.doFlee();
             }
         } else if (this.phase === 'playerTarget') {
             this.handlePlayerTargetInput();
+        } else if (this.phase === 'playerSkillSelect') {
+            this.handlePlayerSkillSelectInput();
         } else if (this.phase === 'magic') {
             // Player Magic Placeholder
             this.msg = 'まだ魔法は覚えられない！';
@@ -171,6 +196,8 @@ export const Battle2 = {
             this.handlePartyCommandInput();
         } else if (this.phase === 'partyTarget') {
             this.handlePartyTargetInput();
+        } else if (this.phase === 'partySkillSelect') {
+            this.handlePartySkillSelectInput();
         } else if (this.phase === 'execution') {
             this.processTurnQueue();
         } else if (this.phase === 'victory') {
@@ -188,7 +215,7 @@ export const Battle2 = {
         const count = this.enemies.length;
         if (count === 0) return;
 
-        // Safety check: specific case where all enemies might be dead but phase didn't switch
+        // Safety check
         if (this.enemies.every(e => e.hp <= 0)) {
             this.checkVictory();
             return;
@@ -208,15 +235,74 @@ export const Battle2 = {
         }
 
         if (Input.interact()) {
-            this.queuePlayerAction('attack');
+            if (this.selectedSkillId) {
+                // Skill Action
+                this.queuePlayerAction('skill', this.selectedSkillId);
+            } else {
+                // Attack Action
+                this.queuePlayerAction('attack');
+            }
         }
+        if (Input.cancel()) {
+            if (this.selectedSkillId) {
+                this.phase = 'playerSkillSelect'; // Back to skill select
+            } else {
+                this.phase = 'command'; // Back to command
+            }
+        }
+    },
+
+    handlePlayerSkillSelectInput() {
+        const skills = PlayerStats2.skills || [];
+        const max = skills.length;
+        if (max === 0) {
+            this.phase = 'command';
+            return;
+        }
+
+        if (Input.justPressed('ArrowUp')) {
+            this.skillCur = (this.skillCur - 1 + max) % max;
+        }
+        if (Input.justPressed('ArrowDown')) {
+            this.skillCur = (this.skillCur + 1) % max;
+        }
+
+        if (Input.interact()) {
+            const skillId = skills[this.skillCur];
+            const skill = SkillData2[skillId];
+
+            if (PlayerStats2.sp < skill.sp) {
+                // SP Insufficient feedback?
+                // For now, maybe shake or just ignore?
+                // Or show temporary message?
+                // showing message resets phase usually... let's just ignore or play buzzer
+                return;
+            }
+
+            this.selectedSkillId = skillId;
+
+            // Target Selection needed?
+            if (skill.target === 'all_enemies' || skill.target === 'party' || skill.target === 'self') {
+                // No target selection needed for now (simplified)
+                // OR queue immediately
+                this.queuePlayerAction('skill', skillId);
+            } else {
+                // Single Target
+                this.phase = 'playerTarget';
+                this.targetIndex = 0;
+                while (this.targetIndex < this.enemies.length && this.enemies[this.targetIndex].hp <= 0) {
+                    this.targetIndex++;
+                }
+            }
+        }
+
         if (Input.cancel()) {
             this.phase = 'command';
         }
     },
 
     // プレイヤー行動の予約（すぐに実行しない）
-    queuePlayerAction(type) {
+    queuePlayerAction(type, skillId = null) {
         // ターゲット
         let targetIdx = this.targetIndex;
 
@@ -226,6 +312,7 @@ export const Battle2 = {
             type: type,
             isPlayer: true,
             targetIndex: targetIdx,
+            skillId: skillId, // Add Skill ID
             priority: 0 // For future use
         };
 
@@ -306,10 +393,18 @@ export const Battle2 = {
                 if (this.partyTargetIndex >= this.enemies.length) this.partyTargetIndex = 0;
             } else if (this.cur === 1) {
                 // スキル
-                this.phase = 'partyTarget';
-                this.partyTargetIndex = 0;
-                while (this.partyTargetIndex < this.enemies.length && this.enemies[this.partyTargetIndex].hp <= 0) {
-                    this.partyTargetIndex++;
+                const skills = member.skills || [];
+                if (skills.length === 0) {
+                    this.msg = 'スキルを覚えていない！';
+                    this.msgTimer = 0;
+                    this.waitForInput = true;
+                    this.phase = 'wait_input';
+                    this.nextPhase = 'partyCommand';
+                } else {
+                    this.phase = 'partySkillSelect';
+                    this.skillCur = 0;
+                    this.skillOffset = 0;
+                    this.selectedSkillId = null;
                 }
             } else if (this.cur === 2) {
                 // どうぐ
@@ -362,11 +457,62 @@ export const Battle2 = {
         }
 
         if (Input.interact()) {
-            let actionType = (this.cur === 0) ? 'attack' : 'magic';
+            let actionType = (this.selectedSkillId) ? 'skill' : 'attack'; // Use 'skill' type
             const member = Party2.members[this.partyTurnIndex];
-            let action = { type: actionType, power: (actionType === 'attack' ? member.atk : member.matk * 2) };
+
+            // Construct Action
+            let action = {};
+            if (actionType === 'skill') {
+                action = { type: 'skill', skillId: this.selectedSkillId };
+            } else {
+                action = { type: 'attack', power: member.atk };
+            }
 
             this.pushPartyCommand(action, this.partyTargetIndex);
+        }
+
+        if (Input.cancel()) {
+            if (this.selectedSkillId) {
+                this.phase = 'partySkillSelect';
+            } else {
+                this.phase = 'partyCommand';
+            }
+        }
+    },
+
+    handlePartySkillSelectInput() {
+        const member = Party2.members[this.partyTurnIndex];
+        const skills = member.skills || [];
+        const max = skills.length;
+
+        if (Input.justPressed('ArrowUp')) {
+            this.skillCur = (this.skillCur - 1 + max) % max;
+        }
+        if (Input.justPressed('ArrowDown')) {
+            this.skillCur = (this.skillCur + 1) % max;
+        }
+
+        if (Input.interact()) {
+            const skillId = skills[this.skillCur];
+            const skill = SkillData2[skillId];
+
+            if (member.sp < skill.sp) {
+                // Insufficient SP
+                return;
+            }
+
+            this.selectedSkillId = skillId;
+
+            if (skill.target === 'all_enemies' || skill.target === 'party' || skill.target === 'self') {
+                // No target selection needed
+                this.pushPartyCommand({ type: 'skill', skillId: skillId }, null);
+            } else {
+                this.phase = 'partyTarget';
+                this.partyTargetIndex = 0;
+                while (this.partyTargetIndex < this.enemies.length && this.enemies[this.partyTargetIndex].hp <= 0) {
+                    this.partyTargetIndex++;
+                }
+            }
         }
 
         if (Input.cancel()) {

@@ -3,6 +3,8 @@ import { Draw } from '../../../core/draw.js';
 import { AssetLoader } from '../../../core/assets.js';
 import { PlayerStats2 } from '../../player.js';
 import { Party2 } from '../../party.js';
+import { SkillData2 } from '../../data/skills.js';
+
 
 export const BattleRender2 = {
     render(ctx, battle) {
@@ -60,6 +62,41 @@ export const BattleRender2 = {
                 const cy = y + 24 + Math.floor(i / 2) * 16;
                 if (i === battle.cur) Draw.text(ctx, '▶', cx - 10, cy, '#fc0', 12);
                 Draw.text(ctx, cmds[i], cx, cy, '#fff', 12);
+            }
+        } else if (battle.phase === 'playerSkillSelect' || battle.phase === 'partySkillSelect') {
+            Draw.text(ctx, 'スキルを選択', 16, y + 8, '#fff', 12);
+
+            // Determine Actor
+            let actor = (battle.phase === 'playerSkillSelect') ? PlayerStats2 : Party2.members[battle.partyTurnIndex];
+            const skills = actor.skills || [];
+
+            // Import SkillData2 not needed here if available via global or passed? 
+            // Render needs data. We might need to import it or rely on Battle passing it?
+            // Battle object doesn't pass SkillData. We need to import it in render.js?
+            // Yes, let's import it.
+            // For now, assume it's imported or I will add import.
+
+            // Draw List (Scroll supported logic placeholder)
+            const maxVisible = 4;
+            const start = battle.skillOffset || 0; // Using offset if we had it, but core didn't fully implement scrolling offset logic
+            // For now, simple list
+
+            for (let i = 0; i < Math.min(skills.length, 6); i++) {
+                // Simple 2-column layout
+                const cx = 16 + (i % 2) * 120;
+                const cy = y + 24 + Math.floor(i / 2) * 16;
+
+                const skillId = skills[i];
+                // We need SkillData. Since we can't easily import inside function, I'll add import at top.
+                // For now, just rendering ID if data missing, but I'll add import.
+                // Assuming `skillData` available via `import`.
+                const skill = SkillData2[skillId] || { name: skillId, sp: 0 };
+
+                const color = (actor.sp >= skill.sp) ? '#fff' : '#888';
+
+                if (i === battle.skillCur) Draw.text(ctx, '▶', cx - 10, cy, '#fc0', 12);
+                Draw.text(ctx, `${skill.name}`, cx, cy, color, 12);
+                Draw.text(ctx, `${skill.sp}`, cx + 90, cy, '#aaf', 10, 'right');
             }
         } else if (battle.phase === 'partyTarget' || battle.phase === 'playerTarget') {
             Draw.text(ctx, 'ターゲットを選択', 16, y + 8, '#fff', 12);

@@ -161,6 +161,9 @@ export const Maps = {
                 if (npc.areaBoss) {
                     if (QuestFlags.bosses && QuestFlags.bosses[npc.areaBoss]) return false;
                 }
+                if (npc.northMiniboss) {
+                    if (QuestFlags.northMinibosses && QuestFlags.northMinibosses[npc.northMiniboss]) return false;
+                }
             }
             // ... (rest of filtering)
 
@@ -227,10 +230,10 @@ export const Maps = {
 
     // 魔王城へワープ
     canAccessDemonCastle() {
-        if (QuestSystem2.checkAllBossesDefeated()) {
+        if (QuestFlags.hasHolySword) {
             return true;
         }
-        Msg.show('城門は堅く閉ざされている……\n四方のエリアボスを倒す必要があるようだ。');
+        Msg.show('城門は堅く閉ざされている……\n「聖剣」が必要なようだ。');
         return false;
     },
 

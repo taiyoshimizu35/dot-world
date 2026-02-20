@@ -1,6 +1,7 @@
 import { Msg } from '../../core/message.js';
 import { LearningData } from '../data/learning.js';
 import { PartyMemberData2 } from '../data/companions.js';
+import { SkillData2 } from '../data/skills.js';
 
 export const LevelSystem = {
     // 経験値テーブル (簡易計算: Level^2 * 10 or similar)
@@ -96,7 +97,8 @@ export const LevelSystem = {
                 if (Array.isArray(target.skills)) {
                     if (!target.skills.includes(skillId)) {
                         target.skills.push(skillId);
-                        Msg.show(`${target.name}は${skillId}を覚えた！`); // 名前解決はSkillData必要
+                        const skillName = (SkillData2[skillId]) ? SkillData2[skillId].name : skillId;
+                        Msg.show(`${target.name}は${skillName}を覚えた！`);
                     }
                 }
                 // オブジェクト形式の場合 (PlayerStats?)

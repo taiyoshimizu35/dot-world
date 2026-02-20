@@ -183,7 +183,7 @@ export const Shop = {
             QuestFlags.check();
             Msg.show(`${item.name}を購入した！\nメニューから装備しよう。`, () => { Input.lock(100); }, 'overlay');
         } else if (item.type === 'holySword') {
-            if (this._worldState) this._worldState.holySwordOwned = true;
+            if (QuestFlags) QuestFlags.hasHolySword = true;
             Msg.show(`${item.name}を購入した！\n「特別な力を感じる...」`, () => { Input.lock(100); }, 'overlay');
         } else if (item.type === 'armor') {
             Msg.show(`${item.name}を購入した！\nメニューから装備しよう。`, () => { Input.lock(100); }, 'overlay');

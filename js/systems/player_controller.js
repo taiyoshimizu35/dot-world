@@ -130,8 +130,8 @@ export class PlayerController {
         if (warp) {
             // Simplified Warp Checks for Loop 1
             if (warp.requiresDemonCastle) {
-                if (!QuestFlags.allBossesDefeated()) {
-                    Msg.show('結界が張られている…\n四方の魔物を倒さねば通れないようだ。');
+                if (!QuestFlags.hasHolySword) {
+                    Msg.show('結界が張られている…\n「聖剣」が無ければ通れないようだ。');
                     return;
                 }
                 // Removed Holy Sword check for simplicity if requested, but user said "defeat enemies... go to demon king". 

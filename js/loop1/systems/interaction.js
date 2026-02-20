@@ -44,10 +44,10 @@ export class InteractionSystem {
         }
 
         if (npc.demonGuide) {
-            if (QuestFlags.allBossesDefeated()) {
-                Msg.show('「四天王を倒したのか！？\n魔王様を倒しに行けるな！」');
+            if (QuestFlags.hasHolySword) {
+                Msg.show('「聖剣を手に入れたのか！？\n魔王城へ行く資格はあるだろう。」');
             } else {
-                Msg.show(`魔王様はずっと北にいるらしい。\n四天王を倒してから行ってみたらどうだい？  \n聖剣を忘れるなよ！`);
+                Msg.show(`魔王様はずっと北にいるらしい。\n城門を開くには「聖剣」が必要だ。`);
             }
             return;
         }

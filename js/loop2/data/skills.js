@@ -22,6 +22,44 @@ export const SkillData2 = {
         desc: '敵単体に2回攻撃'
     },
 
+    // 汎用・魔法系 (Basic Magic)
+    'fire': {
+        id: 'fire',
+        name: 'ファイア',
+        type: 'magic',
+        sp: 4,
+        power: 1.2,
+        element: 'fire',
+        desc: '敵単体に炎の玉を放つ'
+    },
+    'ice': {
+        id: 'ice',
+        name: 'ブリザド',
+        type: 'magic',
+        sp: 4,
+        power: 1.2,
+        element: 'ice',
+        desc: '敵単体に氷の塊をぶつける'
+    },
+    'wind': {
+        id: 'wind',
+        name: 'エアロ',
+        type: 'magic',
+        sp: 4,
+        power: 1.2,
+        element: 'wind',
+        desc: '敵単体を真空の刃で切り裂く'
+    },
+    'thunder': {
+        id: 'thunder',
+        name: 'サンダー',
+        type: 'magic',
+        sp: 4,
+        power: 1.2,
+        element: 'thunder',
+        desc: '敵単体に雷を落とす'
+    },
+
     // リン (Dragon)
     'dragon_claw': {
         id: 'dragon_claw',
