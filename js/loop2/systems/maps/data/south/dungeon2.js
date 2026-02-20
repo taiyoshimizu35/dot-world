@@ -1,0 +1,149 @@
+
+import { GameConfig } from '../../../../../constants.js';
+
+const T = GameConfig.TILE_TYPES;
+
+const mapFromLayout = (layout, mapping) => {
+    const tiles = [];
+    const H = layout.length;
+    const W = layout[0].length;
+    for (let y = 0; y < H; y++) {
+        tiles[y] = [];
+        for (let x = 0; x < W; x++) {
+            const char = layout[y][x];
+            tiles[y][x] = mapping[char] || GameConfig.TILE_TYPES.STONE;
+        }
+    }
+    return tiles;
+};
+
+const mapping = {
+    'W': T.WALL,
+    '.': T.GRAVEL,
+    'S': T.STONE,
+    'F': T.FLOOR // Platform
+};
+
+// South Dungeon 2 (West of South Town) - Dragon's Roost
+const layout1F = [
+    "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW",
+    "WW....................................WW",
+    "WW.FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF.WW",
+    "WW.F................................F.WW",
+    "WW.F.WWWWWWWWWWWWWWWWWWWWWWWWWWWWWW.F.WW",
+    "WW.F.WW..........................WW.F.WW",
+    "WW.F.WW.FFFFFFFFFFFFFFFFFFFFFFFF.WW.F.WW",
+    "WW.F.WW.F......................F.WW.F.WW",
+    "WW.F.WW.F.WWWWWWWWWWWWWWWWWWWW.F.WW.F.WW",
+    "WW.F.WW.F.WW................WW.F.WW.F.WW",
+    "WW.F.WW.F.WW.FFFFFFFFFFFFFF.WW.F.WW.F.WW",
+    "WW.F.WW.F.WW.F............F.WW.F.WW.F.WW",
+    "WW.F.WW.F.WW.F.WWWWWWWWWW.F.WW.F.WW.F.WW",
+    "WW.F.WW.F.WW.F.W........W.F.WW.F.WW.F.WW",
+    "WW.F.WW.F.WW.F.W.FFFFFF.W.F.WW.F.WW.F.WW",
+    "WW.F.WW.F.WW.F.W.F....F.W.F.WW.F.WW.F.WW",
+    "WW.F.WW.F.WW.F.W.F.WW.F.W.F.WW.F.WW.F.WW",
+    "E..F.WW.F.WW.F.W.F.WW.F.W.F.WW.F.WW.F.WW",
+    "E..F.WW.F.WW.F.W.F.UU.F.W.F.WW.F.WW.F.WW",
+    "E..F.WW.F.WW.F.W.F....F.W.F.WW.F.WW.F.WW",
+    "WW.F.WW.F.WW.F.W.FFFFFF.W.F.WW.F.WW.F.WW",
+    "WW.F.WW.F.WW.F.W........W.F.WW.F.WW.F.WW",
+    "WW.F.WW.F.WW.F.WWWWWWWWWW.F.WW.F.WW.F.WW",
+    "WW.F.WW.F.WW.F............F.WW.F.WW.F.WW",
+    "WW.F.WW.F.WW.FFFFFFFFFFFFFF.WW.F.WW.F.WW",
+    "WW.F.WW.F.WW................WW.F.WW.F.WW",
+    "WW.F.WW.F.WWWWWWWWWWWWWWWWWWWW.F.WW.F.WW",
+    "WW.F.WW.F......................F.WW.F.WW",
+    "WW.F.WW.FFFFFFFFFFFFFFFFFFFFFFFF.WW.F.WW",
+    "WW.F.WW..........................WW.F.WW",
+    "WW.F.WWWWWWWWWWWWWWWWWWWWWWWWWWWWWW.F.WW",
+    "WW.F................................F.WW",
+    "WW.FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF.WW",
+    "WW....................................WW",
+    "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW",
+    "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW",
+    "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW",
+    "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW",
+    "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW",
+    "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW"
+];
+// Entrance at x=0, y=18
+
+export const SouthDungeon2 = {
+    w: 40, h: 40,
+    tiles: mapFromLayout(layout1F, mapping),
+    area: 'south_dungeon_2',
+    baseTile: T.GRAVEL,
+    encounterRate: 0.1,
+    npcs: [],
+    warps: [
+        { x: 0, y: 18, to: 'south', tx: 1, ty: 7 },
+        { x: 19, y: 18, to: 'south_dungeon_2_2f', tx: 19, ty: 18 }
+    ],
+    onLoad: (m) => {
+        m.tiles[18][19] = T.STAIRS;
+    },
+    start: { x: 1, y: 18 }
+};
+
+// 2F
+const layout2F = [
+    "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW",
+    "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW",
+    "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW",
+    "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW",
+    "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW",
+    "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW",
+    "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW",
+    "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW",
+    "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW",
+    "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW",
+    "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW",
+    "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW",
+    "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW",
+    "WWWWWWWWWWWWWW..........WWWWWWWWWWWWWWWW",
+    "WWWWWWWWWWWWWW..........WWWWWWWWWWWWWWWW",
+    "WWWWWWWWWWWWWW....C.....WWWWWWWWWWWWWWWW",
+    "WWWWWWWWWWWWWW..........WWWWWWWWWWWWWWWW",
+    "WWWWWWWWWWWWWW..........WWWWWWWWWWWWWWWW",
+    "WWWWWWWWWWWWWW...D......WWWWWWWWWWWWWWWW",
+    "WWWWWWWWWWWWWW..........WWWWWWWWWWWWWWWW",
+    "WWWWWWWWWWWWWW..........WWWWWWWWWWWWWWWW",
+    "WWWWWWWWWWWWWW..........WWWWWWWWWWWWWWWW",
+    "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW",
+    "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW",
+    "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW",
+    "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW",
+    "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW",
+    "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW",
+    "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW",
+    "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW",
+    "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW",
+    "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW",
+    "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW",
+    "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW",
+    "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW",
+    "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW",
+    "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW",
+    "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW",
+    "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW",
+    "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW"
+];
+
+export const SouthDungeon2_2F = {
+    w: 40, h: 40,
+    tiles: mapFromLayout(layout2F, mapping),
+    area: 'south_dungeon_2_2f',
+    baseTile: T.STONE,
+    encounterRate: 0.05,
+    npcs: [
+        { x: 18, y: 15, sprite: 'chest', msg: '竜の鱗を見つけた！（素材）' }
+    ],
+    warps: [
+        { x: 19, y: 18, to: 'south_dungeon_2', tx: 19, ty: 18 }
+    ],
+    onLoad: (m) => {
+        m.tiles[18][19] = T.STAIRS;
+    },
+    start: { x: 19, y: 18 }
+};

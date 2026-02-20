@@ -34,7 +34,16 @@ const createMap = (areaName, baseTile) => {
             // Sophina (Forbidden Mage)
             { x: 14, y: 12, name: 'ソフィーナ', img: 'sophina', partyJoin: 'sophina' },
             // Kron (Time Mage)
-            { x: 16, y: 4, name: 'クロン', img: 'kron', partyJoin: 'kron' }
+            { x: 16, y: 4, name: 'クロン', img: 'kron', partyJoin: 'kron' },
+
+            // Area Boss
+            {
+                x: 10, y: 10, name: '死霊の王', img: 'skeleton_soldier',
+                type: 'boss', bossId: 'south',
+                setFlag: 'south_boss_defeated',
+                afterMsg: '死霊の王は浄化された。',
+                repeatable: false
+            }
         ],
         warps: [
             // North: World Map

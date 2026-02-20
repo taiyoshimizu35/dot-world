@@ -36,7 +36,16 @@ const createMap = (areaName, baseTile) => {
             // Gordon (Merchant)
             { x: 15, y: 10, name: 'ゴルドン', img: 'gordon', partyJoin: 'gordon' },
             // Gawain (Guardian)
-            { x: 5, y: 5, name: 'ガウェイン', img: 'gawain', partyJoin: 'gawain' }
+            { x: 5, y: 5, name: 'ガウェイン', img: 'gawain', partyJoin: 'gawain' },
+
+            // Area Boss
+            {
+                x: 10, y: 3, name: '砂塵の覇者', img: 'desert_scorpion',
+                type: 'boss', bossId: 'west',
+                setFlag: 'west_boss_defeated',
+                afterMsg: '砂塵の覇者は崩れ去った。',
+                repeatable: false
+            }
         ],
         warps: [
             // East: World Map

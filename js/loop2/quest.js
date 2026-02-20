@@ -1,109 +1,105 @@
 // ===========================================
-// 2週目クエストシステム（討伐クエスト）
+// 2週目クエスト＆ストーリーフラグシステム
 // ===========================================
 
-import { PlayerStats2 } from './player.js';
 import { Msg } from '../core/message.js';
 
-const QuestData2 = {
-    // クエストデータをここに記述
-    // example:
-    // slime_hunt: { id: 'slime_hunt', name: 'スライム退治', ... }
+// クエスト・イベント定数（Typo防止用）
+export const StoryFlags = {
+    // 進行度
+    STARTED: 'story_started',
+    MET_KING: 'met_king',
+
+    // エリア攻略
+    EAST_BOSS_DEFEATED: 'east_boss_defeated',
+    WEST_BOSS_DEFEATED: 'west_boss_defeated',
+    SOUTH_BOSS_DEFEATED: 'south_boss_defeated',
+    NORTH_BOSS_DEFEATED: 'north_boss_defeated',
+
+    // 重要イベント
+    DEMON_CASTLE_OPEN: 'demon_castle_open',
+    DEMON_KING_DEFEATED: 'demon_king_defeated',
+
+    // 仲間加入など
+    LULUSIA_JOINED: 'lulusia_joined',
+    RIN_JOINED: 'rin_joined',
+    // ... others
 };
 
 export const QuestSystem2 = {
-    // 討伐カウント
-    killCount: {
-        slime: 0,
-        goblin: 0,
-        bat: 0,
-        any: 0  // 全モンスター合計
+    // フラグ保存用
+    flags: {},
+
+    // 進行状況の一括管理（セーブデータに含まれる想定）
+    // interaction: { [id]: count } // 何回話したかなど
+    interactions: {},
+
+    // フラグ操作
+    set(flagId, value = true) {
+        if (this.flags[flagId] !== value) {
+            this.flags[flagId] = value;
+            // console.log(`[Story] Flag Updated: ${flagId} = ${value}`);
+        }
     },
 
-    // 完了済みクエスト
-    completed: {},
-
-    // モンスター討伐を記録
-    recordKill(enemyType) {
-        // 特定タイプのカウント
-        if (this.killCount[enemyType] !== undefined) {
-            this.killCount[enemyType]++;
-        }
-        // 全体カウント
-        this.killCount.any++;
+    get(flagId) {
+        return this.flags[flagId] || false;
     },
 
-    // クエスト進捗確認
-    getProgress(questId) {
-        const quest = QuestData2[questId];
-        if (!quest) return null;
-
-        const current = this.killCount[quest.target] || 0;
-        return {
-            current,
-            required: quest.required,
-            isComplete: current >= quest.required,
-            isClaimed: this.completed[questId] || false
-        };
+    // 便利メソッド
+    has(flagId) {
+        return !!this.get(flagId);
     },
 
-    // 報酬受け取り
-    claimReward(questId) {
-        const quest = QuestData2[questId];
-        if (!quest) return { success: false, msg: 'クエストが見つからない' };
-
-        const progress = this.getProgress(questId);
-        if (!progress.isComplete) {
-            return { success: false, msg: 'まだ条件を達成していない' };
-        }
-        if (progress.isClaimed) {
-            return { success: false, msg: '既に報酬を受け取っている' };
-        }
-
-        // 報酬付与
-        const reward = quest.reward;
-        let rewardMsg = [];
-
-        if (reward.gold) {
-            PlayerStats2.addGold(reward.gold);
-            rewardMsg.push(`${reward.gold}G`);
-        }
-        if (reward.atk) {
-            PlayerStats2.atk += reward.atk;
-            rewardMsg.push(`ATK+${reward.atk}`);
-        }
-        if (reward.def) {
-            PlayerStats2.def += reward.def;
-            rewardMsg.push(`DEF+${reward.def}`);
-        }
-        if (reward.mdef) {
-            PlayerStats2.mdef += reward.mdef;
-            rewardMsg.push(`MDEF+${reward.mdef}`);
-        }
-
-        this.completed[questId] = true;
-
-        return {
-            success: true,
-            msg: `クエスト達成！\n報酬: ${rewardMsg.join(', ')}`
-        };
+    // カウンター操作（話した回数や、一時的な討伐数など）
+    increment(counterId) {
+        if (!this.interactions[counterId]) this.interactions[counterId] = 0;
+        this.interactions[counterId]++;
+        return this.interactions[counterId];
     },
 
-    // 利用可能なクエスト一覧
-    getAvailableQuests() {
-        return Object.values(QuestData2).map(quest => ({
-            ...quest,
-            progress: this.getProgress(quest.id)
-        }));
+    getCount(counterId) {
+        return this.interactions[counterId] || 0;
     },
 
-    // 離脱した仲間リスト（再加入不可）
+    // ストーリー進行チェックユーティリティ
+    checkAllBossesDefeated() {
+        return this.has(StoryFlags.EAST_BOSS_DEFEATED) &&
+            this.has(StoryFlags.WEST_BOSS_DEFEATED) &&
+            this.has(StoryFlags.SOUTH_BOSS_DEFEATED) &&
+            this.has(StoryFlags.NORTH_BOSS_DEFEATED);
+    },
+
+    // 離脱した仲間リスト（Party2から参照されることも考慮しここでも保持、あるいはParty2が正？）
+    // Party2側で管理するが、ストーリー上のフラグとしてここにも持つのはあり。
+    // 今回はParty2のremoveでQuestSystem2.departedを操作していた仕様を継承。
     departed: {},
 
     // 初期化
     init() {
-        this.killCount = { slime: 0, goblin: 0, bat: 0, any: 0 };
-        this.completed = {};
+        this.flags = {};
+        this.interactions = {};
         this.departed = {};
+
+        // デフォルトフラグ
+        this.set(StoryFlags.STARTED, true);
+        this.set(StoryFlags.LULUSIA_JOINED, true); // 初期メンバー
+    },
+
+    // データロード用（セーブ実装時に使用）
+    load(data) {
+        if (data) {
+            this.flags = data.flags || {};
+            this.interactions = data.interactions || {};
+            this.departed = data.departed || {};
+        }
+    },
+
+    getSaveData() {
+        return {
+            flags: this.flags,
+            interactions: this.interactions,
+            departed: this.departed
+        };
     }
 };

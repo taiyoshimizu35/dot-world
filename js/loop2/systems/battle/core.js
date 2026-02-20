@@ -11,6 +11,7 @@ import { EnemyData2, getEnemiesForMap2 } from '../../data/enemies.js';
 import { WorldState } from '../../../loop1/world.js'; // Context
 import { Inventory2 } from '../../inventory.js';
 import { ItemData2 } from '../../data/items.js';
+import { QuestSystem2, StoryFlags } from '../../quest.js';
 
 // ===========================================
 // 2週目バトルコアシステム
@@ -662,13 +663,26 @@ export const Battle2 = {
         this.msgTimer = 0;
         this.waitForInput = true;
 
-        // ボス撃破フラグ
         if (this.isTrueBoss && this.currentArea) {
-            // WorldState.world2.trueBosses[this.currentArea] = true; (Logic seems correct)
-            if (WorldState && WorldState.world2) WorldState.world2.trueBosses[this.currentArea] = true;
+            WorldState.world2.trueBosses[this.currentArea] = true;
+            QuestSystem2.set(`${this.currentArea}_boss_defeated`);
+
+            // 全ボス撃破チェック -> 魔王城解放
+            if (QuestSystem2.checkAllBossesDefeated()) {
+                QuestSystem2.set(StoryFlags.DEMON_CASTLE_OPEN);
+                Msg.show('世界中から禍々しい気配が消え、\n中央の城から強大な魔力が溢れ出した！');
+            }
         }
         if (this.isDemonKing) {
-            if (WorldState && WorldState.world2) WorldState.world2.trueDemonKingDefeated = true;
+            WorldState.world2.trueDemonKingDefeated = true;
+            QuestSystem2.set(StoryFlags.DEMON_KING_DEFEATED);
+
+            // Trigger Ending
+            if (WorldState.managers.loop2Ending) {
+                this.active = false;
+                WorldState.managers.loop2Ending.start();
+                return;
+            }
         }
     },
 

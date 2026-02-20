@@ -18,7 +18,17 @@ const createMap = (areaName, baseTile) => {
         w: W, h: H, tiles: tiles,
         area: areaName,
         baseTile: baseTile,
-        npcs: [],
+        baseTile: baseTile,
+        npcs: [
+            {
+                x: 10, y: 5, name: '真・魔王', img: 'demon_king_true', // Need image
+                type: 'boss', bossId: 'demon_king',
+                demonKing: true, // Special flag for InteractionSystem
+                setFlag: 'demon_king_defeated',
+                afterMsg: '魔王は倒れた……',
+                repeatable: false
+            }
+        ],
         warps: [
             {
                 x: Math.floor(W / 2),

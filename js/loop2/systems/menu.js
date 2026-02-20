@@ -295,8 +295,8 @@ export const Menu2 = {
         }
     },
 
-    // Categories: 0:Tools, 1:Weapons, 2:Armor, 3:Accessories
-    itemCats: ['道具', '武器', '防具', '装飾品'],
+    // Categories: 0:Tools, 1:Weapons, 2:Armor, 3:Accessories, 4:Materials
+    itemCats: ['道具', '武器', '防具', '装飾品', '素材'],
     itemCatCur: 0,
 
     updateItems() {
@@ -306,8 +306,8 @@ export const Menu2 = {
                 this.sub = null;
                 return;
             }
-            if (Input.justPressed('ArrowUp')) this.itemCatCur = (this.itemCatCur - 1 + 4) % 4;
-            if (Input.justPressed('ArrowDown')) this.itemCatCur = (this.itemCatCur + 1) % 4;
+            if (Input.justPressed('ArrowUp')) this.itemCatCur = (this.itemCatCur - 1 + 5) % 5;
+            if (Input.justPressed('ArrowDown')) this.itemCatCur = (this.itemCatCur + 1) % 5;
 
             if (Input.interact()) {
                 this.sub = 'item_list';
@@ -366,7 +366,7 @@ export const Menu2 = {
                     this.actionCur = 0;
                 } else {
                     // Gear - just show msg
-                    Msg.show(`${data.name} は装備画面で装備できる。`);
+                    Msg.show(`${data.name} はここでは使えない。`);
                 }
             }
 
@@ -377,7 +377,7 @@ export const Menu2 = {
     },
 
     getFilteredItems() {
-        const types = ['consumable', 'weapon', 'armor', 'accessory'];
+        const types = ['consumable', 'weapon', 'armor', 'accessory', 'material'];
         const targetType = types[this.itemCatCur];
         return Inventory2.items.filter(id => ItemData2[id] && ItemData2[id].type === targetType);
     },
@@ -386,7 +386,7 @@ export const Menu2 = {
         const { VIEWPORT_WIDTH: VW, VIEWPORT_HEIGHT: VH } = GameConfig;
 
         // Category Window
-        const catX = 20, catY = 30, catW = 140, catH = 140;
+        const catX = 20, catY = 30, catW = 140, catH = 165; // Height increased
         Draw.rect(ctx, catX, catY, catW, catH, 'rgba(0,0,0,0.95)');
         Draw.stroke(ctx, catX, catY, catW, catH, '#fff', 2);
 
@@ -395,8 +395,8 @@ export const Menu2 = {
         const capacity = Inventory2.getCapacity ? Inventory2.getCapacity() : 20;
 
         // Count items per category
-        const counts = [0, 0, 0, 0];
-        const types = ['consumable', 'weapon', 'armor', 'accessory'];
+        const counts = [0, 0, 0, 0, 0];
+        const types = ['consumable', 'weapon', 'armor', 'accessory', 'material'];
         items.forEach(id => {
             const data = ItemData2[id];
             if (data) {

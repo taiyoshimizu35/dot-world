@@ -4,6 +4,7 @@ import { QuestSystem as QuestFlags } from '../../quest.js';
 import { Msg } from '../../../core/message.js';
 import { initMapData } from './data.js';
 import { Areas } from '../../../loop2/systems/maps/data/areas.js'; // Import Loop 2 Areas
+import { QuestSystem2 } from '../../../loop2/quest.js'; // Loop 2 Quest System
 
 // ===========================================
 // マップマネージャー
@@ -139,21 +140,29 @@ export const Maps = {
                     // 既に仲間になっている場合は非表示
                     if (party.members.find(m => m.id === npc.partyJoin)) return false;
                 }
-                // ボス撃破条件チェック
-                if (npc.requiresBoss && !QuestFlags.trueBosses[npc.requiresBoss]) return false;
             }
 
-            // エリアボスのチェック
-            if (npc.areaBoss) {
-                if (QuestFlags.bosses[npc.areaBoss]) {
-                    return false;
+            // Loop 2: フラグによる表示制御
+            if (WorldState.week === 2) {
+                // ボス (setFlagがあり、かつrepeatableでないなら、フラグが立っていたら消える)
+                if ((npc.type === 'boss' || npc.areaBoss) && !npc.repeatable) {
+                    const flag = npc.setFlag || (npc.areaBoss ? `${npc.areaBoss}_boss_defeated` : null);
+                    if (flag && QuestSystem2.has(flag)) return false;
+                }
+                // 仲間 (既に加入済みなら) - party.membersチェックで十分だが念のため
+                if (npc.partyJoin) {
+                    // 上記でチェック済み
+                }
+                // その他: reqFlag (前提フラグ) がない場合は表示しない？
+                // いや、reqFlagは話しかけた時の条件。表示は常にするのが普通。
+                // 「出現条件」があるなら visibleFlag とかが必要だが、今はシンプルに。
+            } else {
+                // Loop 1 Logic
+                if (npc.areaBoss) {
+                    if (QuestFlags.bosses && QuestFlags.bosses[npc.areaBoss]) return false;
                 }
             }
-
-            // 北エリア中ボス (defeated -> hidden)
-            if (npc.northMiniboss) {
-                if (QuestFlags.northMinibosses[npc.northMiniboss]) return false;
-            }
+            // ... (rest of filtering)
 
             return true;
         });
@@ -207,7 +216,7 @@ export const Maps = {
                     return null;
                 }
                 // 魔王城へのアクセス制限チェック
-                if (w.requiresDemonCastle && !QuestFlags.allBossesDefeated()) {
+                if (w.requiresDemonCastle && !this.canAccessDemonCastle()) {
                     return null;
                 }
                 return w;
@@ -218,7 +227,11 @@ export const Maps = {
 
     // 魔王城へワープ
     canAccessDemonCastle() {
-        return QuestFlags.allBossesDefeated();
+        if (QuestSystem2.checkAllBossesDefeated()) {
+            return true;
+        }
+        Msg.show('城門は堅く閉ざされている……\n四方のエリアボスを倒す必要があるようだ。');
+        return false;
     },
 
     /*

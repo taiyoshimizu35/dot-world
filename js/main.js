@@ -23,6 +23,7 @@ import { GameOverState } from './states/gameover_state.js';
 import { OpeningState } from './states/opening_state.js';
 import { EndingState } from './states/ending_state.js';
 import { Loop1EndingState } from './states/loop1_ending_state.js';
+import { Loop2EndingState } from './states/loop2_ending_state.js';
 import { SaveState } from './states/save_state.js';
 
 class Game {
@@ -59,6 +60,7 @@ class Game {
         this.stateMachine.add('opening', new OpeningState(this));
         this.stateMachine.add('ending', new EndingState(this));
         this.stateMachine.add('loop1_ending', new Loop1EndingState(this));
+        this.stateMachine.add('loop2_ending_scene', new Loop2EndingState(this));
         this.stateMachine.add('save', new SaveState(this)); // Registered
 
         // Default State

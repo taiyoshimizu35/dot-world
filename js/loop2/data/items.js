@@ -72,5 +72,42 @@ export const ItemData2 = {
         desc: '防御力が少し上がる。',
         stats: { def: 5 },
         price: 500
+    },
+
+    // --- Materials (Loot) ---
+    'slime_jelly': {
+        id: 'slime_jelly', name: 'スライムゼリー', type: 'material',
+        desc: 'スライムの体液。ぷるぷるしている。',
+        price: 20
+    },
+    'wolf_fang': {
+        id: 'wolf_fang', name: '狼の牙', type: 'material',
+        desc: '鋭い牙。武器の素材になる。',
+        price: 60
+    },
+    'iron_scrap': {
+        id: 'iron_scrap', name: '鉄くず', type: 'material',
+        desc: '錆びた鉄の塊。',
+        price: 100
+    },
+    'scorpion_tail': {
+        id: 'scorpion_tail', name: 'サソリの尻尾', type: 'material',
+        desc: '毒を持つ尻尾。取り扱い注意。',
+        price: 80
+    },
+    'magic_bone': {
+        id: 'magic_bone', name: '魔力を帯びた骨', type: 'material',
+        desc: 'アンデッドの骨。薄気味悪い。',
+        price: 120
+    },
+    'ancient_coin': {
+        id: 'ancient_coin', name: '古びた金貨', type: 'material',
+        desc: '昔の通貨。換金用。',
+        price: 500
+    },
+    'evil_crystal': {
+        id: 'evil_crystal', name: '魔結晶', type: 'material',
+        desc: '魔力が凝縮された結晶。高値で売れる。',
+        price: 1000
     }
 };

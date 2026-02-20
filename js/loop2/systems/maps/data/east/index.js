@@ -31,11 +31,24 @@ const createMap = (areaName, baseTile) => {
         baseTile: baseTile,
         npcs: [
             // Rin (Dragon Warrior)
-            { x: 5, y: 5, name: 'リン', img: 'rin', partyJoin: 'rin' },
+            {
+                x: 5, y: 5, name: 'リン', img: 'rin', partyJoin: 'rin',
+                reqMsg: '「姉さんどこ…？」'
+            },
             // Shera (Thief)
             { x: 15, y: 5, name: 'シェラ', img: 'shera', partyJoin: 'shera' },
             // George (Porter)
-            { x: 10, y: 10, name: 'ジョージ', img: 'george', partyJoin: 'george' }
+            { x: 10, y: 10, name: 'ジョージ', img: 'george', partyJoin: 'george' },
+
+            // Area Boss (Appears if not defeated)
+            {
+                x: 10, y: 2, name: '森の主', img: 'wolf',
+                type: 'boss', bossId: 'east',
+                reqFlag: null, // Always visible until defeated
+                setFlag: 'east_boss_defeated', // Hide if defeated (Logic in map loader needed or manual check)
+                afterMsg: '森の主は倒れた。',
+                repeatable: false
+            }
         ],
         warps: [
             // West: World Map

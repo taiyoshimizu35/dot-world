@@ -13,6 +13,7 @@ import { Party2 } from '../loop2/party.js';
 import { Battle2 } from '../loop2/systems/battle/core.js';
 import { QuestSystem2 } from '../loop2/quest.js';
 import { Menu2 } from '../loop2/systems/menu.js';
+import { ShopSystem2 } from '../loop2/systems/shop.js';
 
 
 import { PlayerController } from '../systems/player_controller.js';
@@ -21,6 +22,7 @@ import { Maps } from './systems/maps/manager.js';
 import { InteractionSystem } from './systems/interaction.js';
 import { InteractionSystem2 } from '../loop2/systems/interaction.js';
 import { WorldMap } from '../loop2/systems/world_map.js'; // Import World Map
+import { Loop2Ending } from '../loop2/systems/top/loop2_ending.js';
 
 // ===========================================
 // ワールドステート (Unified)
@@ -124,8 +126,11 @@ export const WorldState = {
         this.managers.party = Party2;
         this.managers.battle = Battle2;
         this.managers.menu = Menu2;
+        this.managers.shop = ShopSystem2; // Loop 2 Shop
         this.managers.controllerClass = PlayerController; // Use Unified Controller
         this.managers.interaction = new InteractionSystem2(this);
+
+        this.managers.shop.init(); // Init Loop 2 Shop
 
         console.log("Loop 2 Managers initialized.");
 
@@ -133,6 +138,9 @@ export const WorldState = {
         // Maps.load('center') will be called by Loop1Ending or here?
         // Let's call it here to be safe and ensure data is loaded.
         Maps.load('center');
+
+        // Loop 2 Ending Manager
+        this.managers.loop2Ending = new Loop2Ending(this);
 
         // Disable encounters initially (Center has 0 rate usually)
         // this.resetEncounterSteps(0); // Handled in Maps.load now

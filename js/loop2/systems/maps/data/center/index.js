@@ -20,21 +20,42 @@ const createMap = (areaName, baseTile) => {
     return {
         w: W, h: H, tiles: tiles,
         area: areaName,
-        baseTile: baseTile, 
-        npcs: [
-            { x: 10, y: 5, sprite: 'goddes', savePoint: true, blocking: true }
-        ],
+        baseTile: baseTile,
+        start: { x: Math.floor(W / 2), y: H - 2 },
         warps: [
+            // South: World Map
             {
                 x: Math.floor(W / 2),
                 y: H - 1,
                 onWarp: () => {
                     import('../../../world_map.js').then(m => m.WorldMap.open());
                 }
+            },
+            // North: Demon Castle (Unlockable)
+            {
+                x: Math.floor(W / 2),
+                y: 0,
+                to: 'demon', // Warp to Demon Map
+                requiresDemonCastle: true, // Manager handles check
+                tx: 10, ty: 13
             }
         ],
-        start: { x: Math.floor(W / 2), y: H - 2 },
-        encounterRate: 0 // Safe zone
+        encounterRate: 0, // Safe zone
+        npcs: [
+            { x: 10, y: 5, sprite: 'goddes', savePoint: true, blocking: true },
+            // Gatekeeper or seal visual could be added here
+            {
+                x: 10, y: 1, name: '城門', img: 'door',
+                msg: '堅く閉ざされている……\n四方の守護者を倒さねば開かないようだ。',
+                blocking: true,
+                hideFlag: 'demon_castle_open'
+            },
+            // Shop NPC
+            {
+                x: 5, y: 7, name: '商人', sprite: 'villager',
+                shop: true, msg: '「へいらっしゃい！」'
+            }
+        ]
     };
 };
 

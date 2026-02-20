@@ -28,7 +28,17 @@ const createMap = (areaName, baseTile) => {
         w: W, h: H, tiles: tiles,
         area: areaName,
         baseTile: baseTile,
-        npcs: [],
+        baseTile: baseTile,
+        npcs: [
+            // Area Boss (North has no companions usually, pure combat)
+            {
+                x: 10, y: 7, name: '魔界の門番', img: 'armored_knight',
+                type: 'boss', bossId: 'north',
+                setFlag: 'north_boss_defeated',
+                afterMsg: '門番は道を譲った。',
+                repeatable: false
+            }
+        ],
         warps: [
             // South: World Map
             {
