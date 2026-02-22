@@ -1,5 +1,9 @@
 
 import { GameConfig } from '../../../../../constants.js';
+import { Party2 } from '../../../../party.js';
+import { Msg } from '../../../../../core/message.js';
+import { Battle2 } from '../../../battle/core.js';
+import { QuestSystem2 } from '../../../../quest.js';
 
 const T = GameConfig.TILE_TYPES;
 const W = 20;
@@ -94,7 +98,30 @@ export const EastDungeon3_2F = {
     baseTile: T.STONE,
     encounterRate: 0.0,
     npcs: [
-        { x: 9, y: 3, sprite: 'chest', msg: '宝箱だ！（中身はまだない）' }
+        { x: 9, y: 3, sprite: 'chest', msg: '宝箱だ！（中身はまだない）' },
+        {
+            x: 9, y: 7, name: 'リン', img: 'rin',
+            blocking: true,
+            hideFlag: 'rin_joined',
+            onInteract: () => {
+                Msg.show('リン「きゃあっ！ 誰か助けて！」\n（魔物の群れに囲まれている！）', () => {
+                    Msg.choice('助けますか？', ['助ける', '見捨てる'], (idx) => {
+                        if (idx === 0) {
+                            // Dummy encounter for rescue
+                            // Real game would hook a specific battle here, using a normal random encounter as a stand-in
+                            Msg.show('勇者「そこまでだ！」', () => {
+                                // Since Battle2 triggers asynchronous loops, hook into its post-battle callback or just join after dialogue
+                                // For simplicity here, we add her immediately assuming the fight is skipped/won via narrative
+                                Msg.show('リン「ありがとう、助かったわ！\n……貴方の剣技、姉さんが教えてくれた技に似てる。姉さんを探す旅、私も同行させて！」', () => {
+                                    Party2.add('rin');
+                                    QuestSystem2.set('rin_joined');
+                                });
+                            });
+                        }
+                    });
+                });
+            }
+        }
     ],
     warps: [
         // To 1F

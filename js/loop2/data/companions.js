@@ -35,7 +35,7 @@ export const PartyMemberData2 = {
         agi: 10,
         growthType: 'warrior', // 高ステータス
         initialSkills: ['dragon_claw'], // 強力な物理
-        joinCondition: { type: 'event', region: 'east', id: 'find_sister' },
+        joinCondition: { type: 'auto' }, // 竜族の妹。姉の面影を感じてすぐ加入する
         messages: {
             join: '「貴方の匂い…どこかで。姉さんの手掛かりを知っているの？ ついていくわ。」',
             leave: '「姉さんの情報を探してくる。」'
@@ -56,7 +56,7 @@ export const PartyMemberData2 = {
         agi: 9,
         growthType: 'cleric', // 回復特化
         initialSkills: ['heal', 'cure'], // 回復魔法のみ
-        joinCondition: { type: 'event', region: 'west', id: 'elena_intro' },
+        joinCondition: { type: 'auto' },
         messages: {
             join: '「私、ご先祖様みたいな凄い魔法は使えないけど…回復なら任せてください。」',
             leave: '「もっと修行しなきゃ…ごめんなさい。」'
@@ -77,7 +77,7 @@ export const PartyMemberData2 = {
         agi: 12,
         growthType: 'warrior', // バランス型
         initialSkills: ['slash'],
-        joinCondition: { type: 'event', region: 'south', id: 'aldo_duel' },
+        joinCondition: { type: 'auto' },
         messages: {
             join: '「あんた、ただ者じゃないな！ 俺に剣を教えてくれよ！」',
             leave: '「俺の剣じゃ、まだ足手まといか…」'
@@ -125,7 +125,7 @@ export const PartyMemberData2 = {
         growthType: 'thief',
         initialSkills: ['mug'], // 盗む攻撃
         passive: 'trap_master', // 罠解除、先制攻撃
-        joinCondition: { type: 'event', region: 'east', id: 'thieves_guild' },
+        joinCondition: { type: 'auto' }, // 腕利きのスリ。面白そうだからと加入
         messages: {
             join: '「あたしと組む？ 悪い話じゃないね。分け前は弾んでよ？」',
             leave: '「あばよ！ お宝は山分けだ。」'
@@ -169,7 +169,7 @@ export const PartyMemberData2 = {
         growthType: 'tank',
         initialSkills: ['cover', 'shield_bash'], // デコイ、防御攻撃
         passive: 'party_def_up', // パッシブで防御微増？
-        joinCondition: { type: 'event', region: 'west', id: 'knight_pledge' },
+        joinCondition: { type: 'auto' },
         messages: {
             join: '「老骨ですが、盾くらいにはなりましょう。我が剣、貴方に捧げます。」',
             leave: '「ご武運を……。」'
@@ -190,7 +190,7 @@ export const PartyMemberData2 = {
         agi: 10,
         growthType: 'debuffer',
         initialSkills: ['curse', 'blood_pact'], // デバフ、強化
-        joinCondition: { type: 'item', value: 'forbidden_scroll' },
+        joinCondition: { type: 'auto' },
         messages: {
             join: '「ククク……私の実験に付き合ってくれるのかしら？ いいわよ。」',
             leave: '「興味が尽きたわ。」'
@@ -211,7 +211,7 @@ export const PartyMemberData2 = {
         agi: 14,
         growthType: 'special',
         initialSkills: ['slow', 'haste'], // 時間操作
-        joinCondition: { type: 'event', region: 'south', id: 'clock_tower' },
+        joinCondition: { type: 'auto' },
         messages: {
             join: '「……ふわぁ。あなたと行くと、面白い未来が見えそう。」',
             leave: '「……おやすみ。」'

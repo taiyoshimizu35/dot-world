@@ -115,9 +115,8 @@ export const WorldState = {
         Party2.init();
         QuestSystem2.init();
 
-        // Initial Party Member: Lulusia (The Woman / Demon King)
-        Party2.add('lulusia');
-        Msg.show('謎の少女「あのままでは危ないところでした！\n私もお供します、怪我の手当てくらいならできますから…」');
+        // Lulusia no longer joins immediately here. She will join via event in CenterMap.
+        QuestSystem2.set('intro_done', false);
 
         Battle2.init(this);
 

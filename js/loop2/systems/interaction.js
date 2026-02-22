@@ -98,6 +98,38 @@ export class InteractionSystem2 {
         const bossId = npc.bossId || npc.areaBoss; // 互換性
         if (!bossId) return;
 
+        if (npc.demonKing) {
+            const isTrueEnd = Party2.isMember('rin') && Party2.isMember('elena') && Party2.isMember('aldo');
+
+            if (isTrueEnd) {
+                Msg.show('（広間の中央に、かつての仲間たちの遺品が落ちている……）\nルルシア「……ここまでですね。勇者様。」\nルルシア「失った私の力も、贵方の魔剣も十分に育ちました。さあ……」', () => {
+                    Msg.show('リン「姉さんの遺品……！ あなたが魔王だったのね！」\nエレナ「ご先祖様の仇……絶対ここで討つ！」\nアルド「俺たちの剣で、過去の因縁を断ち切る！」\nルルシア「フフッ……面白い。ならばその力、見せてもらいましょうか！」', () => {
+                        Battle2.startTrueDemonKing();
+                    });
+                });
+            } else {
+                Msg.show('（広間の中央に、かつての仲間たちの遺品が落ちている……）\nルルシア「……ここまでですね。勇者様。」\nルルシア「失った私の力も、貴方の魔剣も十分に育ちました。さあ……」', () => {
+                    const cheerMsgs = [];
+                    Party2.members.forEach(m => {
+                        if (m.id !== 'lulusia' && m.id !== 'hero') {
+                            cheerMsgs.push(`${m.name}「過去のことは関係ない！ 私たちでも魔王は倒せる。今度は私たちがお前の仲間だ！」`);
+                        }
+                    });
+
+                    if (cheerMsgs.length > 0) {
+                        Msg.show(cheerMsgs.join('\n') + '\n勇者（みんな……！）\nルルシア「無駄な足掻きを……消え去りなさい！」', () => {
+                            Battle2.startTrueDemonKing();
+                        });
+                    } else {
+                        Msg.show('勇者「仲間の遺志は……俺が継ぐ！」\nルルシア「愚かな……消え去りなさい！」', () => {
+                            Battle2.startTrueDemonKing();
+                        });
+                    }
+                });
+            }
+            return;
+        }
+
         Msg.choice('強大な気配を感じる……挑みますか？', ['挑む', 'やめる'], (idx) => {
             if (idx === 0) {
                 // 戦闘開始

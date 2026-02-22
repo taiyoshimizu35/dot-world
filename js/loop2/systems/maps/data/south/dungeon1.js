@@ -1,5 +1,9 @@
 
 import { GameConfig } from '../../../../../constants.js';
+import { Party2 } from '../../../../party.js';
+import { Msg } from '../../../../../core/message.js';
+import { Battle2 } from '../../../battle/core.js';
+import { QuestSystem2 } from '../../../../quest.js';
 
 const T = GameConfig.TILE_TYPES;
 
@@ -79,7 +83,33 @@ export const SouthDungeon1 = {
     baseTile: T.GRAVEL,
     encounterRate: 0.15,
     npcs: [
-        { x: 20, y: 35, msg: '熱気がすごい…' }
+        { x: 20, y: 35, msg: '熱気がすごい…' },
+        {
+            x: 20, y: 25, name: '鋭い目つきの剣士', img: 'aldo',
+            blocking: true,
+            hideFlag: 'aldo_joined',
+            onInteract: () => {
+                Msg.show('剣士「……貴様、只者ではないな。その歩法、ただの旅人ではない。」\n勇者「お前は？」', () => {
+                    Msg.choice('凄まじい剣気だ……', ['勝負を受ける', '立ち去る'], (idx) => {
+                        if (idx === 0) {
+                            Msg.show('剣士「俺はアルド。親父の残した剣の極致を探している。……いざ、尋常に！」', () => {
+                                // Dummy battle for Aldo duel
+                                Msg.show('（激しい打ち合いの末、アルドの剣が弾き飛ばされた！）', () => {
+                                    Msg.show('アルド「見事だ……。親父の言っていた『無心の剣』、貴様の太刀筋にそれを見た。」', () => {
+                                        Msg.show('アルド「頼む、俺を弟子にしてくれ！ 貴様と同行すれば、俺の剣も高みに……！」\n（アルドが仲間になった！）', () => {
+                                            Party2.add('aldo');
+                                            QuestSystem2.set('aldo_joined');
+                                        });
+                                    });
+                                });
+                            });
+                        } else {
+                            Msg.show('アルド「……臆したか。まあいい、俺は見込みのある奴としか刃を交えん。」');
+                        }
+                    });
+                });
+            }
+        }
     ],
     warps: [
         { x: 20, y: 37, to: 'south', tx: 10, ty: 13 },

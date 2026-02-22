@@ -1,4 +1,7 @@
 import { GameConfig } from '../../../../../constants.js';
+import { QuestSystem2 } from '../../../../quest.js';
+import { Party2 } from '../../../../party.js';
+import { Msg } from '../../../../../core/message.js';
 
 const T = GameConfig.TILE_TYPES;
 const W = 20;
@@ -30,16 +33,6 @@ const createMap = (areaName, baseTile) => {
         area: areaName,
         baseTile: baseTile,
         npcs: [
-            // Rin (Dragon Warrior)
-            {
-                x: 5, y: 5, name: 'リン', img: 'rin', partyJoin: 'rin',
-                reqMsg: '「姉さんどこ…？」'
-            },
-            // Shera (Thief)
-            { x: 15, y: 5, name: 'シェラ', img: 'shera', partyJoin: 'shera' },
-            // George (Porter)
-            { x: 10, y: 10, name: 'ジョージ', img: 'george', partyJoin: 'george' },
-
             // Area Boss (Appears if not defeated)
             {
                 x: 10, y: 2, name: '森の主', img: 'wolf',
@@ -48,6 +41,37 @@ const createMap = (areaName, baseTile) => {
                 setFlag: 'east_boss_defeated', // Hide if defeated (Logic in map loader needed or manual check)
                 afterMsg: '森の主は倒れた。',
                 repeatable: false
+            },
+            // Shera & George Encounter Event
+            {
+                x: 16, y: 12, name: '怪しい女', img: 'shera',
+                blocking: true,
+                hideFlag: 'east_thief_event', // Custom flag
+                onInteract: () => {
+                    Msg.show('怪しい女「ほら、さっさとその荷物を渡しな！」\n気の弱そうな男「ひぃっ！ 命だけは……！」', () => {
+                        Msg.choice('女が男を脅している……', ['助ける', '見守る'], (idx) => {
+                            if (idx === 0) {
+                                Msg.show('勇者「そこまでだ！」\n怪しい女「ちっ、邪魔が入ったか。……あんた、なかなか見込みがありそうじゃん。アタシはシェラ。組まない？」', () => {
+                                    Msg.show('気の弱そうな男「あ、ありがとうございます……私は行商人のジョージです。お礼に荷物持ちでもなんでもします！」', () => {
+                                        Msg.show('（シェラとジョージが仲間になった！）', () => {
+                                            Party2.add('shera');
+                                            Party2.add('george');
+                                            QuestSystem2.set('east_thief_event'); // Hides both NPCs
+                                        });
+                                    });
+                                });
+                            } else {
+                                Msg.show('（今は関わらない方がよさそうだ……）');
+                            }
+                        });
+                    });
+                }
+            },
+            {
+                x: 15, y: 12, name: '行商人', img: 'george',
+                blocking: true,
+                hideFlag: 'east_thief_event',
+                msg: '「ひぃっ！ 助けて……！」'
             }
         ],
         warps: [

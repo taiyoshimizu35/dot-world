@@ -1,5 +1,8 @@
 
 import { GameConfig } from '../../../../../constants.js';
+import { Party2 } from '../../../../party.js';
+import { Msg } from '../../../../../core/message.js';
+import { QuestSystem2 } from '../../../../quest.js';
 
 const T = GameConfig.TILE_TYPES;
 
@@ -116,7 +119,26 @@ export const WestDungeon3_2F = {
     baseTile: T.SANDS,
     encounterRate: 0.1,
     npcs: [
-        { x: 15, y: 11, sprite: 'chest', msg: 'サソリの毒針を入手した！（素材）' }
+        { x: 15, y: 11, sprite: 'chest', msg: 'サソリの毒針を入手した！（素材）' },
+        {
+            x: 15, y: 9, name: '魔法使いの少女', img: 'elena',
+            blocking: true,
+            hideFlag: 'elena_intro',
+            onInteract: () => {
+                Msg.show('魔法使いの少女「はぁっ…はぁっ……。先祖の古文書は……どこ……？」', () => {
+                    Msg.show('勇者「大丈夫か？ こんな砂漠の地下で何を……」\n魔法使いの少女「私、大魔術師の末裔なのに……攻撃魔法がちっとも使えないの。」', () => {
+                        Msg.show('魔法使いの少女「一族から追放されたけど……せめて先代の魔力さえ取り戻せればって……」\n勇者「……攻撃なんて俺がやる。お前は治癒が得意なら、それで十分だろ？」', () => {
+                            Msg.show('魔法使いの少女「え……？ ほんと？ 足手まといにならない？」\n勇者「ああ。お前の魔法が必要だ。」', () => {
+                                Msg.show('エレナ「ありがとう……！ 私、エレナっていうの。よろしくお願いします！」\n（エレナが仲間になった！）', () => {
+                                    Party2.add('elena');
+                                    QuestSystem2.set('elena_intro');
+                                });
+                            });
+                        });
+                    });
+                });
+            }
+        }
     ],
     warps: [
         { x: 13, y: 28, to: 'west_dungeon_3', tx: 13, ty: 27 }

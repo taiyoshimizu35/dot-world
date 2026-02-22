@@ -4,6 +4,7 @@ import { Input } from '../../core/input.js';
 import { Msg } from '../../core/message.js';
 import { PlayerStats2 } from '../player.js';
 import { Inventory2 } from '../inventory.js';
+import { Party2 } from '../party.js';
 import { ItemData2 } from '../data/items.js';
 import { WorldState } from '../../loop1/world.js';
 
@@ -77,7 +78,12 @@ export const ShopSystem2 = {
         if (this.items.length === 0) return;
 
         const item = this.items[this.cursor];
-        const price = Math.floor(item.price / 2); // Sell at half price? or full? Let's say half for now or specific sellPrice
+        let price = Math.floor(item.price / 2); // 基本買取価格
+
+        // ゴルドンのパッシブ (買取価格上昇)
+        if (Party2.isMember('gordon')) {
+            price = Math.floor(item.price * 0.8);
+        }
 
         Msg.choice(`${item.name}を${price}Gで売りますか？`, ['はい', 'いいえ'], (idx) => {
             if (idx === 0) {
@@ -128,8 +134,13 @@ export const ShopSystem2 = {
                 const color = isSelected ? '#fff' : '#aaa';
                 const prefix = isSelected ? '▶ ' : '  ';
 
+                let price = Math.floor(item.price / 2);
+                if (Party2.isMember('gordon')) {
+                    price = Math.floor(item.price * 0.8);
+                }
+
                 Draw.text(ctx, `${prefix}${item.name}`, 40, y, color, 14, 'left');
-                Draw.text(ctx, `${Math.floor(item.price / 2)}G`, VW - 40, y, color, 14, 'right');
+                Draw.text(ctx, `${price}G`, VW - 40, y, color, 14, 'right');
             }
         }
 

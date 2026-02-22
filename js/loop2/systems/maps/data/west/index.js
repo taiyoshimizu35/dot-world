@@ -1,4 +1,7 @@
 import { GameConfig } from '../../../../../constants.js';
+import { QuestSystem2 } from '../../../../quest.js';
+import { Party2 } from '../../../../party.js';
+import { Msg } from '../../../../../core/message.js';
 
 const T = GameConfig.TILE_TYPES;
 const W = 20;
@@ -31,12 +34,39 @@ const createMap = (areaName, baseTile) => {
         area: areaName,
         baseTile: baseTile,
         npcs: [
-            // Elena (Mage)
-            { x: 5, y: 10, name: 'エレナ', img: 'elena', partyJoin: 'elena' },
-            // Gordon (Merchant)
-            { x: 15, y: 10, name: 'ゴルドン', img: 'gordon', partyJoin: 'gordon' },
-            // Gawain (Guardian)
-            { x: 5, y: 5, name: 'ガウェイン', img: 'gawain', partyJoin: 'gawain' },
+            // Gordon & Gawain Event
+            {
+                x: 15, y: 10, name: 'でっぷりした男', img: 'gordon',
+                blocking: true,
+                hideFlag: 'west_merchant_event',
+                onInteract: () => {
+                    Msg.show('でっぷりした男「ひぃぃ！ 魔物が出たぞ！ ガウェイン、何とかしろ！」\n老騎士「御意。……しかし数が多すぎるな。」', () => {
+                        Msg.choice('魔物に襲われているようだ……', ['助太刀する', '立ち去る'], (idx) => {
+                            if (idx === 0) {
+                                Msg.show('勇者「加勢するぞ！」\n（魔物を蹴散らした！）', () => {
+                                    Msg.show('でっぷりした男「ふぅ、助かったぜ。俺は豪商のゴルドン。こっちは護衛のガウェインだ。」\n老騎士「……助太刀感謝する。私一人では商人殿を守り切れなかったやもしれん。」', () => {
+                                        Msg.show('ゴルドン「あんた強いな！ 恩着せがましいが、俺たちも同行させてくれ。金儲けの臭いがするぜ！」\nガウェイン「主の命なれば。私の盾、役立ててくだされ。」', () => {
+                                            Msg.show('（ゴルドンとガウェインが仲間になった！）', () => {
+                                                Party2.add('gordon');
+                                                Party2.add('gawain');
+                                                QuestSystem2.set('west_merchant_event');
+                                            });
+                                        });
+                                    });
+                                });
+                            } else {
+                                Msg.show('（他人の揉め事に関わるのはやめておこう……）');
+                            }
+                        });
+                    });
+                }
+            },
+            {
+                x: 14, y: 10, name: '老騎士', img: 'gawain',
+                blocking: true,
+                hideFlag: 'west_merchant_event',
+                msg: '「主はお下がりくだされ！」'
+            },
 
             // Area Boss
             {

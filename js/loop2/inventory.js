@@ -6,9 +6,13 @@ import { Msg } from '../core/message.js'; // For effect messages if needed, or h
 export const Inventory2 = {
     items: [],
 
-    // 基本容量 + 仲間1人につき+5
+    // 基本容量 10 + ジョージがいる場合 +20
     getCapacity() {
-        return 10 + (Party2.members.length * 5);
+        let capacity = 10;
+        if (Party2.isMember('george')) {
+            capacity += 20; // 荷物持ちパッシブ
+        }
+        return capacity;
     },
 
     addItem(itemId) {
@@ -44,9 +48,13 @@ export const Inventory2 = {
         let success = false;
         let msg = '';
 
+        // ソフィーナのパッシブ (アイテム効果1.5倍)
+        let effectMultiplier = Party2.isMember('sophina') ? 1.5 : 1.0;
+
         if (effect.type === 'heal') {
             const oldHp = target.hp;
-            target.hp = Math.min(target.maxHp, target.hp + effect.value);
+            const healValue = Math.floor(effect.value * effectMultiplier);
+            target.hp = Math.min(target.maxHp, target.hp + healValue);
             const healed = target.hp - oldHp;
             if (healed > 0) {
                 success = true;
@@ -56,7 +64,8 @@ export const Inventory2 = {
             }
         } else if (effect.type === 'heal_sp') {
             const oldSp = target.sp;
-            target.sp = Math.min(target.maxSp, target.sp + effect.value);
+            const healValue = Math.floor(effect.value * effectMultiplier);
+            target.sp = Math.min(target.maxSp, target.sp + healValue);
             const healed = target.sp - oldSp;
             if (healed > 0) {
                 success = true;

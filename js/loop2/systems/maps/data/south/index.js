@@ -1,4 +1,7 @@
 import { GameConfig } from '../../../../../constants.js';
+import { QuestSystem2 } from '../../../../quest.js';
+import { Party2 } from '../../../../party.js';
+import { Msg } from '../../../../../core/message.js';
 
 const T = GameConfig.TILE_TYPES;
 const W = 20;
@@ -29,12 +32,31 @@ const createMap = (areaName, baseTile) => {
         area: areaName,
         baseTile: baseTile,
         npcs: [
-            // Aldo (Swordsman)
-            { x: 8, y: 6, name: 'アルド', img: 'aldo', partyJoin: 'aldo' },
-            // Sophina (Forbidden Mage)
-            { x: 14, y: 12, name: 'ソフィーナ', img: 'sophina', partyJoin: 'sophina' },
-            // Kron (Time Mage)
-            { x: 16, y: 4, name: 'クロン', img: 'kron', partyJoin: 'kron' },
+            // Sophina & Kron Event
+            {
+                x: 14, y: 12, name: '怪しげな女', img: 'sophina',
+                blocking: true,
+                hideFlag: 'south_mage_event',
+                onInteract: () => {
+                    Msg.show('怪しげな女「ククク……そこの君、面白い魔力を秘めているわね。」\n眠そうな少年「……ふわぁ。この人から、複雑な未来が見えるよ。」', () => {
+                        Msg.show('勇者「お前たちは？」\n怪しげな女「私は禁術師ソフィーナ。こっちは時魔導士のクロンよ。君の横にいる『彼女』から、凄まじいものを感じるわ。」', () => {
+                            Msg.show('ルルシア「……！」\nソフィーナ「安心なさい、誰にも言わないわ。ただ私たちの研究対象として観察させてもらうわよ。」', () => {
+                                Msg.show('（ソフィーナとクロンが仲間になった！）', () => {
+                                    Party2.add('sophina');
+                                    Party2.add('kron');
+                                    QuestSystem2.set('south_mage_event');
+                                });
+                            });
+                        });
+                    });
+                }
+            },
+            {
+                x: 15, y: 12, name: '眠そうな少年', img: 'kron',
+                blocking: true,
+                hideFlag: 'south_mage_event',
+                msg: '「……おやすみ。」'
+            },
 
             // Area Boss
             {

@@ -98,6 +98,7 @@ export const Battle2 = {
         this.phase = 'wait_input'; this.nextPhase = 'command'; this.cur = 0;
         this.msg = `ボス：${this.enemies[0].name}が現れた！`;
         this.msgTimer = 0;
+        this.turnCount = 1;
         this.isBoss = true; this.enemyAttackCount = 0;
         this.active = true;
         if (WorldState) WorldState.changeState('battle'); // currentState = GameState.BATTLE;
@@ -111,6 +112,7 @@ export const Battle2 = {
         const name = this.enemies.length > 1 ? '魔物たち' : this.enemies[0].name;
         this.msg = `${name}が現れた！`;
         this.msgTimer = 0;
+        this.turnCount = 1;
         this.isBoss = false; this.enemyAttackCount = 0;
         this.currentArea = null;
         this.isTrueBoss = false;
@@ -575,6 +577,20 @@ export const Battle2 = {
             }
         });
 
+        // 先制行動の計算 (シェラのパッシブ)
+        let preemptiveBonus = 0;
+        if (this.turnCount === 1 && Party2.isMember('shera') && !this.isBoss) {
+            preemptiveBonus = 1000;
+        }
+
+        if (preemptiveBonus > 0) {
+            this.turnQueue.forEach(t => {
+                if (t.isPlayer || !t.isEnemy) {
+                    t.speed += preemptiveBonus;
+                }
+            });
+        }
+
         // 3. Add Enemy Actions (AI Decision)
         this.enemies.forEach(enemy => {
             if (enemy.hp > 0) {
@@ -617,6 +633,7 @@ export const Battle2 = {
             // End of Turn
             this.playerAction = null;
             this.partyCommands = [];
+            this.turnCount++;
             this.phase = 'wait_input';
             this.nextPhase = 'command';
             this.msg = ''; // Clear msg
@@ -691,32 +708,56 @@ export const Battle2 = {
             if (!target) {
                 msg = `${actor.name}は攻撃しようとしたが、敵がいなかった。`;
             } else {
-                const power = turn.action?.power || actor.atk; // Default or Skill Power
-                // If simple attack, use actor.atk. If skill, use power.
-                // Logic in handlePartyTargetInput set power manually.
-                // For Player, we just used 'attack'.
-                const finalPower = (turn.isPlayer) ? PlayerStats2.atk : (turn.action.power || actor.atk);
-
+                const finalPower = (turn.isPlayer) ? PlayerStats2.atk : (turn.action?.power || actor.atk);
                 const dmg = Math.floor(Math.max(1, finalPower - target.def + Math.random() * 2));
-                target.hp = Math.floor(target.hp - dmg);
+                target.hp = Math.max(0, target.hp - dmg);
                 msg = `${actor.name}の攻撃！${target.name}に${dmg}ダメージ！`;
                 FX.shake(100);
             }
         }
-        else if (type === 'magic') {
-            if (!target) {
-                msg = `${actor.name}は魔法を唱えたが、敵がいなかった。`;
+        else if (type === 'skill' || type === 'magic') {
+            const skillId = turn.action?.skillId || turn.skillId;
+            const skill = SkillData2[skillId];
+
+            if (!skill) {
+                msg = `${actor.name}はどうしていいか分からなかった。`;
+            } else if (actor.sp < skill.sp) {
+                msg = `${actor.name}は${skill.name}を使おうとしたがSPが足りない！`;
             } else {
-                // SP Check
-                if (actor.sp >= 5) {
-                    actor.sp -= 5;
-                    const power = turn.action?.power || actor.matk;
-                    const dmg = Math.max(1, power);
-                    target.hp -= dmg;
-                    msg = `${actor.name}のスキル攻撃！${target.name}に${dmg}ダメージ！`;
+                actor.sp -= skill.sp;
+
+                // Ally Targeting logic
+                let skillTarget = target;
+                if (skill.type === 'heal' || skill.target === 'self' || skill.target === 'party' || skill.type === 'buff') {
+                    let lowestHpAlly = Party2.members.reduce((prev, curr) => (curr.hp > 0 && curr.hp < prev.hp) ? curr : prev, actor);
+                    if (PlayerStats2.hp > 0 && PlayerStats2.hp < lowestHpAlly.hp) lowestHpAlly = PlayerStats2;
+                    skillTarget = lowestHpAlly;
+                }
+
+                if (skill.type === 'heal') {
+                    const healDmg = skill.power || 30;
+                    skillTarget.hp = Math.min(skillTarget.maxHp, skillTarget.hp + healDmg);
+                    msg = `${actor.name}は${skill.name}を唱えた！\n${skillTarget.name}のHPが${healDmg}回復！`;
                     FX.flash(100);
+                } else if (skill.type === 'buff') {
+                    msg = `${actor.name}は${skill.name}を使った！\n味方の力が上がった！`;
+                    FX.flash(100);
+                } else if (skill.type === 'debuff') {
+                    if (target) {
+                        msg = `${actor.name}は${skill.name}を使った！\n${target.name}の能力が下がった！`;
+                        FX.flash(100);
+                    } else {
+                        msg = `${actor.name}は${skill.name}を使ったが対象がいなかった。`;
+                    }
+                } else if (!target) {
+                    msg = `${actor.name}は${skill.name}を使おうとしたが対象がいなかった。`;
                 } else {
-                    msg = `${actor.name}はスキルを使おうとしたがSPが足りない！`;
+                    const baseStat = skill.type === 'magic' ? actor.matk : actor.atk;
+                    const power = Math.floor(baseStat * (skill.power || 1.0));
+                    const dmg = Math.max(1, power - target.def);
+                    target.hp = Math.max(0, target.hp - dmg);
+                    msg = `${actor.name}の${skill.name}！\n${target.name}に${dmg}ダメージ！`;
+                    FX.flash(100);
                 }
             }
         }
@@ -749,8 +790,19 @@ export const Battle2 = {
             return;
         }
 
-        const target = validTargets[Math.floor(Math.random() * validTargets.length)];
-        const dmg = Math.max(1, enemy.atk - target.stats.def);
+        // デコイ効果 (ガウェイン)
+        let targetPool = [...validTargets];
+        const gawain = validTargets.find(t => !t.isPlayer && t.stats.id === 'gawain');
+        if (gawain) {
+            // ガウェインが生きている場合、タゲられる確率を大幅に上げる(3回追加)
+            targetPool.push(gawain, gawain, gawain);
+        }
+
+        const target = targetPool[Math.floor(Math.random() * targetPool.length)];
+
+        // 防御パッシブ効果 (ガウェイン) - パーティ全体に防御力+5
+        let defBonus = Party2.isMember('gawain') ? 5 : 0;
+        const dmg = Math.max(1, enemy.atk - (target.stats.def + defBonus));
 
         let dead = false;
         if (target.isPlayer) {
@@ -813,10 +865,22 @@ export const Battle2 = {
             WorldState.world2.trueBosses[this.currentArea] = true;
             QuestSystem2.set(`${this.currentArea}_boss_defeated`);
 
+            if (this.currentArea === 'east') {
+                // Post-boss event: add string to msg buffer
+                this.msg += '\nルルシア「やりましたね！ 少しだけ…私の力が戻ってきた気がします！」\nルルシア「ふふっ、貴方と一緒なら安心ですね。」';
+            } else if (this.currentArea === 'west') {
+                this.msg += '\nルルシア「お怪我はありませんか？ 私が治しますね。」';
+            } else if (this.currentArea === 'south') {
+                this.msg += '\nルルシア「……すごい。貴方の魔剣、どんどん私の力と……いいえ、なんでもありません。」';
+            } else if (this.currentArea === 'north') {
+                this.msg += '\nルルシア「これで全ての結界が……！ さあ、魔王城へ向かいましょう！」';
+            }
+
             // 全ボス撃破チェック -> 魔王城解放
-            if (QuestSystem2.checkAllBossesDefeated()) {
+            if (QuestSystem2.checkAllBossesDefeated() && !QuestSystem2.has(StoryFlags.DEMON_CASTLE_OPEN)) {
                 QuestSystem2.set(StoryFlags.DEMON_CASTLE_OPEN);
-                Msg.show('世界中から禍々しい気配が消え、\n中央の城から強大な魔力が溢れ出した！');
+                this.msg += '\n\n世界中から禍々しい気配が消え、\n中央の城から強大な魔力が溢れ出した！';
+                this.msg += '\nルルシア「……ふふっ、長かったですがこれでようやく……\nさあ勇者様、魔王城へ急ぎましょう。」';
             }
         }
         if (this.isDemonKing) {
